@@ -18,6 +18,7 @@ package org.oscim.app;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.view.MapView;
+import org.oscim.view.MapViewPosition;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -39,9 +40,8 @@ public class LocationDialog {
 		editText.setText(Double.toString(mapCenter.getLongitude()));
 
 		SeekBar zoomlevel = (SeekBar) dialog.findViewById(R.id.zoomLevel);
-		zoomlevel.setMax(20); // FIXME
-								// map.getMapGenerator().getZoomLevelMax());
-		zoomlevel.setProgress(mapView.getMapPosition().getZoomLevel());
+		zoomlevel.setMax(MapViewPosition.MAX_ZOOMLEVEL);
+		zoomlevel.setProgress(mapView.getMapPosition().getMapPosition().zoomLevel);
 
 		final TextView textView = (TextView) dialog.findViewById(R.id.zoomlevelValue);
 		textView.setText(String.valueOf(zoomlevel.getProgress()));

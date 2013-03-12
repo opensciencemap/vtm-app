@@ -107,9 +107,9 @@ public class LocationHandler {
 		}
 
 		if (bestLocation != null) {
-			byte zoom = mTileMap.map.getMapPosition().getZoomLevel();
-			if (zoom < 12)
-				zoom = (byte) 12;
+			//byte zoom = mTileMap.map.getMapPosition().getZoomLevel();
+			//if (zoom < 12)
+			byte zoom = (byte) 12;
 
 			MapPosition mapPosition = new MapPosition(bestLocation.getLatitude(),
 					bestLocation.getLongitude(), zoom, 1, 0);

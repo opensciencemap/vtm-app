@@ -70,7 +70,7 @@ public abstract class InfoWindow {
 		mView.setDrawingCacheEnabled(true);
 		//		mLayout.setDrawingCacheEnabled(true);
 		//		mLayout.setPersistentDrawingCache(ViewGroup.PERSISTENT_ALL_CACHES);
-		//		mLayout.setAlwaysDrawnWithCacheEnabled(true); // call this method 
+		//		mLayout.setAlwaysDrawnWithCacheEnabled(true); // call this method
 		mLayout.setWillNotDraw(true);
 		mLayout.addView(mView);
 	}
@@ -108,8 +108,8 @@ public abstract class InfoWindow {
 		RelativeLayout.LayoutParams rlp = mLayoutPos;
 		rlp.leftMargin = x;
 		rlp.rightMargin = -x;
-		rlp.topMargin = -y;
-		rlp.bottomMargin = y + mMapView.getHeight() / 2;
+		rlp.topMargin = y;
+		rlp.bottomMargin =  mMapView.getHeight() / 2 - y;
 		mLayout.setLayoutParams(rlp);
 
 		//mMapView.requestLayout();
