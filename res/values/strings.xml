@@ -5,19 +5,21 @@
         <item>Default</item>
         <item>Tubes</item>
     </string-array>
-    <string-array name="preferences_map_generator_values">
 
+    <string-array name="preferences_map_generator_values">
         <!-- <item>Mapfile</item> -->
         <!-- <item>PostGIS</item> -->
         <item>OpenScienceMap</item>
         <item>OpenScienceMap2</item>
         <item>VectorTileServer</item>
         <item>Experimentation</item>
-        </string-array>
+    </string-array>
+
     <string-array name="preferences_scale_bar_unit_values">
         <item>Imperial</item>
         <item>Metric</item>
     </string-array>
+
     <string-array name="preferences_text_scale_values">
         <item>tiny</item>
         <item>small</item>
@@ -95,8 +97,8 @@
     <string name="preferences_fix_orientation">Fix screen orientation</string>
     <string name="preferences_fix_orientation_desc">Fix screen orientation</string>
     <string name="preferences_map">Map settings</string>
-    <string name="preferences_map_view_mode">Map mode</string>
-    <string name="preferences_map_view_mode_desc">Select the operating mode</string>
+    <string name="preferences_map_view_mode">Map source</string>
+    <string name="preferences_map_view_mode_desc">Select map data source</string>
     <string name="preferences_move_speed">Move speed</string>
     <string name="preferences_move_speed_desc">Adjust the move speed of the map</string>
     <string name="preferences_move_speed_value">%d %% move speed</string>
@@ -129,5 +131,6 @@
     <string name="departure">Departure</string>
     <string name="destination">Destination</string>
     <string name="viapoint">Via-Point</string>
+
 
 </resources>
