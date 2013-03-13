@@ -27,7 +27,6 @@ import android.content.Intent;
 import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -52,7 +51,7 @@ import android.widget.TextView;
  * @author M.Kergall
  */
 
-// TODO implement: 
+// TODO implement:
 // http://codehenge.net/blog/2011/06/android-development-tutorial-
 //        asynchronous-lazy-loading-and-caching-of-listview-images/
 
@@ -66,9 +65,6 @@ public class POIActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.items_list);
 
-		//		TextView title = (TextView) findViewById(R.id.title);
-		//		title.setText("Points of Interest");
-
 		ListView list = (ListView) findViewById(R.id.items);
 
 		Intent myIntent = getIntent();
@@ -81,7 +77,7 @@ public class POIActivity extends Activity {
 		list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View view, int position, long index) {
-				Log.d(App.TAG, "poi on click: " + position);
+				//Log.d(App.TAG, "poi on click: " + position);
 				Intent intent = new Intent();
 				intent.putExtra("ID", position);
 				setResult(RESULT_OK, intent);
@@ -89,20 +85,8 @@ public class POIActivity extends Activity {
 			}
 		});
 
-		//		list.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
-		//
-		//			@Override
-		//			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		//				// TODO Auto-generated method stub
-		//				Log.d(App.TAG, "context menu created 2");
-		//
-		//			}
-		//		});
-
 		list.setAdapter(adapter);
 		list.setSelection(currentNodeId);
-
-		//mAdapter.registerDataSetObserver(new POIObserver());
 
 		// POI search interface:
 		String[] poiTags = getResources().getStringArray(R.array.poi_tags);
@@ -127,7 +111,7 @@ public class POIActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				hideKeyboard();
-				App.poiSearch.getPOIAsync("flickr");
+				App.poiSearch.getPOIAsync(POISearch.TAG_FLICKR);
 			}
 		});
 
@@ -149,7 +133,7 @@ public class POIActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				hideKeyboard();
-				App.poiSearch.getPOIAsync("wikipedia");
+				App.poiSearch.getPOIAsync(POISearch.TAG_WIKIPEDIA);
 			}
 		});
 
@@ -158,7 +142,8 @@ public class POIActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				hideKeyboard();
-				App.poiSearch.getPOIAsync("foursquare" + poiTagText.getText().toString());
+				App.poiSearch.getPOIAsync(POISearch.TAG_FOURSQUARE
+						+ poiTagText.getText().toString());
 			}
 		});
 
@@ -185,7 +170,6 @@ public class POIActivity extends Activity {
 
 	@Override
 	protected void onNewIntent(Intent intent) {
-		Log.d(App.TAG, "NEW INTENT!!!!");
 		// from SearchableDictionary Example:
 		// Because this activity has set launchMode="singleTop", the system calls this method
 		// to deliver the intent if this activity is currently the foreground activity when
@@ -200,13 +184,13 @@ public class POIActivity extends Activity {
 		mAdapter.notifyDataSetChanged();
 	}
 
-	// http://www.mikeplate.com/2010/01/21/show-a-context-menu-for-long-clicks-in-an-android-listview/
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		if (v.getId() == R.id.items) {
-			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-			Log.d(App.TAG, "list context menu created " + info.position);
+			//AdapterView.AdapterContextMenuInfo info =
+			// (AdapterView.AdapterContextMenuInfo) menuInfo;
+			//Log.d(App.TAG, "list context menu created " + info.position);
 
 			MenuInflater inflater = getMenuInflater();
 			inflater.inflate(R.menu.poi_menu, menu);
@@ -219,12 +203,12 @@ public class POIActivity extends Activity {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		Log.d(App.TAG, "context menu item selected " + item.getItemId());
+		//Log.d(App.TAG, "context menu item selected " + item.getItemId());
 
 		if (item.getItemId() == R.id.menu_link) {
 
-			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
-					.getMenuInfo();
+			AdapterView.AdapterContextMenuInfo info =
+					(AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
 			POI poi = (POI) mAdapter.getItem(info.position);
 			if (poi == null || poi.url == null)
@@ -300,19 +284,10 @@ class POIAdapter extends BaseAdapter implements OnClickListener {
 			view.setTag(holder);
 		}
 
-		//		TextView tvTitle = (TextView) convertView.findViewById(R.id.title);
 		ViewHolder holder = (ViewHolder) view.getTag();
 
 		holder.title.setText((entry.url == null ? "" : "[link] ") + entry.type);
-		//		TextView tvDetails = (TextView) convertView.findViewById(R.id.details);
-
 		holder.details.setText(entry.description);
-
-		//		ImageView iv = (ImageView) convertView.findViewById(R.id.thumbnail);
-
-		//ivManeuver.setImageBitmap(entry.mThumbnail);
-		//		iv.getT
-		//		entry.fetchThumbnailOnThread(iv);
 
 		entry.fetchThumbnail(holder.thumbnail);
 
@@ -321,7 +296,6 @@ class POIAdapter extends BaseAdapter implements OnClickListener {
 
 	@Override
 	public void onClick(View arg0) {
-		Log.d(App.TAG, "click" + arg0.getId());
 		//nothing to do.
 	}
 
