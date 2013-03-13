@@ -174,7 +174,7 @@ public class GeocoderNominatim {
 				+ "&accept-language=" + mLocale.getLanguage()
 				+ "&addressdetails=1"
 				+ "&limit=" + maxResults
-				+ "&q=" + URLEncoder.encode(locationName);
+				+ "&q=" + URLEncoder.encode(locationName, "UTF-8");
 		if (lowerLeftLatitude != 0.0 && lowerLeftLongitude != 0.0) {
 			//viewbox = left, top, right, bottom:
 			url += "&viewbox=" + lowerLeftLongitude

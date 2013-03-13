@@ -42,7 +42,7 @@ public class FourSquareProvider {
 
 	protected String mApiKey;
 
-	//	private static HashMap<String, Bitmap> mIcons = 
+	//	private static HashMap<String, Bitmap> mIcons =
 	//			(HashMap<String,Bitmap>)Collections.synchronizedMap(new HashMap<String, Bitmap>());
 
 	/**
@@ -55,6 +55,7 @@ public class FourSquareProvider {
 	}
 
 	//"https://api.foursquare.com/v2/venues/search?v=20120321&intent=checkin&ll=53.06,8.8&client_id=ZUN4ZMNZUFT3Z5QQZNMQ3ACPL4OJMBFGO15TYX51D5MHCIL3&client_secret=X1RXCVF4VVSG1Y2FUDQJLKQUC1WF4XXKIMK2STXKACLPDGLY
+	@SuppressWarnings("deprecation")
 	private String getUrlInside(BoundingBox boundingBox, String query, int maxResults) {
 		StringBuffer url = new StringBuffer(
 				"https://api.foursquare.com/v2/venues/search?v=20120321"
