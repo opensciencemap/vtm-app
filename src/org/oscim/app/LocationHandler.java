@@ -61,6 +61,7 @@ public class LocationHandler {
 		});
 	}
 
+	@SuppressWarnings("deprecation")
 	boolean enableShowMyLocation(boolean centerAtFirstFix) {
 		Log.d("TileMap", "enableShowMyLocation " + mShowMyLocation);
 
