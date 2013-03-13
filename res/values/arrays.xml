@@ -3,15 +3,15 @@
 
     <string-array name="preferences_map_database_keys">
 
-        <!-- <item>MAP_READER</item> --> 
-        <!--  <item>POSTGIS_READER</item> -->
+        <!-- <item>MAP_READER</item> -->
+        <!-- <item>POSTGIS_READER</item> -->
         <item>PBMAP_READER</item>
-      	<item>OSCIMAP_READER</item>
-	      <item>TEST_READER</item>
-	      <item>OSCIMAP_READER_TEST</item>
-        </string-array>
+        <item>OSCIMAP_READER</item>
+        <item>TEST_READER</item>
+        <item>OSCIMAP_READER_TEST</item>
+    </string-array>
 
-    <string name="preferences_map_database_default">PBMAP_READER</string>
+    <string name="preferences_map_database_default">OSCIMAP_READER</string>
 
     <string-array name="preferences_scale_bar_unit_keys">
         <item>imperial</item>
@@ -37,9 +37,11 @@
         <item>etc</item>
     </string-array>
     <string-array name="preferences_map_theme_keys">
-        <item >OSMARENDER</item>
-        <item >TRONRENDER</item>
+        <item>OSMARENDER</item>
+        <item>TRONRENDER</item>
     </string-array>
+
     <string name="preferences_map_theme_default">OSMARENDER</string>
+
 
 </resources>
