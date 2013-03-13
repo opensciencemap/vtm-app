@@ -320,7 +320,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				int id = intent.getIntExtra("ID", 0);
 				Log.d(TAG, "result: POIS_REQUEST: " + id);
 
-				mPoiSearch.poiMarkers.showBubbleOnItem(id, map);
+				mPoiSearch.poiMarkers.showBubbleOnItem(id);
 
 				POI poi = mPoiSearch.getPOIs().get(id);
 

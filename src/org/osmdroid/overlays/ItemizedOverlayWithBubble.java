@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
+import org.oscim.core.PointF;
 import org.oscim.overlay.ItemizedIconOverlay;
 import org.oscim.overlay.OverlayItem;
 import org.oscim.view.MapView;
 import org.osmdroid.utils.BonusPackHelper;
 
 import android.content.Context;
-import android.graphics.Point;
 import android.util.Log;
 
 /**
@@ -52,17 +52,17 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 		return false;
 	}
 
-	private Point mTmpPoint = new Point();
+	private PointF mTmpPoint = new PointF();
 
 	@Override
 	public void onUpdate(MapPosition mapPosition, boolean changed) {
 		if (mBubble.isOpen()) {
 			GeoPoint gp = mItemWithBubble.getPoint();
 
-			Point p = mTmpPoint;
+			PointF p = mTmpPoint;
 			mMapView.getMapViewPosition().project(gp, p);
 
-			mBubble.position(p.x, p.y);
+			mBubble.position((int)p.x, (int)p.y);
 		}
 	}
 
@@ -98,7 +98,7 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 	}
 
 	void showBubble(int index) {
-		showBubbleOnItem(index, mMapView);
+		showBubbleOnItem(index);
 	}
 
 	/**
@@ -110,14 +110,16 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 	 * @param mapView
 	 *            ...
 	 */
-	public void showBubbleOnItem(final int index, final MapView mapView) {
+	@SuppressWarnings("unchecked")
+	public void showBubbleOnItem(final int index) {
 		ExtendedOverlayItem eItem = (ExtendedOverlayItem) (getItem(index));
 		mItemWithBubble = eItem;
 		if (eItem != null) {
-			eItem.showBubble(mBubble, mapView);
-			//			mMapView.getMapViewPosition().animateTo(eItem.mGeoPoint, 0);
+			eItem.showBubble(mBubble,mMapView);
 
-			mapView.redrawMap(true);
+			mMapView.getMapViewPosition().animateTo(eItem.mGeoPoint);
+
+			mMapView.redrawMap(true);
 			setFocus((Item) eItem);
 		}
 	}
@@ -129,8 +131,8 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 	}
 
 	@Override
-	protected boolean onSingleTapUpHelper(final int index, final Item item, final MapView mapView) {
-		showBubbleOnItem(index, mapView);
+	protected boolean onSingleTapUpHelper(final int index, final Item item) {
+		showBubbleOnItem(index);
 		return true;
 	}
 
