@@ -6,10 +6,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Road intersection, with instructions to continue.
+ * Route intersection, with instructions to continue.
  * @author M.Kergall
  */
-public class RoadNode implements Parcelable {
+public class RouteNode implements Parcelable {
 	/**
 	 * @see <a
 	 *      href="http://open.mapquestapi.com/guidance/#maneuvertypes">Maneuver
@@ -18,8 +18,8 @@ public class RoadNode implements Parcelable {
 	public int maneuverType;
 	/** textual information on what to do at this intersection */
 	public String instructions;
-	/** index in road links array - internal use only, for MapQuest directions */
-	public int nextRoadLink;
+	/** index in route links array - internal use only, for MapQuest directions */
+	public int nextRouteLink;
 	/** in km to the next node */
 	public double length;
 	/** in seconds to the next node */
@@ -27,9 +27,9 @@ public class RoadNode implements Parcelable {
 	/** position of the node */
 	public GeoPoint location;
 
-	public RoadNode() {
+	public RouteNode() {
 		maneuverType = 0;
-		nextRoadLink = -1;
+		nextRouteLink = -1;
 		length = duration = 0.0;
 	}
 
@@ -49,11 +49,11 @@ public class RoadNode implements Parcelable {
 		out.writeParcelable(location, 0);
 	}
 
-	public static final Parcelable.Creator<RoadNode> CREATOR = new
-			Parcelable.Creator<RoadNode>() {
+	public static final Parcelable.Creator<RouteNode> CREATOR = new
+			Parcelable.Creator<RouteNode>() {
 				@Override
-				public RoadNode createFromParcel(Parcel in) {
-					RoadNode rn = new RoadNode();
+				public RouteNode createFromParcel(Parcel in) {
+					RouteNode rn = new RouteNode();
 					rn.maneuverType = in.readInt();
 					rn.instructions = in.readString();
 					rn.length = in.readDouble();
@@ -63,8 +63,8 @@ public class RoadNode implements Parcelable {
 				}
 
 				@Override
-				public RoadNode[] newArray(int size) {
-					return new RoadNode[size];
+				public RouteNode[] newArray(int size) {
+					return new RouteNode[size];
 				}
 			};
 

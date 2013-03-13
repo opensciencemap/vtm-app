@@ -9,9 +9,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
-import org.osmdroid.routing.Road;
-import org.osmdroid.routing.RoadManager;
-import org.osmdroid.routing.RoadNode;
+import org.osmdroid.routing.Route;
+import org.osmdroid.routing.RouteProvider;
+import org.osmdroid.routing.RouteNode;
 import org.osmdroid.utils.BonusPackHelper;
 import org.osmdroid.utils.HttpConnection;
 import org.osmdroid.utils.PolylineEncoder;
@@ -27,7 +27,7 @@ import android.util.Log;
  * TODO: improve internationalization of instructions
  * @author M.Kergall
  */
-public class OSRMRoadManager extends RoadManager {
+public class OSRMRouteProvider extends RouteProvider {
 
 	static final String OSRM_SERVICE = "http://router.project-osrm.org/viaroute?";
 	//Note that the result of OSRM is quite close to Cloudmade NavEngine format:
@@ -64,9 +64,9 @@ public class OSRMRoadManager extends RoadManager {
 
 	//From: Project-OSRM-Web / WebContent / localization / OSRM.Locale.en.js
 	// driving directions
-	// %s: road name
+	// %s: route name
 	// %d: direction => removed
-	// <*>: will only be printed when there actually is a road name
+	// <*>: will only be printed when there actually is a route name
 	static final HashMap<String, HashMap<String, String>> DIRECTIONS;
 	static {
 		DIRECTIONS = new HashMap<String, HashMap<String, String>>();
@@ -145,10 +145,10 @@ public class OSRMRoadManager extends RoadManager {
 		directions.put("15", "Dotarłeś do celu podróży");
 	}
 
-	public OSRMRoadManager() {
+	public OSRMRouteProvider() {
 		super();
 		mServiceUrl = OSRM_SERVICE;
-		mUserAgent = BonusPackHelper.DEFAULT_USER_AGENT; //set user agent to the default one. 
+		mUserAgent = BonusPackHelper.DEFAULT_USER_AGENT; //set user agent to the default one.
 	}
 
 	/**
@@ -181,9 +181,9 @@ public class OSRMRoadManager extends RoadManager {
 	}
 
 	@Override
-	public Road getRoad(ArrayList<GeoPoint> waypoints) {
+	public Route getRoute(ArrayList<GeoPoint> waypoints) {
 		String url = getUrl(waypoints);
-		Log.d(BonusPackHelper.LOG_TAG, "OSRMRoadManager.getRoad:" + url);
+		Log.d(BonusPackHelper.LOG_TAG, "OSRMRouteManager.getRoute:" + url);
 
 		//String jString = BonusPackHelper.requestStringFromUrl(url);
 		HttpConnection connection = new HttpConnection();
@@ -193,63 +193,63 @@ public class OSRMRoadManager extends RoadManager {
 		connection.close();
 
 		if (jString == null) {
-			Log.e(BonusPackHelper.LOG_TAG, "OSRMRoadManager::getRoad: request failed.");
-			return new Road(waypoints);
+			Log.e(BonusPackHelper.LOG_TAG, "OSRMRouteManager::getRoute: request failed.");
+			return new Route(waypoints);
 		}
 		Locale l = Locale.getDefault();
 		HashMap<String, String> directions = DIRECTIONS.get(l.getLanguage());
 		if (directions == null)
 			directions = DIRECTIONS.get("en");
-		Road road = new Road();
+		Route route = new Route();
 		try {
 			JSONObject jObject = new JSONObject(jString);
 			String route_geometry = jObject.getString("route_geometry");
-			road.routeHigh = PolylineEncoder.decode(route_geometry, 10);
+			route.routeHigh = PolylineEncoder.decode(route_geometry, 10);
 			JSONArray jInstructions = jObject.getJSONArray("route_instructions");
 			int n = jInstructions.length();
-			RoadNode lastNode = null;
+			RouteNode lastNode = null;
 			for (int i = 0; i < n; i++) {
 				JSONArray jInstruction = jInstructions.getJSONArray(i);
-				RoadNode node = new RoadNode();
+				RouteNode node = new RouteNode();
 				int positionIndex = jInstruction.getInt(3);
-				node.location = road.routeHigh.get(positionIndex);
+				node.location = route.routeHigh.get(positionIndex);
 				node.length = jInstruction.getInt(2) / 1000.0;
 				node.duration = jInstruction.getInt(4); //Segment duration in seconds.
 				String direction = jInstruction.getString(0);
-				String roadName = jInstruction.getString(1);
-				if (lastNode != null && "1".equals(direction) && "".equals(roadName)) {
-					//node "Continue" with no road name is useless, don't add it
+				String routeName = jInstruction.getString(1);
+				if (lastNode != null && "1".equals(direction) && "".equals(routeName)) {
+					//node "Continue" with no route name is useless, don't add it
 					lastNode.length += node.length;
 					lastNode.duration += node.duration;
 				} else {
 					node.maneuverType = getManeuverCode(direction);
-					node.instructions = buildInstructions(direction, roadName, directions);
+					node.instructions = buildInstructions(direction, routeName, directions);
 					//Log.d(BonusPackHelper.LOG_TAG, direction+"=>"+node.mManeuverType+"; "+node.mInstructions);
-					road.nodes.add(node);
+					route.nodes.add(node);
 					lastNode = node;
 				}
 			}
 			JSONObject jSummary = jObject.getJSONObject("route_summary");
-			road.length = jSummary.getInt("total_distance") / 1000.0;
-			road.duration = jSummary.getInt("total_time");
+			route.length = jSummary.getInt("total_distance") / 1000.0;
+			route.duration = jSummary.getInt("total_time");
 		} catch (JSONException e) {
 			e.printStackTrace();
-			return new Road(waypoints);
+			return new Route(waypoints);
 		}
-		if (road.routeHigh.size() == 0) {
-			//Create default road:
-			road = new Road(waypoints);
+		if (route.routeHigh.size() == 0) {
+			//Create default route:
+			route = new Route(waypoints);
 		} else {
-			road.buildLegs(waypoints);
-			BoundingBox bb = BoundingBox.fromGeoPoints(road.routeHigh);
+			route.buildLegs(waypoints);
+			BoundingBox bb = BoundingBox.fromGeoPoints(route.routeHigh);
 			//Correcting osmdroid bug #359:
-			road.boundingBox = bb;
+			route.boundingBox = bb;
 			//	new BoundingBox(
 			//	bb.getLatSouthE6(), bb.getLonWestE6(), bb.getLatNorthE6(), bb.getLonEastE6());
-			road.status = Road.STATUS_OK;
+			route.status = Route.STATUS_OK;
 		}
-		Log.d(BonusPackHelper.LOG_TAG, "OSRMRoadManager.getRoad - finished");
-		return road;
+		Log.d(BonusPackHelper.LOG_TAG, "OSRMRouteManager.getRoute - finished");
+		return route;
 	}
 
 	protected int getManeuverCode(String direction) {
@@ -260,7 +260,7 @@ public class OSRMRoadManager extends RoadManager {
 		return 0;
 	}
 
-	protected String buildInstructions(String direction, String roadName,
+	protected String buildInstructions(String direction, String routeName,
 			HashMap<String, String> directions) {
 		if (directions == null)
 			return null;
@@ -268,13 +268,13 @@ public class OSRMRoadManager extends RoadManager {
 		if (direction == null)
 			return null;
 		String instructions = null;
-		if (roadName.equals(""))
+		if (routeName.equals(""))
 			//remove "<*>"
 			instructions = direction.replaceFirst("<[^>]*>", "");
 		else {
 			direction = direction.replace('<', ' ');
 			direction = direction.replace('>', ' ');
-			instructions = String.format(direction, roadName);
+			instructions = String.format(direction, routeName);
 		}
 		return instructions;
 	}

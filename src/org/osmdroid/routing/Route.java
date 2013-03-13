@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
-import org.osmdroid.routing.provider.GoogleRoadManager;
-import org.osmdroid.routing.provider.MapQuestRoadManager;
-import org.osmdroid.routing.provider.OSRMRoadManager;
+import org.osmdroid.routing.provider.GoogleRouteProvider;
+import org.osmdroid.routing.provider.MapQuestRouteProvider;
+import org.osmdroid.routing.provider.OSRMRouteProvider;
 import org.osmdroid.utils.BonusPackHelper;
 import org.osmdroid.utils.DouglasPeuckerReducer;
 
@@ -17,12 +17,12 @@ import android.util.Log;
 /**
  * describes the way to go from a position to an other. Normally returned by a
  * call to a Directions API (from MapQuest, GoogleMaps or other)
- * @see MapQuestRoadManager
- * @see GoogleRoadManager
- * @see OSRMRoadManager
+ * @see MapQuestRouteProvider
+ * @see GoogleRouteProvider
+ * @see OSRMRouteProvider
  * @author M.Kergall
  */
-public class Road implements Parcelable {
+public class Route implements Parcelable {
 	/**
 	 * @see #STATUS_INVALID STATUS_INVALID
 	 * @see #STATUS_OK STATUS_OK
@@ -34,24 +34,24 @@ public class Road implements Parcelable {
 	public double length;
 	/** duration of the whole trip in sec. */
 	public double duration;
-	public ArrayList<RoadNode> nodes;
+	public ArrayList<RouteNode> nodes;
 	/** */
 	/** there is one leg between each waypoint */
-	public ArrayList<RoadLeg> legs;
+	public ArrayList<RouteLeg> legs;
 	/** full shape: polyline, as an array of GeoPoints */
 	public ArrayList<GeoPoint> routeHigh;
 	/** the same, in low resolution (less points) */
 	private ArrayList<GeoPoint> routeLow;
-	/** road bounding box */
+	/** route bounding box */
 	public BoundingBox boundingBox;
 
-	/** STATUS_INVALID = road not built */
+	/** STATUS_INVALID = route not built */
 	public static final int STATUS_INVALID = 0;
-	/** STATUS_OK = road properly retrieved and built */
+	/** STATUS_OK = route properly retrieved and built */
 	public static final int STATUS_OK = 1;
 	/**
 	 * STATUS_DEFAULT = any issue (technical issue, or no possible route) led to
-	 * build a default road
+	 * build a default route
 	 */
 	public static final int STATUS_DEFAULT = 2;
 
@@ -59,25 +59,25 @@ public class Road implements Parcelable {
 		status = STATUS_INVALID;
 		length = 0.0;
 		duration = 0.0;
-		nodes = new ArrayList<RoadNode>();
+		nodes = new ArrayList<RouteNode>();
 		routeHigh = new ArrayList<GeoPoint>();
 		routeLow = null;
-		legs = new ArrayList<RoadLeg>();
+		legs = new ArrayList<RouteLeg>();
 		boundingBox = null;
 	}
 
-	public Road() {
+	public Route() {
 		init();
 	}
 
 	/**
-	 * default constructor when normal loading failed: the road shape only
+	 * default constructor when normal loading failed: the route shape only
 	 * contains the waypoints; All distances and times are at 0; there is no
 	 * node; status equals DEFAULT.
 	 * @param waypoints
 	 *            ...
 	 */
-	public Road(ArrayList<GeoPoint> waypoints) {
+	public Route(ArrayList<GeoPoint> waypoints) {
 		init();
 		int n = waypoints.size();
 		for (int i = 0; i < n; i++) {
@@ -85,7 +85,7 @@ public class Road implements Parcelable {
 			routeHigh.add(p);
 		}
 		for (int i = 0; i < n - 1; i++) {
-			RoadLeg leg = new RoadLeg(/* i, i+1, mLinks */);
+			RouteLeg leg = new RouteLeg(/* i, i+1, mLinks */);
 			legs.add(leg);
 		}
 		boundingBox = BoundingBox.fromGeoPoints(routeHigh);
@@ -93,7 +93,7 @@ public class Road implements Parcelable {
 	}
 
 	/**
-	 * @return the road shape in "low resolution" = simplified by around 10
+	 * @return the route shape in "low resolution" = simplified by around 10
 	 *         factor.
 	 */
 	public ArrayList<GeoPoint> getRouteLow() {
@@ -101,7 +101,7 @@ public class Road implements Parcelable {
 			// Simplify the route (divide number of points by around 10):
 			int n = routeHigh.size();
 			routeLow = DouglasPeuckerReducer.reduceWithTolerance(routeHigh, 1500.0);
-			Log.d(BonusPackHelper.LOG_TAG, "Road reduced from " + n + " to " + routeLow.size()
+			Log.d(BonusPackHelper.LOG_TAG, "route reduced from " + n + " to " + routeLow.size()
 					+ " points");
 		}
 		return routeLow;
@@ -144,10 +144,10 @@ public class Road implements Parcelable {
 	}
 
 	/**
-	 * @return length and duration of the whole road, or of a leg of the road,
+	 * @return length and duration of the whole route, or of a leg of the route,
 	 *         as a String, in a readable format.
 	 * @param leg
-	 *            leg index, starting from 0. -1 for the whole road
+	 *            leg index, starting from 0. -1 for the whole route
 	 */
 	public String getLengthDurationText(int leg) {
 		double len = (leg == -1 ? this.length : legs.get(leg).length);
@@ -163,7 +163,7 @@ public class Road implements Parcelable {
 
 	/**
 	 * As MapQuest and OSRM doesn't provide legs information, we have to rebuild
-	 * it, using the waypoints and the road nodes. <br>
+	 * it, using the waypoints and the route nodes. <br>
 	 * Note that MapQuest legs fit well with waypoints, as there is a
 	 * "dedicated" node for each waypoint. But OSRM legs are not precise, as
 	 * there is no node "dedicated" to waypoints.
@@ -171,7 +171,7 @@ public class Road implements Parcelable {
 	 *            ...
 	 */
 	public void buildLegs(ArrayList<GeoPoint> waypoints) {
-		legs = new ArrayList<RoadLeg>();
+		legs = new ArrayList<RouteLeg>();
 		int firstNodeIndex = 0;
 		// For all intermediate waypoints, search the node closest to the
 		// waypoint
@@ -182,20 +182,20 @@ public class Road implements Parcelable {
 			double distanceMin = -1.0;
 			int nodeIndexMin = -1;
 			for (int j = firstNodeIndex; j < n; j++) {
-				GeoPoint roadPoint = nodes.get(j).location;
-				double dSquared = distanceLLSquared(roadPoint, waypoint);
+				GeoPoint routePoint = nodes.get(j).location;
+				double dSquared = distanceLLSquared(routePoint, waypoint);
 				if (nodeIndexMin == -1 || dSquared < distanceMin) {
 					distanceMin = dSquared;
 					nodeIndexMin = j;
 				}
 			}
 			// Build the leg as ending with this closest node:
-			RoadLeg leg = new RoadLeg(firstNodeIndex, nodeIndexMin, nodes);
+			RouteLeg leg = new RouteLeg(firstNodeIndex, nodeIndexMin, nodes);
 			legs.add(leg);
 			firstNodeIndex = nodeIndexMin + 1; // restart next leg from end
 		}
 		// Build last leg ending with last node:
-		RoadLeg lastLeg = new RoadLeg(firstNodeIndex, n - 1, nodes);
+		RouteLeg lastLeg = new RouteLeg(firstNodeIndex, n - 1, nodes);
 		legs.add(lastLeg);
 	}
 
@@ -217,26 +217,26 @@ public class Road implements Parcelable {
 		out.writeParcelable(boundingBox, 0);
 	}
 
-	public static final Parcelable.Creator<Road> CREATOR = new Parcelable.Creator<Road>() {
+	public static final Parcelable.Creator<Route> CREATOR = new Parcelable.Creator<Route>() {
 		@Override
-		public Road createFromParcel(Parcel source) {
-			return new Road(source);
+		public Route createFromParcel(Parcel source) {
+			return new Route(source);
 		}
 
 		@Override
-		public Road[] newArray(int size) {
-			return new Road[size];
+		public Route[] newArray(int size) {
+			return new Route[size];
 		}
 	};
 
 	@SuppressWarnings("unchecked")
-	private Road(Parcel in) {
+	private Route(Parcel in) {
 		status = in.readInt();
 		length = in.readDouble();
 		duration = in.readDouble();
 
-		nodes = in.readArrayList(RoadNode.class.getClassLoader());
-		legs = in.readArrayList(RoadLeg.class.getClassLoader());
+		nodes = in.readArrayList(RouteNode.class.getClassLoader());
+		legs = in.readArrayList(RouteLeg.class.getClassLoader());
 		routeHigh = in.readArrayList(GeoPoint.class.getClassLoader());
 		boundingBox = in.readParcelable(BoundingBox.class.getClassLoader());
 	}
