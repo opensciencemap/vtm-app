@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import org.oscim.app.filepicker.FilePicker;
 import org.oscim.app.preferences.EditPreferences;
 import org.oscim.core.GeoPoint;
+import org.oscim.core.MapPosition;
 import org.oscim.database.MapDatabases;
 import org.oscim.database.MapOptions;
 import org.oscim.theme.InternalRenderTheme;
@@ -40,7 +41,6 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -156,11 +156,11 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				options.put("url",
 						"http://city.informatik.uni-bremen.de:8000/");
 				break;
-			//case OSCIMAP_READER_TEST:
-			//	options = new MapOptions(MapDatabases.OSCIMAP_READER);
-			//	options.put("url",
-			//		"http://city.informatik.uni-bremen.de:80/osci/map3/");
-			//break;
+			case MAP_READER:
+				options = new MapOptions(mapDatabaseNew);
+				options.put("file",
+						"/storage/sdcard0/Download/berlin.map");
+				break;
 			default:
 				break;
 			}
@@ -176,7 +176,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		Uri uri = intent.getData();
 		if (uri != null) {
 			String scheme = uri.getSchemeSpecificPart();
-			Log.d(TAG, "got new intent >>> " + (scheme == null ? "" : scheme));
+			Log.d(TAG, "got intent: " + (scheme == null ? "" : scheme));
 		}
 	}
 
@@ -245,6 +245,12 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			showDialog(DIALOG_ENTER_COORDINATES);
 			return true;
 
+		case R.id.menu_position_map_center:
+			MapPosition mapCenter = map.getMapFileCenter();
+			if (mapCenter != null)
+				map.setMapCenter(mapCenter);
+			return true;
+
 		case R.id.menu_preferences:
 			startActivity(new Intent(this, EditPreferences.class));
 			return true;
@@ -279,14 +285,13 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				R.id.menu_position_my_location_disable,
 				!mLocation.isShowMyLocationEnabled());
 
-		// if (mMapDatabase == MapDatabases.MAP_READER) {
-		// menu.findItem(R.id.menu_mapfile).setVisible(true);
-		// menu.findItem(R.id.menu_position_map_center).setVisible(true);
-		// }
-		// else {
-		// menu.findItem(R.id.menu_mapfile).setVisible(false);
-		// menu.findItem(R.id.menu_position_map_center).setVisible(false);
-		// }
+		if (mMapDatabase == MapDatabases.MAP_READER) {
+			//menu.findItem(R.id.menu_mapfile).setVisible(true);
+			menu.findItem(R.id.menu_position_map_center).setVisible(true);
+		} else {
+			//menu.findItem(R.id.menu_mapfile).setVisible(false);
+			menu.findItem(R.id.menu_position_map_center).setVisible(false);
+		}
 
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -432,15 +437,6 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-		// MapScaleBar mapScaleBar = mapView.getMapScaleBar();
-		// mapScaleBar.setShowMapScaleBar(preferences.getBoolean("showScaleBar",
-		// false));
-		// String scaleBarUnitDefault =
-		// getString(R.string.preferences_scale_bar_unit_default);
-		// String scaleBarUnit = preferences.getString("scaleBarUnit",
-		// scaleBarUnitDefault);
-		// mapScaleBar.setImperialUnits(scaleBarUnit.equals("imperial"));
-
 		if (preferences.contains("mapDatabase")) {
 			setMapDatabase(preferences);
 		}
@@ -458,14 +454,6 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			else
 				map.setRenderTheme(theme);
 		}
-		// try {
-		// String textScaleDefault =
-		// getString(R.string.preferences_text_scale_default);
-		// map.setTextScale(Float.parseFloat(preferences.getString("textScale",
-		// textScaleDefault)));
-		// } catch (NumberFormatException e) {
-		// map.setTextScale(1);
-		// }
 
 		if (preferences.getBoolean("fullscreen", false)) {
 			Log.i("mapviewer", "FULLSCREEN");
@@ -482,6 +470,24 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			// getWindow().getWindowManager().getDefaultDisplay().getRotation());
 			// getWindow().getWindowManager().getDefaultDisplay().getOrientation());
 		}
+
+		// try {
+		// String textScaleDefault =
+		// getString(R.string.preferences_text_scale_default);
+		// map.setTextScale(Float.parseFloat(preferences.getString("textScale",
+		// textScaleDefault)));
+		// } catch (NumberFormatException e) {
+		// map.setTextScale(1);
+		// }
+
+		// MapScaleBar mapScaleBar = mapView.getMapScaleBar();
+		// mapScaleBar.setShowMapScaleBar(preferences.getBoolean("showScaleBar",
+		// false));
+		// String scaleBarUnitDefault =
+		// getString(R.string.preferences_scale_bar_unit_default);
+		// String scaleBarUnit = preferences.getString("scaleBarUnit",
+		// scaleBarUnitDefault);
+		// mapScaleBar.setImperialUnits(scaleBarUnit.equals("imperial"));
 
 		//if (preferences.getBoolean("wakeLock", false) && !mWakeLock.isHeld()) {
 		//	mWakeLock.acquire();
@@ -548,6 +554,12 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.map_menu, menu);
+
+		if (mPoiSearch.getPOIs().isEmpty())
+			menu.removeItem(R.id.menu_clear_poi);
+
+		if (mRouteSearch.isEmpty())
+			menu.removeItem(R.id.menu_clear_route);
 	}
 
 	@Override

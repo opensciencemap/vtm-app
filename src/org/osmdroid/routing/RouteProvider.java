@@ -49,6 +49,15 @@ public abstract class RouteProvider {
 		return result.toString();
 	}
 
+	public static void buildRouteOverlay(PathOverlay routeOverlay, Route route) {
+		if (route != null) {
+			ArrayList<GeoPoint> polyline = route.routeHigh;
+			for (GeoPoint p : polyline) {
+				routeOverlay.addPoint(p);
+			}
+		}
+	}
+
 	public static PathOverlay buildRouteOverlay(MapView mapView, Route route, Paint paint) {
 		PathOverlay routeOverlay = new PathOverlay(mapView, 0);
 		routeOverlay.setPaint(paint);

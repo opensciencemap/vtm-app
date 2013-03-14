@@ -315,6 +315,13 @@ public class POISearch {
 			intent.putExtra("ID", poiMarkers.getBubbledItemId());
 			tileMap.startActivityForResult(intent, TileMap.POIS_REQUEST);
 			return true;
+
+		case R.id.menu_clear_poi:
+			poiMarkers.removeAllItems();
+			mPOIs.clear();
+			App.map.redrawMap(true);
+
+			return true;
 		default:
 		}
 		return false;
@@ -322,3 +329,5 @@ public class POISearch {
 	}
 
 }
+
+
