@@ -30,6 +30,12 @@ public class EditPreferences extends PreferenceActivity {
 		addPreferencesFromResource(R.xml.preferences);
 	}
 
+	@Override
+	public void finish(){
+		super.finish();
+		overridePendingTransition(R.anim.slide_left, R.anim.slide_right2);
+	}
+
 	// @TargetApi(11)
 	@Override
 	protected void onResume() {

@@ -56,31 +56,27 @@ public class RouteSearch {
 	protected static int START_INDEX = -2, DEST_INDEX = -1;
 	protected ExtendedOverlayItem markerStart, markerDestination;
 
-	private final TileMap tileMap;
-
-	RouteSearch(TileMap tileMap) {
-
-		this.tileMap = tileMap;
+	RouteSearch() {
 		mViaPoints = new ArrayList<GeoPoint>();
 
 		// Itinerary markers:
 		ArrayList<ExtendedOverlayItem> waypointsItems = new ArrayList<ExtendedOverlayItem>();
-		mItineraryMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(tileMap.map,
-				tileMap, waypointsItems, new ViaPointInfoWindow(R.layout.itinerary_bubble,
-						tileMap.map));
+		mItineraryMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map,
+				App.activity, waypointsItems, new ViaPointInfoWindow(R.layout.itinerary_bubble,
+						App.map));
 
 		updateIternaryMarkers();
 
 		//Route and Directions
 		ArrayList<ExtendedOverlayItem> routeItems = new ArrayList<ExtendedOverlayItem>();
-		mRouteMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(tileMap, routeItems,
-				tileMap.map);
+		mRouteMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.activity, routeItems,
+				App.map);
 
-		mRouteOverlay = new PathOverlay(tileMap.map, Color.RED);
+		mRouteOverlay = new PathOverlay(App.map, Color.RED);
 
-		tileMap.map.getOverlays().add(mRouteOverlay);
-		tileMap.map.getOverlays().add(mRouteMarkers);
-		tileMap.map.getOverlays().add(mItineraryMarkers);
+		App.map.getOverlays().add(mRouteOverlay);
+		App.map.getOverlays().add(mRouteMarkers);
+		App.map.getOverlays().add(mItineraryMarkers);
 	}
 
 	/**
@@ -90,7 +86,7 @@ public class RouteSearch {
 	 * @return ...
 	 */
 	public String getAddress(GeoPoint p) {
-		GeocoderNominatim geocoder = new GeocoderNominatim(tileMap);
+		GeocoderNominatim geocoder = new GeocoderNominatim(App.activity);
 		String theAddress;
 		try {
 			double dLatitude = p.getLatitude();
@@ -158,7 +154,7 @@ public class RouteSearch {
 
 		mItineraryMarkers.addItem(overlayItem);
 
-		tileMap.map.redrawMap(true);
+		App.map.redrawMap(true);
 
 		//Start geocoding task to update the description of the marker with its address:
 		new GeocodingTask().execute(overlayItem);
@@ -239,14 +235,14 @@ public class RouteSearch {
 			return;
 
 		if (route.status == Route.STATUS_DEFAULT)
-			Toast.makeText(tileMap, "We have a problem to get the route",
+			Toast.makeText(App.map.getContext(), "We have a problem to get the route",
 					Toast.LENGTH_SHORT).show();
 
 		RouteProvider.buildRouteOverlay(mRouteOverlay, route);
 
 		putRouteNodes(route);
 
-		tileMap.map.redrawMap(true);
+		App.map.redrawMap(true);
 	}
 
 
@@ -260,7 +256,7 @@ public class RouteSearch {
 		mDestinationPoint = null;
 		mViaPoints.clear();
 
-		tileMap.map.redrawMap(true);
+		App.map.redrawMap(true);
 	}
 
 	/**

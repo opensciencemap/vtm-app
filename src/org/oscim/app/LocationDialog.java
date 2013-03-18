@@ -81,7 +81,7 @@ public class LocationDialog {
 						MapPosition mapPosition = new MapPosition(latitude,
 								longitude, zoom, 1, 0);
 
-						map.map.setMapCenter(mapPosition);
+						App.map.setMapCenter(mapPosition);
 					}
 				});
 		builder.setNegativeButton(R.string.cancel, null);

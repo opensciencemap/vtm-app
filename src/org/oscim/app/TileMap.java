@@ -56,7 +56,7 @@ import android.widget.Toast;
 public class TileMap extends MapActivity implements MapEventsReceiver {
 	static final String TAG = TileMap.class.getSimpleName();
 
-	MapView map;
+	//MapView mMapView;
 
 	private static final String BUNDLE_SHOW_MY_LOCATION = "showMyLocation";
 	private static final String BUNDLE_SNAP_TO_LOCATION = "snapToLocation";
@@ -83,15 +83,15 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		setContentView(R.layout.activity_tilemap);
-		map = (MapView) findViewById(R.id.mapView);
+		mMapView = (MapView) findViewById(R.id.mapView);
 
 		setMapDatabase(preferences);
 
-		App.map = map;
-		App.mainActivity = this;
+		App.map = mMapView;
+		App.activity = this;
 
-		map.setClickable(true);
-		map.setFocusable(true);
+		mMapView.setClickable(true);
+		mMapView.setFocusable(true);
 
 		mLocation = new LocationHandler(this);
 
@@ -104,13 +104,13 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				savedInstanceState.getBoolean(BUNDLE_SNAP_TO_LOCATION))
 			mLocation.enableSnapToLocation(false);
 
-		MapEventsOverlay overlay = new MapEventsOverlay(map, this);
-		map.getOverlays().add(overlay);
+		MapEventsOverlay overlay = new MapEventsOverlay(mMapView, this);
+		mMapView.getOverlays().add(overlay);
 
-		App.poiSearch = mPoiSearch = new POISearch(this);
+		App.poiSearch = mPoiSearch = new POISearch();
 
-		registerForContextMenu(map);
-		mRouteSearch = new RouteSearch(this);
+		registerForContextMenu(mMapView);
+		mRouteSearch = new RouteSearch();
 
 		//map.getOverlays().add(new AreaSelectionOverlay(map));
 
@@ -165,7 +165,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				break;
 			}
 
-			map.setMapDatabase(options);
+			mMapView.setMapDatabase(options);
 			mMapDatabase = mapDatabaseNew;
 		}
 	}
@@ -203,10 +203,10 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		case R.id.menu_rotation_enable:
 			if (!item.isChecked()) {
 				item.setChecked(true);
-				map.enableRotation(true);
+				mMapView.enableRotation(true);
 			} else {
 				item.setChecked(false);
-				map.enableRotation(false);
+				mMapView.enableRotation(false);
 			}
 			toggleMenuCheck();
 			return true;
@@ -219,10 +219,10 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		case R.id.menu_compass_enable:
 			if (!item.isChecked()) {
 				item.setChecked(true);
-				map.enableCompass(true);
+				mMapView.enableCompass(true);
 			} else {
 				item.setChecked(false);
-				map.enableCompass(false);
+				mMapView.enableCompass(false);
 			}
 			toggleMenuCheck();
 			return true;
@@ -246,13 +246,14 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			return true;
 
 		case R.id.menu_position_map_center:
-			MapPosition mapCenter = map.getMapFileCenter();
+			MapPosition mapCenter = mMapView.getMapFileCenter();
 			if (mapCenter != null)
-				map.setMapCenter(mapCenter);
+				mMapView.setMapCenter(mapCenter);
 			return true;
 
 		case R.id.menu_preferences:
 			startActivity(new Intent(this, EditPreferences.class));
+			overridePendingTransition(R.anim.slide_right, R.anim.slide_left2);
 			return true;
 
 		default:
@@ -261,8 +262,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	}
 
 	private void toggleMenuCheck() {
-		mMenu.findItem(R.id.menu_rotation_enable).setChecked(map.getRotationEnabled());
-		mMenu.findItem(R.id.menu_compass_enable).setChecked(map.getCompassEnabled());
+		mMenu.findItem(R.id.menu_rotation_enable).setChecked(mMapView.getRotationEnabled());
+		mMenu.findItem(R.id.menu_compass_enable).setChecked(mMapView.getCompassEnabled());
 	}
 
 	private static void toggleMenuItem(Menu menu, int id, int id2, boolean enable) {
@@ -299,7 +300,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	@Override
 	public boolean onTrackballEvent(MotionEvent event) {
 		// forward the event to the MapView
-		return map.onTrackballEvent(event);
+		return mMapView.onTrackballEvent(event);
 	}
 
 	// private void startMapFilePicker() {
@@ -330,16 +331,16 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				POI poi = mPoiSearch.getPOIs().get(id);
 
 				if (poi.bbox != null)
-					map.getMapViewPosition().animateTo(poi.bbox);
+					mMapView.getMapViewPosition().animateTo(poi.bbox);
 				else
-					map.getMapViewPosition().animateTo(poi.location);
+					mMapView.getMapViewPosition().animateTo(poi.location);
 			}
 			break;
 		case SELECT_RENDER_THEME_FILE:
 			if (resultCode == RESULT_OK && intent != null
 					&& intent.getStringExtra(FilePicker.SELECTED_FILE) != null) {
 				try {
-					map.setRenderTheme(intent
+					mMapView.setRenderTheme(intent
 							.getStringExtra(FilePicker.SELECTED_FILE));
 				} catch (FileNotFoundException e) {
 					showToastOnUiThread(e.getLocalizedMessage());
@@ -424,7 +425,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	protected void onPrepareDialog(int id, final Dialog dialog) {
 		if (id == DIALOG_ENTER_COORDINATES) {
 
-			mLocationDialog.prepareDialog(map, dialog);
+			mLocationDialog.prepareDialog(mMapView, dialog);
 
 		} else {
 			super.onPrepareDialog(id, dialog);
@@ -450,9 +451,9 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			} catch (IllegalArgumentException e) {
 			}
 			if (theme == null)
-				map.setRenderTheme(InternalRenderTheme.DEFAULT);
+				mMapView.setRenderTheme(InternalRenderTheme.DEFAULT);
 			else
-				map.setRenderTheme(theme);
+				mMapView.setRenderTheme(theme);
 		}
 
 		if (preferences.getBoolean("fullscreen", false)) {
@@ -499,7 +500,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		boolean drawUnmatchedWays = preferences.getBoolean("drawUnmatchedWays", false);
 		boolean debugLabels = preferences.getBoolean("debugLabels", false);
 
-		DebugSettings cur = map.getDebugSettings();
+		DebugSettings cur = mMapView.getDebugSettings();
 		if (cur.disablePolygons != disablePolygons
 				|| cur.drawTileCoordinates != drawTileCoordinates
 				|| cur.drawTileFrames != drawTileFrames
@@ -509,10 +510,10 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			DebugSettings debugSettings = new DebugSettings(drawTileCoordinates,
 					drawTileFrames, disablePolygons, drawUnmatchedWays, debugLabels);
 
-			map.setDebugSettings(debugSettings);
+			mMapView.setDebugSettings(debugSettings);
 		}
 
-		map.redrawMap(false);
+		mMapView.redrawMap(false);
 	}
 
 	@Override
@@ -588,7 +589,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	public boolean longPressHelper(GeoPoint p) {
 		mRouteSearch.longPress(p);
 
-		openContextMenu(map);
+		openContextMenu(mMapView);
 
 		return true;
 	}

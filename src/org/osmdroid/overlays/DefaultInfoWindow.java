@@ -4,6 +4,7 @@ import org.oscim.view.MapView;
 import org.osmdroid.utils.BonusPackHelper;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
@@ -24,15 +25,12 @@ public class DefaultInfoWindow extends InfoWindow {
 	private static void setResIds(Context context) {
 		// get application package name
 		String packageName = context.getPackageName();
-		mTitleId = context.getResources().getIdentifier("id/bubble_title", null, packageName);
+		Resources res = context.getResources();
 
-		mDescriptionId = context.getResources().getIdentifier("id/bubble_description", null,
-				packageName);
-
-		mSubDescriptionId = context.getResources().getIdentifier("id/bubble_subdescription", null,
-				packageName);
-
-		mImageId = context.getResources().getIdentifier("id/bubble_image", null, packageName);
+		mTitleId = res.getIdentifier("id/bubble_title", null, packageName);
+		mDescriptionId = res.getIdentifier("id/bubble_description", null, packageName);
+		mSubDescriptionId = res.getIdentifier("id/bubble_subdescription", null, packageName);
+		mImageId = res.getIdentifier("id/bubble_image", null, packageName);
 
 		if (mTitleId == 0 || mDescriptionId == 0) {
 			Log.e(BonusPackHelper.LOG_TAG, "DefaultInfoWindow: unable to get res ids in "

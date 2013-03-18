@@ -80,9 +80,7 @@ public class POIOverlay extends ItemizedOverlayWithBubble<ExtendedOverlayItem> {
 			BoundingBox bb = mMapView.getBoundingBox();
 
 			if (mBoundingBox == null || !mBoundingBox.equals(bb)) {
-				//				synchronized (mBoundingBox) {
 				mBoundingBox = bb;
-				//				}
 
 				// check bounding box
 				Log.d(BonusPackHelper.LOG_TAG, " update pois");

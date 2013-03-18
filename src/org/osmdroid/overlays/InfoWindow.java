@@ -36,9 +36,10 @@ public abstract class InfoWindow {
 
 	protected View mView;
 	protected boolean mIsVisible = false;
-	protected MapView mMapView;
 	protected RelativeLayout mLayout;
 	private android.widget.RelativeLayout.LayoutParams mLayoutPos;
+
+	private MapView mMapView;
 
 	/**
 	 * @param layoutResId
@@ -47,9 +48,6 @@ public abstract class InfoWindow {
 	 *            the mapview on which is hooked the view
 	 */
 	public InfoWindow(int layoutResId, MapView mapView) {
-		mMapView = mapView;
-
-		mIsVisible = false;
 		ViewGroup parent = (ViewGroup) mapView.getParent();
 		Context context = mapView.getContext();
 		LayoutInflater inflater = (LayoutInflater) context
@@ -60,19 +58,19 @@ public abstract class InfoWindow {
 				new RelativeLayout.LayoutParams(
 						android.view.ViewGroup.LayoutParams.MATCH_PARENT,
 						android.view.ViewGroup.LayoutParams.MATCH_PARENT);
-
 		mLayout = new RelativeLayout(context);
+		mLayout.setWillNotDraw(true);
 		mLayout.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
 		mLayout.setLayoutParams(rlp);
 		mLayoutPos = rlp;
-
-		// not so sure about this. why is just blitting the bitmap on glview so slow?...
 		mView.setDrawingCacheEnabled(true);
-		//		mLayout.setDrawingCacheEnabled(true);
-		//		mLayout.setPersistentDrawingCache(ViewGroup.PERSISTENT_ALL_CACHES);
-		//		mLayout.setAlwaysDrawnWithCacheEnabled(true); // call this method
-		mLayout.setWillNotDraw(true);
 		mLayout.addView(mView);
+
+		mIsVisible = false;
+		mLayout.setVisibility(View.GONE);
+		mMapView = mapView;
+
+		mapView.addView(mLayout);
 	}
 
 	/**
@@ -82,6 +80,8 @@ public abstract class InfoWindow {
 	public View getView() {
 		return (mView);
 	}
+
+	private int mHeight;
 
 	/**
 	 * open the window at the specified position.
@@ -95,11 +95,13 @@ public abstract class InfoWindow {
 	 */
 	public void open(ExtendedOverlayItem item, int offsetX, int offsetY) {
 		onOpen(item);
-
 		close(); // if it was already opened
 		//		mView.requestLayout();
 		mView.buildDrawingCache();
-		mMapView.addView(mLayout);
+
+		//mView.getDrawingCache();
+		mHeight = mMapView.getHeight();
+		mLayout.setVisibility(View.VISIBLE);
 		mIsVisible = true;
 	}
 
@@ -109,21 +111,16 @@ public abstract class InfoWindow {
 		rlp.leftMargin = x;
 		rlp.rightMargin = -x;
 		rlp.topMargin = y;
-		rlp.bottomMargin =  mMapView.getHeight() / 2 - y;
+		rlp.bottomMargin = mHeight / 2 - y;
 		mLayout.setLayoutParams(rlp);
-
-		//mMapView.requestLayout();
 		mLayout.requestLayout();
-
-		// using scrollTo the bubble somehow does not appear when it
-		// is not already in viewport...
-		//		mLayout.scrollTo(-x, y + mMapView.getHeight() / 2);
 	}
 
 	public void close() {
+
 		if (mIsVisible) {
 			mIsVisible = false;
-			((ViewGroup) mLayout.getParent()).removeView(mLayout);
+			mLayout.setVisibility(View.GONE);
 			onClose();
 		}
 	}

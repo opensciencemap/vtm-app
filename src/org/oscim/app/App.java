@@ -23,11 +23,11 @@ import android.content.res.Resources;
 public class App extends Application {
 
 	public static final String TAG = TileMap.class.getName();
-	
+
 	static MapView map;
 	static POISearch poiSearch;
 	static Resources res;
-	static TileMap mainActivity;
+	static TileMap activity;
 
 	@Override
 	public void onCreate() {

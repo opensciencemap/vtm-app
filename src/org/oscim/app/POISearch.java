@@ -46,7 +46,6 @@ import android.widget.Toast;
 public class POISearch {
 	private final ArrayList<POI> mPOIs;
 	ItemizedOverlayWithBubble<ExtendedOverlayItem> poiMarkers;
-	final TileMap tileMap;
 	Drawable[] mMarkers;
 
 	private final static int MDEFAULT = 0;
@@ -55,13 +54,12 @@ public class POISearch {
 	private final static int MWIKI16 = 3;
 	private final static int MWIKI32 = 4;
 
-	POISearch(TileMap tileMap) {
-		this.tileMap = tileMap;
+	POISearch() {
 		mPOIs = new ArrayList<POI>();
 		//POI markers:
 		final ArrayList<ExtendedOverlayItem> poiItems = new ArrayList<ExtendedOverlayItem>();
 
-		poiMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map, tileMap,
+		poiMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map, App.activity,
 				poiItems, new POIInfoWindow(App.map));
 
 		App.map.getOverlays().add(poiMarkers);
@@ -152,11 +150,11 @@ public class POISearch {
 			if (mTag.equals("")) {
 				//no search, no message
 			} else if (pois == null) {
-				Toast.makeText(tileMap.getApplicationContext(),
+				Toast.makeText(App.activity,
 						"Technical issue when getting " + mTag + " POI.",
 						Toast.LENGTH_SHORT).show();
 			} else {
-				Toast.makeText(tileMap.getApplicationContext(),
+				Toast.makeText(App.activity,
 						pois.size() + " " + mTag + " entries found",
 						Toast.LENGTH_SHORT).show();
 
@@ -232,11 +230,11 @@ public class POISearch {
 
 	private void showPOIActivity(boolean setNew) {
 		// show or update
-		Intent intent = new Intent(tileMap.getApplicationContext(), POIActivity.class);
+		Intent intent = new Intent(App.activity, POIActivity.class);
 		intent.putExtra("ID", poiMarkers.getBubbledItemId());
 		if (setNew)
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		tileMap.startActivityForResult(intent, TileMap.POIS_REQUEST);
+		App.activity.startActivityForResult(intent, TileMap.POIS_REQUEST);
 	}
 
 	void getPOIAsync(String tag) {
@@ -311,9 +309,9 @@ public class POISearch {
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_nearby:
-			Intent intent = new Intent(tileMap, POIActivity.class);
+			Intent intent = new Intent(App.activity, POIActivity.class);
 			intent.putExtra("ID", poiMarkers.getBubbledItemId());
-			tileMap.startActivityForResult(intent, TileMap.POIS_REQUEST);
+			App.activity.startActivityForResult(intent, TileMap.POIS_REQUEST);
 			return true;
 
 		case R.id.menu_clear_poi:

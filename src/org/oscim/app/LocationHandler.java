@@ -115,7 +115,7 @@ public class LocationHandler {
 			MapPosition mapPosition = new MapPosition(bestLocation.getLatitude(),
 					bestLocation.getLongitude(), zoom, 1, 0);
 
-			mTileMap.map.setMapCenter(mapPosition);
+			App.map.setMapCenter(mapPosition);
 
 		} else {
 			mTileMap.showToastOnUiThread(mTileMap
@@ -165,7 +165,7 @@ public class LocationHandler {
 			mSnapToLocation = false;
 			mSnapToLocationView.setChecked(false);
 
-			mTileMap.map.setClickable(true);
+			App.map.setClickable(true);
 
 			if (showToast) {
 				mTileMap.showToastOnUiThread(mTileMap
@@ -183,7 +183,7 @@ public class LocationHandler {
 		if (!mSnapToLocation) {
 			mSnapToLocation = true;
 
-			mTileMap.map.setClickable(false);
+			App.map.setClickable(false);
 
 			if (showToast) {
 				mTileMap.showToastOnUiThread(mTileMap
@@ -224,7 +224,7 @@ public class LocationHandler {
 
 			if (mSetCenter || isSnapToLocationEnabled()) {
 				mSetCenter = false;
-				mTileMap.map.setCenter(point);
+				App.map.setCenter(point);
 			}
 		}
 
