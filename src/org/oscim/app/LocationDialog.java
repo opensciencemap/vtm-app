@@ -33,7 +33,7 @@ public class LocationDialog {
 
 	void prepareDialog(MapView mapView, final Dialog dialog) {
 		EditText editText = (EditText) dialog.findViewById(R.id.latitude);
-		GeoPoint mapCenter = mapView.getMapPosition().getMapCenter();
+		GeoPoint mapCenter = mapView.getMapViewPosition().getMapCenter();
 		editText.setText(Double.toString(mapCenter.getLatitude()));
 
 		editText = (EditText) dialog.findViewById(R.id.longitude);
@@ -41,7 +41,9 @@ public class LocationDialog {
 
 		SeekBar zoomlevel = (SeekBar) dialog.findViewById(R.id.zoomLevel);
 		zoomlevel.setMax(MapViewPosition.MAX_ZOOMLEVEL);
-		zoomlevel.setProgress(mapView.getMapPosition().getMapPosition().zoomLevel);
+
+		//FIXME zoomlevel.setProgress(mapView.getMapPosition().getMapPosition().zoomLevel);
+		zoomlevel.setProgress(12);
 
 		final TextView textView = (TextView) dialog.findViewById(R.id.zoomlevelValue);
 		textView.setText(String.valueOf(zoomlevel.getProgress()));
@@ -76,12 +78,13 @@ public class LocationDialog {
 						SeekBar zoomLevelView = (SeekBar) view
 								.findViewById(R.id.zoomLevel);
 
-						byte zoom = (byte) (zoomLevelView.getProgress());
+						int zoom = zoomLevelView.getProgress();
 
-						MapPosition mapPosition = new MapPosition(latitude,
-								longitude, zoom, 1, 0);
+						MapPosition mapPosition = new MapPosition();
+						mapPosition.setPosition(latitude,longitude);
+						mapPosition.setZoomLevel(zoom);
 
-						App.map.setMapCenter(mapPosition);
+						App.map.setMapPosition(mapPosition);
 					}
 				});
 		builder.setNegativeButton(R.string.cancel, null);

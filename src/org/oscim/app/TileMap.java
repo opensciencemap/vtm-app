@@ -248,7 +248,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		case R.id.menu_position_map_center:
 			MapPosition mapCenter = mMapView.getMapFileCenter();
 			if (mapCenter != null)
-				mMapView.setMapCenter(mapCenter);
+				mMapView.setMapPosition(mapCenter);
 			return true;
 
 		case R.id.menu_preferences:

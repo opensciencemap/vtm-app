@@ -108,14 +108,17 @@ public class LocationHandler {
 		}
 
 		if (bestLocation != null) {
+
 			//byte zoom = mTileMap.map.getMapPosition().getZoomLevel();
 			//if (zoom < 12)
-			byte zoom = (byte) 12;
+			//byte zoom = (byte) 12;
 
-			MapPosition mapPosition = new MapPosition(bestLocation.getLatitude(),
-					bestLocation.getLongitude(), zoom, 1, 0);
+			MapPosition mapPosition = new MapPosition();
+			mapPosition.setPosition(bestLocation.getLatitude(),
+					bestLocation.getLongitude());
+			mapPosition.setZoomLevel(12);
 
-			App.map.setMapCenter(mapPosition);
+			App.map.setMapPosition(mapPosition);
 
 		} else {
 			mTileMap.showToastOnUiThread(mTileMap
