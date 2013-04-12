@@ -35,7 +35,6 @@ import org.osmdroid.routing.RouteNode;
 import org.osmdroid.routing.RouteProvider;
 import org.osmdroid.routing.provider.MapQuestRouteProvider;
 
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.os.AsyncTask;
@@ -72,7 +71,7 @@ public class RouteSearch {
 		mRouteMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.activity, routeItems,
 				App.map);
 
-		mRouteOverlay = new PathOverlay(App.map, Color.RED);
+		mRouteOverlay = new PathOverlay(App.map, 0xAA0000FF, 3);
 
 		App.map.getOverlays().add(mRouteOverlay);
 		App.map.getOverlays().add(mRouteMarkers);
@@ -238,7 +237,9 @@ public class RouteSearch {
 			Toast.makeText(App.map.getContext(), "We have a problem to get the route",
 					Toast.LENGTH_SHORT).show();
 
-		RouteProvider.buildRouteOverlay(mRouteOverlay, route);
+		mRouteOverlay.setPoints(route.routeHigh);
+
+		//RouteProvider.buildRouteOverlay(mRouteOverlay, route);
 
 		putRouteNodes(route);
 

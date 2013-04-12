@@ -9,8 +9,6 @@ import org.osmdroid.routing.provider.GoogleRouteProvider;
 import org.osmdroid.routing.provider.MapQuestRouteProvider;
 import org.osmdroid.routing.provider.OSRMRouteProvider;
 
-import android.graphics.Paint;
-
 /**
  * Generic class to get a route between a start and a destination point, going
  * through a list of waypoints.
@@ -49,27 +47,6 @@ public abstract class RouteProvider {
 		return result.toString();
 	}
 
-	public static void buildRouteOverlay(PathOverlay routeOverlay, Route route) {
-		if (route != null) {
-			ArrayList<GeoPoint> polyline = route.routeHigh;
-			for (GeoPoint p : polyline) {
-				routeOverlay.addPoint(p);
-			}
-		}
-	}
-
-	public static PathOverlay buildRouteOverlay(MapView mapView, Route route, Paint paint) {
-		PathOverlay routeOverlay = new PathOverlay(mapView, 0);
-		routeOverlay.setPaint(paint);
-		if (route != null) {
-			ArrayList<GeoPoint> polyline = route.routeHigh;
-			for (GeoPoint p : polyline) {
-				routeOverlay.addPoint(p);
-			}
-		}
-		return routeOverlay;
-	}
-
 	/**
 	 * Builds an overlay for the route shape with a default (and nice!) color.
 	 * @param mapView
@@ -81,11 +58,14 @@ public abstract class RouteProvider {
 	 * @return route shape overlay
 	 */
 	public static PathOverlay buildRouteOverlay(MapView mapView, Route route) {
-		Paint paint = new Paint();
-		paint.setColor(0x800000FF);
-		paint.setStyle(Paint.Style.STROKE);
-		paint.setStrokeWidth(5);
-		return buildRouteOverlay(mapView, route, paint);
+		int lineColor = 0x800000FF;
+		float lineWidth = 2.5f;
+
+		PathOverlay routeOverlay = new PathOverlay(mapView, lineColor, lineWidth);
+		if (route != null) {
+			routeOverlay.setPoints(route.routeHigh);
+		}
+		return routeOverlay;
 	}
 
 }
