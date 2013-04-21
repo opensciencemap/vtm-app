@@ -22,7 +22,7 @@ import java.io.InputStream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.oscim.database.OpenResult;
+import org.oscim.database.IMapDatabase.OpenResult;
 import org.oscim.theme.RenderThemeHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

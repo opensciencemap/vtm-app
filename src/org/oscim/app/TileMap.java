@@ -16,14 +16,12 @@
 
 package org.oscim.app;
 
-import java.io.FileNotFoundException;
-
-import org.oscim.app.filepicker.FilePicker;
 import org.oscim.app.preferences.EditPreferences;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.database.MapDatabases;
 import org.oscim.database.MapOptions;
+import org.oscim.layers.tile.TileLayer;
 import org.oscim.theme.InternalRenderTheme;
 import org.oscim.utils.AndroidUtils;
 import org.oscim.view.DebugSettings;
@@ -64,7 +62,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	private static final int DIALOG_LOCATION_PROVIDER_DISABLED = 2;
 
 	// Intents
-	private static final int SELECT_RENDER_THEME_FILE = 1;
+	//private static final int SELECT_RENDER_THEME_FILE = 1;
 	protected static final int POIS_REQUEST = 2;
 
 	LocationHandler mLocation;
@@ -76,6 +74,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	POISearch mPoiSearch;
 	RouteSearch mRouteSearch;
+
+	private TileLayer mBaseLayer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -159,13 +159,19 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			case MAP_READER:
 				options = new MapOptions(mapDatabaseNew);
 				options.put("file",
-						"/storage/sdcard0/Download/berlin.map");
+						"/storage/sdcard0/Download/bremen.map");
 				break;
 			default:
 				break;
 			}
 
-			mMapView.setMapDatabase(options);
+			if (mBaseLayer == null)
+				mBaseLayer = mMapView.setBaseMap(options);
+			else
+				mBaseLayer.setMapDatabase(options);
+
+
+			//mMapView.setMapDatabase(options);
 			mMapDatabase = mapDatabaseNew;
 		}
 	}
@@ -246,7 +252,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			return true;
 
 		case R.id.menu_position_map_center:
-			MapPosition mapCenter = mMapView.getMapFileCenter();
+			MapPosition mapCenter = mBaseLayer.getMapFileCenter();
 			if (mapCenter != null)
 				mMapView.setMapPosition(mapCenter);
 			return true;
@@ -336,17 +342,17 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 					mMapView.getMapViewPosition().animateTo(poi.location);
 			}
 			break;
-		case SELECT_RENDER_THEME_FILE:
-			if (resultCode == RESULT_OK && intent != null
-					&& intent.getStringExtra(FilePicker.SELECTED_FILE) != null) {
-				try {
-					mMapView.setRenderTheme(intent
-							.getStringExtra(FilePicker.SELECTED_FILE));
-				} catch (FileNotFoundException e) {
-					showToastOnUiThread(e.getLocalizedMessage());
-				}
-			}
-			break;
+		//case SELECT_RENDER_THEME_FILE:
+		//	if (resultCode == RESULT_OK && intent != null
+		//			&& intent.getStringExtra(FilePicker.SELECTED_FILE) != null) {
+		//		try {
+		//			mMapView.setRenderTheme(intent
+		//					.getStringExtra(FilePicker.SELECTED_FILE));
+		//		} catch (FileNotFoundException e) {
+		//			showToastOnUiThread(e.getLocalizedMessage());
+		//		}
+		//	}
+		//	break;
 		default:
 			break;
 		}
@@ -451,9 +457,11 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			} catch (IllegalArgumentException e) {
 			}
 			if (theme == null)
-				mMapView.setRenderTheme(InternalRenderTheme.DEFAULT);
+				mBaseLayer.setRenderTheme(InternalRenderTheme.DEFAULT);
 			else
-				mMapView.setRenderTheme(theme);
+				mBaseLayer.setRenderTheme(theme);
+		} else{
+			mBaseLayer.setRenderTheme(InternalRenderTheme.DEFAULT);
 		}
 
 		if (preferences.getBoolean("fullscreen", false)) {
@@ -465,6 +473,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 		}
+
 		if (preferences.getBoolean("fixOrientation", true)) {
 			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 			// this all returns the orientation which is not currently active?!

@@ -17,10 +17,10 @@ package org.oscim.app.filefilter;
 import java.io.File;
 
 import org.oscim.database.IMapDatabase;
+import org.oscim.database.IMapDatabase.OpenResult;
 import org.oscim.database.MapDatabases;
-import org.oscim.database.OpenResult;
-import org.oscim.database.mapfile.MapDatabase;
 import org.oscim.database.MapOptions;
+import org.oscim.database.mapfile.MapDatabase;
 
 /**
  * Accepts all valid map files.
