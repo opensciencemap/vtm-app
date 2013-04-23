@@ -21,7 +21,7 @@ import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.database.MapDatabases;
 import org.oscim.database.MapOptions;
-import org.oscim.layers.tile.TileLayer;
+import org.oscim.layers.tile.MapTileLayer;
 import org.oscim.theme.InternalRenderTheme;
 import org.oscim.utils.AndroidUtils;
 import org.oscim.view.DebugSettings;
@@ -75,7 +75,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	POISearch mPoiSearch;
 	RouteSearch mRouteSearch;
 
-	private TileLayer mBaseLayer;
+	private MapTileLayer mBaseLayer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
