@@ -19,14 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.oscim.core.BoundingBox;
-import org.oscim.overlay.ItemizedOverlay;
-import org.oscim.overlay.OverlayItem;
-import org.oscim.overlay.OverlayItem.HotspotPlace;
+import org.oscim.layers.overlay.ItemizedOverlay;
+import org.oscim.layers.overlay.OverlayItem;
+import org.oscim.layers.overlay.OverlayItem.HotspotPlace;
 import org.oscim.view.MapView;
 import org.osmdroid.location.FlickrPOIProvider;
 import org.osmdroid.location.FourSquareProvider;
 import org.osmdroid.location.GeoNamesPOIProvider;
 import org.osmdroid.location.NominatimPOIProvider;
+import org.osmdroid.location.OverpassPOIProvider;
 import org.osmdroid.location.POI;
 import org.osmdroid.location.PicasaPOIProvider;
 import org.osmdroid.overlays.DefaultInfoWindow;
@@ -104,32 +105,32 @@ public class POISearch {
 			if (mTag == null || mTag.equals("")) {
 				return null;
 			} else if (mTag.equals(TAG_WIKIPEDIA)) {
-				GeoNamesPOIProvider poiProvider = new GeoNamesPOIProvider("mkergall");
+				OverpassPOIProvider poiProvider = new OverpassPOIProvider();
+				//GeoNamesPOIProvider poiProvider = new GeoNamesPOIProvider("mkergall");
 				//ArrayList<POI> pois = poiProvider.getPOICloseTo(point, 30, 20.0);
 				//Get POI inside the bounding box of the current map view:
 				BoundingBox bb = App.map.getBoundingBox();
-				ArrayList<POI> pois = poiProvider.getPOIInside(bb, 30);
-				return pois;
+				//ArrayList<POI> pois = poiProvider.getPOIInside(bb, 30);
+
+				return poiProvider.getPOIInside(bb, "", 0);
 			} else if (mTag.equals(TAG_FLICKR)) {
 				FlickrPOIProvider poiProvider = new FlickrPOIProvider(
 						"c39be46304a6c6efda8bc066c185cd7e");
 				BoundingBox bb = App.map.getBoundingBox();
-				ArrayList<POI> pois = poiProvider.getPOIInside(bb, null, 20);
-				return pois;
+
+				return poiProvider.getPOIInside(bb, null, 20);
 			} else if (mTag.startsWith(TAG_PICASA)) {
 				PicasaPOIProvider poiProvider = new PicasaPOIProvider(null);
 				BoundingBox bb = App.map.getBoundingBox();
 				String q = mTag.substring(7);
-				List<POI> pois = poiProvider.getPOIInside(bb, q, 20);
-				return pois;
+				return poiProvider.getPOIInside(bb, q, 20);
 			}
 			else if (mTag.startsWith(TAG_FOURSQUARE)) {
 				FourSquareProvider poiProvider = new FourSquareProvider(null, null);
 				BoundingBox bb = App.map.getBoundingBox();
 				String q = mTag.substring(10);
 				//				String q = mTag.substring("picasa".length());
-				ArrayList<POI> pois = poiProvider.getPOIInside(bb, q, 40);
-				return pois;
+				return poiProvider.getPOIInside(bb, q, 40);
 			}
 			else {
 				NominatimPOIProvider poiProvider = new NominatimPOIProvider();
@@ -137,11 +138,9 @@ public class POISearch {
 
 				poiProvider.setService(NominatimPOIProvider.MAPQUEST_POI_SERVICE);
 
-				ArrayList<POI> pois;
 				BoundingBox bb = App.map.getBoundingBox();
-				pois = poiProvider.getPOIInside(bb, mTag, 10);
 				//pois = poiProvider.getPOIAlong(mRoute.getRouteLow(), mTag, 100, 2.0);
-				return pois;
+				return poiProvider.getPOIInside(bb, mTag, 10);
 			}
 		}
 
