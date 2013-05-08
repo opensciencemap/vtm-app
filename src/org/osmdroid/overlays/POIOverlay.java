@@ -62,8 +62,8 @@ public class POIOverlay extends ItemizedOverlayWithBubble<ExtendedOverlayItem> {
 	}
 
 	@Override
-	public void onUpdate(MapPosition mapPosition, boolean changed) {
-		super.onUpdate(mapPosition, changed);
+	public void onUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
+		super.onUpdate(mapPosition, changed, clear);
 
 		if (changed && !mTaskRunning) {
 			mMapView.postDelayed(mUpdateTask, 1000);

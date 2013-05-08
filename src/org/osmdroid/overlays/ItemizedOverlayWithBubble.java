@@ -55,7 +55,7 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 	private PointF mTmpPoint = new PointF();
 
 	@Override
-	public void onUpdate(MapPosition mapPosition, boolean changed) {
+	public void onUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
 		if (mBubble.isOpen()) {
 			GeoPoint gp = mItemWithBubble.getPoint();
 

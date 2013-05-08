@@ -40,7 +40,8 @@ public class OverpassPOIProvider implements POIProvider {
 
 		for (OSMNode n : osmData.getNodes()){
 			POI p = new POI(POI.POI_SERVICE_4SQUARE);
-			//p.id = n.id;
+			p.id = Long.toString(n.id);
+
 			p.location = new GeoPoint(n.lat, n.lon);
 			Tag t;
 
@@ -50,9 +51,10 @@ public class OverpassPOIProvider implements POIProvider {
 			if ((t = n.tags.get(Tag.TAG_KEY_AMENITY)) != null)
 				p.type = t.value;
 
-			if ((t = n.tags.get(TAG_KEY_WEBSITE)) != null)
+			if ((t = n.tags.get(TAG_KEY_WEBSITE)) != null){
+				Log.d("...", p.description + " " + t.value);
 				p.url = t.value;
-
+			}
 			pois.add(p);
 		}
 		return pois;
