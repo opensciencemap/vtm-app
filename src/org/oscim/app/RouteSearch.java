@@ -34,7 +34,7 @@ import org.osmdroid.overlays.ItemizedOverlayWithBubble;
 import org.osmdroid.routing.Route;
 import org.osmdroid.routing.RouteNode;
 import org.osmdroid.routing.RouteProvider;
-import org.osmdroid.routing.provider.MapQuestRouteProvider;
+import org.osmdroid.routing.provider.OSRMRouteProvider;
 
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -301,14 +301,14 @@ public class RouteSearch {
 		@Override
 		protected Route doInBackground(WayPoints... wp) {
 			WayPoints waypoints = wp[0];
-			//RouteManager routeManager = new GoogleRouteManager();
-			//RouteManager routeManager = new OSRMRouteManager();
-			RouteProvider routeManager = new MapQuestRouteProvider();
+			//RouteProvuder routeProvider = new GoogleRouteProvider();
+			RouteProvider routeProvider = new OSRMRouteProvider();
+			//RouteProvider routeProvider = new MapQuestRouteProvider();
 			Locale locale = Locale.getDefault();
-			routeManager.addRequestOption("locale=" + locale.getLanguage() + "_"
-					+ locale.getCountry());
-			routeManager.addRequestOption("routeType=pedestrian");
-			return routeManager.getRoute(waypoints);
+			//routeProvider.addRequestOption("locale=" + locale.getLanguage() + "_"
+			//		+ locale.getCountry());
+			//routeProvider.addRequestOption("routeType=pedestrian");
+			return routeProvider.getRoute(waypoints);
 		}
 
 		@Override

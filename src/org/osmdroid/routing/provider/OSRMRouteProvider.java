@@ -29,7 +29,11 @@ import android.util.Log;
  */
 public class OSRMRouteProvider extends RouteProvider {
 
+
+	//static final String OSRM_SERVICE = "http://city.informatik.uni-bremen.de:5000/viaroute?";
+	//static final String OSRM_SERVICE = "http://city.informatik.uni-bremen.de:5001/viaroute?";
 	static final String OSRM_SERVICE = "http://router.project-osrm.org/viaroute?";
+
 	//Note that the result of OSRM is quite close to Cloudmade NavEngine format:
 	//http://developers.cloudmade.com/wiki/navengine/JSON_format
 
