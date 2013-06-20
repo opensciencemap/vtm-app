@@ -7,6 +7,7 @@ import org.oscim.core.MapPosition;
 import org.oscim.core.PointF;
 import org.oscim.layers.overlay.ItemizedIconOverlay;
 import org.oscim.layers.overlay.OverlayItem;
+import org.oscim.layers.overlay.OverlayMarker;
 import org.oscim.view.MapView;
 import org.osmdroid.utils.BonusPackHelper;
 
@@ -66,9 +67,10 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 		}
 	}
 
-	public ItemizedOverlayWithBubble(final MapView mapView, final Context context,
-			final List<Item> aList, final InfoWindow bubble) {
-		super(mapView, context, aList, null);
+
+	public ItemizedOverlayWithBubble(MapView mapView, Context context, OverlayMarker marker,
+			List<Item> aList, InfoWindow bubble) {
+		super(mapView, aList, marker, null);
 
 		mItemsList = aList;
 		if (bubble != null) {
@@ -92,9 +94,8 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 		mOnItemGestureListener = this;
 	}
 
-	public ItemizedOverlayWithBubble(final Context context, final List<Item> aList,
-			final MapView mapView) {
-		this(mapView, context, aList, null);
+	public ItemizedOverlayWithBubble(MapView mapView, Context context, OverlayMarker marker, List<Item> aList) {
+		this(mapView, context, marker, aList,  null);
 	}
 
 	void showBubble(int index) {
@@ -115,7 +116,7 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 		ExtendedOverlayItem eItem = (ExtendedOverlayItem) (getItem(index));
 		mItemWithBubble = eItem;
 		if (eItem != null) {
-			eItem.showBubble(mBubble,mMapView);
+			eItem.showBubble(mBubble, (MapView)mMapView);
 
 			mMapView.getMapViewPosition().animateTo(eItem.mGeoPoint);
 
@@ -167,34 +168,4 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 		super.removeAllItems();
 		hideBubble();
 	}
-
-	//	FIXME @Override
-	//	public void draw(final Canvas canvas, final MapView mapView, final boolean shadow) {
-	//		// 1. Fixing drawing focused item on top in ItemizedOverlay (osmdroid
-	//		// issue 354):
-	//		if (shadow) {
-	//			return;
-	//		}
-	//		final Projection pj = mapView.getProjection();
-	//		final int size = mItemsList.size() - 1;
-	//		final Point mCurScreenCoords = new Point();
-	//
-	//		/*
-	//		 * Draw in backward cycle, so the items with the least index are on the
-	//		 * front.
-	//		 */
-	//		for (int i = size; i >= 0; i--) {
-	//			final Item item = getItem(i);
-	//			if (item != mItemWithBubble) {
-	//				pj.toMapPixels(item.mGeoPoint, mCurScreenCoords);
-	//				onDrawItem(canvas, item, mCurScreenCoords);
-	//			}
-	//		}
-	//		// draw focused item last:
-	//		if (mItemWithBubble != null) {
-	//			pj.toMapPixels(mItemWithBubble.mGeoPoint, mCurScreenCoords);
-	//			onDrawItem(canvas, (Item) mItemWithBubble, mCurScreenCoords);
-	//		}
-	//	}
-
 }

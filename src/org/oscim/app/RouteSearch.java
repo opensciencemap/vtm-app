@@ -19,12 +19,12 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
+import org.oscim.android.AndroidGraphics;
 import org.oscim.core.GeoPoint;
-import org.oscim.layers.overlay.ItemizedOverlay;
 import org.oscim.layers.overlay.OverlayItem;
 import org.oscim.layers.overlay.OverlayItem.HotspotPlace;
+import org.oscim.layers.overlay.OverlayMarker;
 import org.oscim.layers.overlay.PathOverlay;
 import org.oscim.view.MapView;
 import org.osmdroid.location.GeocoderNominatim;
@@ -36,7 +36,6 @@ import org.osmdroid.routing.RouteNode;
 import org.osmdroid.routing.RouteProvider;
 import org.osmdroid.routing.provider.OSRMRouteProvider;
 
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.os.AsyncTask;
 import android.view.MenuItem;
@@ -51,6 +50,7 @@ public class RouteSearch {
 	protected final ItemizedOverlayWithBubble<ExtendedOverlayItem> mItineraryMarkers;
 
 	protected GeoPoint mStartPoint, mDestinationPoint;
+
 	public GeoPoint getmStartPoint() {
 		return mStartPoint;
 	}
@@ -74,8 +74,6 @@ public class RouteSearch {
 		return true;
 	}
 
-
-
 	public GeoPoint getmDestinationPoint() {
 		return mDestinationPoint;
 	}
@@ -95,15 +93,16 @@ public class RouteSearch {
 		// Itinerary markers:
 		ArrayList<ExtendedOverlayItem> waypointsItems = new ArrayList<ExtendedOverlayItem>();
 		mItineraryMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map,
-				App.activity, waypointsItems, new ViaPointInfoWindow(R.layout.itinerary_bubble,
-						App.map));
+				App.activity, null, waypointsItems,
+
+				new ViaPointInfoWindow(R.layout.itinerary_bubble, App.map));
 
 		updateIternaryMarkers();
 
 		//Route and Directions
 		ArrayList<ExtendedOverlayItem> routeItems = new ArrayList<ExtendedOverlayItem>();
-		mRouteMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.activity, routeItems,
-				App.map);
+		mRouteMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map, App.activity,
+				null, routeItems);
 
 		mRouteOverlay = new PathOverlay(App.map, 0xAA0000FF, 3);
 
@@ -171,7 +170,7 @@ public class RouteSearch {
 		if (item != null)
 			mItineraryMarkers.removeItem(item);
 
-		Drawable marker = ItemizedOverlay.makeMarker(App.res, markerResId,
+		OverlayMarker marker = AndroidGraphics.makeMarker(App.res, markerResId,
 				HotspotPlace.BOTTOM_CENTER);
 
 		String title = App.res.getString(titleResId);
@@ -238,7 +237,7 @@ public class RouteSearch {
 	private void putRouteNodes(Route route) {
 		mRouteMarkers.removeAllItems();
 
-		Drawable marker = ItemizedOverlay.makeMarker(App.res, R.drawable.marker_node, null);
+		OverlayMarker marker = AndroidGraphics.makeMarker(App.res, R.drawable.marker_node, null);
 
 		int n = route.nodes.size();
 		//TypedArray iconIds = App.res.obtainTypedArray(R.array.direction_icons);
@@ -280,8 +279,6 @@ public class RouteSearch {
 		App.map.redrawMap(true);
 	}
 
-
-
 	void removeAllOverlay() {
 		mRouteMarkers.removeAllItems(true);
 		mItineraryMarkers.removeAllItems(true);
@@ -304,7 +301,7 @@ public class RouteSearch {
 			//RouteProvuder routeProvider = new GoogleRouteProvider();
 			RouteProvider routeProvider = new OSRMRouteProvider();
 			//RouteProvider routeProvider = new MapQuestRouteProvider();
-			Locale locale = Locale.getDefault();
+			//Locale locale = Locale.getDefault();
 			//routeProvider.addRequestOption("locale=" + locale.getLanguage() + "_"
 			//		+ locale.getCountry());
 			//routeProvider.addRequestOption("routeType=pedestrian");
@@ -315,8 +312,6 @@ public class RouteSearch {
 		protected void onPostExecute(Route result) {
 			mRoute = result;
 			updateRouteMarkers(result);
-
-
 
 			DecimalFormat twoDForm = new DecimalFormat("#.#");
 			DecimalFormat oneDForm = new DecimalFormat("#");
@@ -354,7 +349,6 @@ public class RouteSearch {
 			//					+ " km \n By car: "
 			//					+time);
 			App.activity.setRouteBar(distance + " km ", shortpath + " km ", time);
-
 
 		}
 	}
@@ -427,8 +421,8 @@ public class RouteSearch {
 		return false;
 	}
 
-	public boolean isEmpty(){
-		 return (mItineraryMarkers.size() == 0);
+	public boolean isEmpty() {
+		return (mItineraryMarkers.size() == 0);
 	}
 
 	class ViaPointInfoWindow extends DefaultInfoWindow {

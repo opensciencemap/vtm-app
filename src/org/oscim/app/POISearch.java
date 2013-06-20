@@ -18,10 +18,11 @@ package org.oscim.app;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.oscim.android.AndroidGraphics;
 import org.oscim.core.BoundingBox;
-import org.oscim.layers.overlay.ItemizedOverlay;
 import org.oscim.layers.overlay.OverlayItem;
 import org.oscim.layers.overlay.OverlayItem.HotspotPlace;
+import org.oscim.layers.overlay.OverlayMarker;
 import org.oscim.view.MapView;
 import org.osmdroid.location.FlickrPOIProvider;
 import org.osmdroid.location.FourSquareProvider;
@@ -34,7 +35,6 @@ import org.osmdroid.overlays.ExtendedOverlayItem;
 import org.osmdroid.overlays.ItemizedOverlayWithBubble;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.view.MenuItem;
@@ -46,7 +46,7 @@ import android.widget.Toast;
 public class POISearch {
 	private final ArrayList<POI> mPOIs;
 	ItemizedOverlayWithBubble<ExtendedOverlayItem> poiMarkers;
-	Drawable[] mMarkers;
+	OverlayMarker[] mMarkers;
 
 	private final static int MDEFAULT = 0;
 	private final static int MFLICKR = 1;
@@ -59,27 +59,27 @@ public class POISearch {
 		//POI markers:
 		final ArrayList<ExtendedOverlayItem> poiItems = new ArrayList<ExtendedOverlayItem>();
 
-		poiMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map, App.activity,
+		poiMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map, App.activity, null,
 				poiItems, new POIInfoWindow(App.map));
 
 		App.map.getOverlays().add(poiMarkers);
 
-		mMarkers = new Drawable[5];
+		mMarkers = new OverlayMarker[5];
 
-		mMarkers[MDEFAULT] = ItemizedOverlay.makeMarker(
+		mMarkers[MDEFAULT] = AndroidGraphics.makeMarker(
 				App.res, R.drawable.pin,
 				HotspotPlace.BOTTOM_CENTER);
 
-		mMarkers[MFLICKR] = ItemizedOverlay.makeMarker(
+		mMarkers[MFLICKR] = AndroidGraphics.makeMarker(
 				App.res, R.drawable.marker_poi_flickr, null);
 
-		mMarkers[MPICASA] = ItemizedOverlay.makeMarker(
+		mMarkers[MPICASA] = AndroidGraphics.makeMarker(
 				App.res, R.drawable.marker_poi_picasa_24, null);
 
-		mMarkers[MWIKI16] = ItemizedOverlay.makeMarker(
+		mMarkers[MWIKI16] = AndroidGraphics.makeMarker(
 				App.res, R.drawable.marker_poi_wikipedia_16, null);
 
-		mMarkers[MWIKI32] = ItemizedOverlay.makeMarker(App.res,
+		mMarkers[MWIKI32] = AndroidGraphics.makeMarker(App.res,
 				R.drawable.marker_poi_wikipedia_32, null);
 	}
 
@@ -195,7 +195,7 @@ public class POISearch {
 
 			ExtendedOverlayItem poiMarker = new ExtendedOverlayItem(
 					poi.type + (name == null ? "" : ": " + name), desc, poi.location);
-			Drawable marker = null;
+			OverlayMarker marker = null;
 
 			if (poi.serviceId == POI.POI_SERVICE_NOMINATIM) {
 

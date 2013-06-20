@@ -94,19 +94,19 @@ public abstract class InfoWindow {
 	 *            ...
 	 */
 	public void open(ExtendedOverlayItem item, int offsetX, int offsetY) {
+
 		onOpen(item);
-		close(); // if it was already opened
-		//		mView.requestLayout();
+		close();
+
 		mView.buildDrawingCache();
 
-		//mView.getDrawingCache();
 		mHeight = mMapView.getHeight();
 		mLayout.setVisibility(View.VISIBLE);
 		mIsVisible = true;
+
 	}
 
 	public void position(int x, int y) {
-		// if this isnt madness...
 		RelativeLayout.LayoutParams rlp = mLayoutPos;
 		rlp.leftMargin = x;
 		rlp.rightMargin = -x;
