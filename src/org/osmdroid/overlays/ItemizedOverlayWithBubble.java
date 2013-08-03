@@ -13,6 +13,7 @@ import org.osmdroid.utils.BonusPackHelper;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.MotionEvent;
 
 /**
  * An itemized overlay with an InfoWindow or "bubble" which opens when the user
@@ -63,10 +64,9 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 			PointF p = mTmpPoint;
 			mMapView.getMapViewPosition().project(gp, p);
 
-			mBubble.position((int)p.x, (int)p.y);
+			mBubble.position((int) p.x, (int) p.y);
 		}
 	}
-
 
 	public ItemizedOverlayWithBubble(MapView mapView, Context context, OverlayMarker marker,
 			List<Item> aList, InfoWindow bubble) {
@@ -94,8 +94,9 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 		mOnItemGestureListener = this;
 	}
 
-	public ItemizedOverlayWithBubble(MapView mapView, Context context, OverlayMarker marker, List<Item> aList) {
-		this(mapView, context, marker, aList,  null);
+	public ItemizedOverlayWithBubble(MapView mapView, Context context, OverlayMarker marker,
+			List<Item> aList) {
+		this(mapView, context, marker, aList, null);
 	}
 
 	void showBubble(int index) {
@@ -116,7 +117,7 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 		ExtendedOverlayItem eItem = (ExtendedOverlayItem) (getItem(index));
 		mItemWithBubble = eItem;
 		if (eItem != null) {
-			eItem.showBubble(mBubble, (MapView)mMapView);
+			eItem.showBubble(mBubble, (MapView) mMapView);
 
 			mMapView.getMapViewPosition().animateTo(eItem.mGeoPoint);
 
@@ -129,6 +130,14 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 	public void hideBubble() {
 		mBubble.close();
 		mItemWithBubble = null;
+	}
+
+	@Override
+	public boolean onSingleTapUp(final MotionEvent event) {
+		boolean handled = super.onSingleTapUp(event);
+		if (!handled)
+			hideBubble();
+		return handled;
 	}
 
 	@Override
