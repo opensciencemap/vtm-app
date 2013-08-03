@@ -26,8 +26,8 @@ import org.oscim.layers.overlay.OverlayMarker;
 import org.oscim.view.MapView;
 import org.osmdroid.location.FlickrPOIProvider;
 import org.osmdroid.location.FourSquareProvider;
+import org.osmdroid.location.GeoNamesPOIProvider;
 import org.osmdroid.location.NominatimPOIProvider;
-import org.osmdroid.location.OverpassPOIProvider;
 import org.osmdroid.location.POI;
 import org.osmdroid.location.PicasaPOIProvider;
 import org.osmdroid.overlays.DefaultInfoWindow;
@@ -104,14 +104,14 @@ public class POISearch {
 			if (mTag == null || mTag.equals("")) {
 				return null;
 			} else if (mTag.equals(TAG_WIKIPEDIA)) {
-				OverpassPOIProvider poiProvider = new OverpassPOIProvider();
-				//GeoNamesPOIProvider poiProvider = new GeoNamesPOIProvider("mkergall");
+				GeoNamesPOIProvider poiProvider = new GeoNamesPOIProvider("mkergall");
 				//ArrayList<POI> pois = poiProvider.getPOICloseTo(point, 30, 20.0);
 				//Get POI inside the bounding box of the current map view:
 				BoundingBox bb = App.map.getBoundingBox();
-				//ArrayList<POI> pois = poiProvider.getPOIInside(bb, 30);
+				return poiProvider.getPOIInside(bb, 30);
 
-				return poiProvider.getPOIInside(bb, "", 0);
+				//OverpassPOIProvider poiProvider = new OverpassPOIProvider();
+				//return poiProvider.getPOIInside(bb, "", 0);
 			} else if (mTag.equals(TAG_FLICKR)) {
 				FlickrPOIProvider poiProvider = new FlickrPOIProvider(
 						"c39be46304a6c6efda8bc066c185cd7e");
