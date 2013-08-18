@@ -1,7 +1,7 @@
 package org.osmdroid.routing.provider;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import org.json.JSONArray;
@@ -174,7 +174,7 @@ public class OSRMRouteProvider extends RouteProvider {
 		mUserAgent = userAgent;
 	}
 
-	protected String getUrl(ArrayList<GeoPoint> waypoints) {
+	protected String getUrl(List<GeoPoint> waypoints) {
 		StringBuffer urlString = new StringBuffer(mServiceUrl);
 		for (int i = 0; i < waypoints.size(); i++) {
 			GeoPoint p = waypoints.get(i);
@@ -185,7 +185,7 @@ public class OSRMRouteProvider extends RouteProvider {
 	}
 
 	@Override
-	public Route getRoute(ArrayList<GeoPoint> waypoints) {
+	public Route getRoute(List<GeoPoint> waypoints) {
 		String url = getUrl(waypoints);
 		Log.d(BonusPackHelper.LOG_TAG, "OSRMRouteManager.getRoute:" + url);
 

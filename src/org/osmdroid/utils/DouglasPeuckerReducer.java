@@ -1,6 +1,7 @@
 package org.osmdroid.utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.oscim.core.GeoPoint;
 
@@ -23,7 +24,7 @@ public class DouglasPeuckerReducer {
 	 *            coordinate system of the points (micro-degrees here)
 	 * @return the reduced shape
 	 */
-	public static ArrayList<GeoPoint> reduceWithTolerance(ArrayList<GeoPoint> shape,
+	public static List<GeoPoint> reduceWithTolerance(List<GeoPoint> shape,
 			double tolerance)
 	{
 		int n = shape.size();
@@ -73,7 +74,7 @@ public class DouglasPeuckerReducer {
 	 *            The index in original shape's point of the ending point for
 	 *            this line segment
 	 */
-	private static void douglasPeuckerReduction(ArrayList<GeoPoint> shape, boolean[] marked,
+	private static void douglasPeuckerReduction(List<GeoPoint> shape, boolean[] marked,
 			double tolerance, int firstIdx, int lastIdx)
 	{
 		if (lastIdx <= firstIdx + 1) {
@@ -103,7 +104,7 @@ public class DouglasPeuckerReducer {
 		}
 
 		if (maxDistance > tolerance) {
-			//The farthest point is outside the tolerance: it is marked and the algorithm continues. 
+			//The farthest point is outside the tolerance: it is marked and the algorithm continues.
 			marked[indexFarthest] = true;
 
 			// reduce the shape between the starting point to newly found point

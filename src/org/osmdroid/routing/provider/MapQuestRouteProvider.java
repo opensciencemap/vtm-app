@@ -3,6 +3,7 @@ package org.osmdroid.routing.provider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -40,7 +41,7 @@ public class MapQuestRouteProvider extends RouteProvider {
 	 *            point.
 	 * @return ...
 	 */
-	protected String getUrl(ArrayList<GeoPoint> waypoints) {
+	protected String getUrl(List<GeoPoint> waypoints) {
 		StringBuffer urlString = new StringBuffer(MAPQUEST_GUIDANCE_SERVICE);
 		urlString.append("from=");
 		GeoPoint p = waypoints.get(0);
@@ -79,7 +80,7 @@ public class MapQuestRouteProvider extends RouteProvider {
 	 * @return the route
 	 */
 	@Override
-	public Route getRoute(ArrayList<GeoPoint> waypoints) {
+	public Route getRoute(List<GeoPoint> waypoints) {
 		String url = getUrl(waypoints);
 		Log.d(BonusPackHelper.LOG_TAG, "MapQuestRouteManager.getRoute:" + url);
 		Route route = null;
@@ -105,7 +106,7 @@ public class MapQuestRouteProvider extends RouteProvider {
 	 *            ...
 	 * @return the route ...
 	 */
-	protected Route getRouteXML(InputStream is, ArrayList<GeoPoint> waypoints) {
+	protected Route getRouteXML(InputStream is, List<GeoPoint> waypoints) {
 		XMLHandler handler = new XMLHandler();
 		try {
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
@@ -126,8 +127,8 @@ public class MapQuestRouteProvider extends RouteProvider {
 		return route;
 	}
 
-	protected ArrayList<RouteNode> finalizeNodes(ArrayList<RouteNode> mNodes,
-			ArrayList<RouteLink> mLinks, ArrayList<GeoPoint> polyline) {
+	protected List<RouteNode> finalizeNodes(List<RouteNode> mNodes,
+			List<RouteLink> mLinks, List<GeoPoint> polyline) {
 		int n = mNodes.size();
 		if (n == 0)
 			return mNodes;

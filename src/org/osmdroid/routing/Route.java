@@ -1,6 +1,7 @@
 package org.osmdroid.routing;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
@@ -34,14 +35,14 @@ public class Route implements Parcelable {
 	public double length;
 	/** duration of the whole trip in sec. */
 	public double duration;
-	public ArrayList<RouteNode> nodes;
+	public List<RouteNode> nodes;
 	/** */
 	/** there is one leg between each waypoint */
-	public ArrayList<RouteLeg> legs;
+	public List<RouteLeg> legs;
 	/** full shape: polyline, as an array of GeoPoints */
-	public ArrayList<GeoPoint> routeHigh;
+	public List<GeoPoint> routeHigh;
 	/** the same, in low resolution (less points) */
-	private ArrayList<GeoPoint> routeLow;
+	private List<GeoPoint> routeLow;
 	/** route bounding box */
 	public BoundingBox boundingBox;
 
@@ -77,7 +78,7 @@ public class Route implements Parcelable {
 	 * @param waypoints
 	 *            ...
 	 */
-	public Route(ArrayList<GeoPoint> waypoints) {
+	public Route(List<GeoPoint> waypoints) {
 		init();
 		int n = waypoints.size();
 		for (int i = 0; i < n; i++) {
@@ -96,7 +97,7 @@ public class Route implements Parcelable {
 	 * @return the route shape in "low resolution" = simplified by around 10
 	 *         factor.
 	 */
-	public ArrayList<GeoPoint> getRouteLow() {
+	public List<GeoPoint> getRouteLow() {
 		if (routeLow == null) {
 			// Simplify the route (divide number of points by around 10):
 			int n = routeHigh.size();
@@ -170,7 +171,7 @@ public class Route implements Parcelable {
 	 * @param waypoints
 	 *            ...
 	 */
-	public void buildLegs(ArrayList<GeoPoint> waypoints) {
+	public void buildLegs(List<GeoPoint> waypoints) {
 		legs = new ArrayList<RouteLeg>();
 		int firstNodeIndex = 0;
 		// For all intermediate waypoints, search the node closest to the

@@ -1,6 +1,6 @@
 package org.osmdroid.routing;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.overlay.PathOverlay;
@@ -21,7 +21,7 @@ public abstract class RouteProvider {
 
 	protected String mOptions;
 
-	public abstract Route getRoute(ArrayList<GeoPoint> waypoints);
+	public abstract Route getRoute(List<GeoPoint> waypoints);
 
 	public RouteProvider() {
 		mOptions = "";

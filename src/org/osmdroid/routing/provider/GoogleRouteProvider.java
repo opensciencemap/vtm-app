@@ -3,6 +3,7 @@ package org.osmdroid.routing.provider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -43,7 +44,7 @@ public class GoogleRouteProvider extends RouteProvider {
 	 *            ...
 	 * @return ...
 	 */
-	protected String getUrl(ArrayList<GeoPoint> waypoints) {
+	protected String getUrl(List<GeoPoint> waypoints) {
 		StringBuffer urlString = new StringBuffer(GOOGLE_DIRECTIONS_SERVICE);
 		urlString.append("origin=");
 		GeoPoint p = waypoints.get(0);
@@ -75,7 +76,7 @@ public class GoogleRouteProvider extends RouteProvider {
 	 * @return the route
 	 */
 	@Override
-	public Route getRoute(ArrayList<GeoPoint> waypoints) {
+	public Route getRoute(List<GeoPoint> waypoints) {
 		String url = getUrl(waypoints);
 		Log.d(BonusPackHelper.LOG_TAG, "GoogleRouteManager.getRoute:" + url);
 		Route route = null;

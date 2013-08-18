@@ -1,6 +1,6 @@
 package org.osmdroid.routing;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.osmdroid.utils.BonusPackHelper;
 
@@ -29,7 +29,7 @@ public class RouteLeg implements Parcelable {
 	}
 
 	public RouteLeg(int startNodeIndex, int endNodeIndex,
-			ArrayList<RouteNode> nodes) {
+			List<RouteNode> nodes) {
 		this.startNodeIndex = startNodeIndex;
 		this.endNodeIndex = endNodeIndex;
 		length = duration = 0.0;
