@@ -28,7 +28,8 @@ import android.util.Log;
  * @author M.Kergall
  */
 public class OSRMRouteProvider extends RouteProvider {
-
+	// 1 for 6 digit precision, 10 for 5
+	private final static int ENCODING_PRECISION = 1;
 
 	//static final String OSRM_SERVICE = "http://city.informatik.uni-bremen.de:5000/viaroute?";
 	//static final String OSRM_SERVICE = "http://city.informatik.uni-bremen.de:5001/viaroute?";
@@ -208,7 +209,7 @@ public class OSRMRouteProvider extends RouteProvider {
 		try {
 			JSONObject jObject = new JSONObject(jString);
 			String route_geometry = jObject.getString("route_geometry");
-			route.routeHigh = PolylineEncoder.decode(route_geometry, 10);
+			route.routeHigh = PolylineEncoder.decode(route_geometry, ENCODING_PRECISION);
 			JSONArray jInstructions = jObject.getJSONArray("route_instructions");
 			int n = jInstructions.length();
 			RouteNode lastNode = null;
