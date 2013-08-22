@@ -1,4 +1,4 @@
-/*Copyright 2013 Ahmad Al-saleem
+/* Copyright 2013 Ahmad Al-saleem
  * Copyright 2010, 2011, 2012 mapsforge.org
  *
  * This program is free software: you can redistribute it and/or modify it under the
@@ -13,10 +13,6 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.oscim.app.location;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
 
 import org.oscim.app.App;
 import org.oscim.app.R;
@@ -45,7 +41,9 @@ import android.util.Log;
 public class LocationHandler {
 	private final static String TAG = LocationHandler.class.getName();
 
-	private static final int DIALOG_LOCATION_PROVIDER_DISABLED = 2;
+	private final static int DIALOG_LOCATION_PROVIDER_DISABLED = 2;
+
+	private final static int SHOW_LOCATION_ZOOM = 15;
 
 	private MyLocationListener mLocationListener;
 	private LocationManager mLocationManager;
@@ -53,28 +51,18 @@ public class LocationHandler {
 
 	private boolean mSnapToLocation;
 
-	/* package */final TileMap mTileMap;
+	private GenericOverlay mOrientationOverlay;
+	private GeoPoint mCurrentLocation;
 
-	List<GeoPoint> points = new ArrayList<GeoPoint>();
-
-	LocationMarker mLocationMaker;
-
-	boolean preLocation;
-
-	GeoPoint myLocation;
-
-	Timer mTimer = new Timer();
+	private GeoPoint prePosition;
 
 	public LocationHandler(TileMap tileMap) {
-		mTileMap = tileMap;
 
 		mLocationManager = (LocationManager) tileMap
 				.getSystemService(Context.LOCATION_SERVICE);
 		mLocationListener = new MyLocationListener(App.map);
 
 	}
-
-	int preZoomLevel;
 
 	@SuppressWarnings("deprecation")
 	public boolean enableShowMyLocation(boolean centerAtFirstFix) {
@@ -88,7 +76,7 @@ public class LocationHandler {
 			String bestProvider = mLocationManager.getBestProvider(criteria, true);
 
 			if (bestProvider == null) {
-				mTileMap.showDialog(DIALOG_LOCATION_PROVIDER_DISABLED);
+				App.activity.showDialog(DIALOG_LOCATION_PROVIDER_DISABLED);
 				return false;
 			}
 
@@ -106,105 +94,56 @@ public class LocationHandler {
 		return false;
 	}
 
-	GeoPoint prePosition;
-	int preZoomMylocation;
-
 	public void gotoLastKnownPosition() {
 
-		Location currentLocation = null;
-		Location bestLocation = null;
-		MapPosition Positontemp = new MapPosition();
+		Location location = null;
 
+		MapPosition Positontemp = new MapPosition();
 		App.map.getMapViewPosition().getMapPosition(Positontemp);
 
-		prePosition = Positontemp.getGeoPoint();    // SAVE LAST POSITION
-
-		preZoomLevel = Positontemp.zoomLevel;
+		prePosition = Positontemp.getGeoPoint();
 
 		for (String provider : mLocationManager.getProviders(true)) {
-			currentLocation = mLocationManager.getLastKnownLocation(provider);
-			if (currentLocation == null)
+			Location l = mLocationManager.getLastKnownLocation(provider);
+			if (l == null)
 				continue;
-			if (bestLocation == null
-					|| currentLocation.getAccuracy() < bestLocation.getAccuracy()) {
-				bestLocation = currentLocation;
+
+			if (location == null || l.getAccuracy() < location.getAccuracy()) {
+				location = l;
 			}
 		}
 
-		if (bestLocation != null) {
-
-			byte zoom = (byte) 12;
-
-			MapPosition mapPosition = new MapPosition();
-			mapPosition.setPosition(bestLocation.getLatitude(), bestLocation.getLongitude());
-			mapPosition.setZoomLevel(zoom);
-
-			if (App.map.getOverlays().size() > 2) {
-				App.map.getOverlays().remove(myLocationOverlay);
-				App.map.getOverlays().remove(ts);
-				App.map.getOverlays().remove(orientationOverlay);
-			}
-
-			myLocationOverlay = new LocationMarker(App.map);
-			//	return ;}
-
-			myLocationOverlay.setPosition(mapPosition.getGeoPoint());
-
-			MyLocation2 = new GeoPoint(bestLocation.getLatitude(), bestLocation.getLongitude());
-
-			myLocation = new GeoPoint(mapPosition.getGeoPoint().getLatitude(), mapPosition
-					.getGeoPoint().getLongitude());
-
-			// calculation related to offset the lat/log  ... make it general function
-
-			//	double ground=	MercatorProjection.calculateGroundResolution(
-			// App.map.getMapPosition().getMapCenter().getLatitude(),
-			//App.map.getMapPosition().getMapPosition().zoomLevel);
-
-			//double  raduisInPixle = ((double) currentLocation.getAccuracy()) /ground;
-
-			//double latt = MercatorProjection.latitudeToPixelY(
-			//App.map.getMapPosition().getMapCenter().getLatitude()	,
-			//App.map.getMapPosition().getMapPosition().zoomLevel);
-
-			//Toast.makeText(App.activity,"raduis in pixle"+ String.valueOf(latt), Toast.LENGTH_LONG).show();
-
-			if (currentLocation != null) {
-				ts = new LocationOverlay(App.map, (float) currentLocation.getAccuracy(), 0);
-				ts.setLat(((float) mapPosition.getGeoPoint().getLatitude()));
-				ts.setLon(((float) mapPosition.getGeoPoint().getLongitude()));
-
-			} else if (bestLocation != null) {
-				ts = new LocationOverlay(App.map, (float) bestLocation.getAccuracy(), 0);
-				ts.setLat(((float) mapPosition.getGeoPoint().getLatitude()));
-				ts.setLon(((float) mapPosition.getGeoPoint().getLongitude()));
-			}
-			//else
-			//	return;
-
-			// ts.setRaduis((float) currentLocation.getAccuracy());
-			App.map.getOverlays().add(1, ts);
-
-			App.map.getOverlays().add(2, myLocationOverlay);
-			orientationOverlay = new GenericOverlay(App.map, tempZeft);
-			App.map.getOverlays().add(orientationOverlay);
-
-			App.map.setMapPosition(mapPosition);
-
-			App.map.redrawMap(true);
-
-		} else {
-			mTileMap.showToastOnUiThread(mTileMap
+		if (location == null) {
+			App.activity.showToastOnUiThread(App.activity
 					.getString(R.string.error_last_location_unknown));
+			return;
 		}
+
+		MapPosition mapPosition = new MapPosition();
+		mapPosition.setPosition(location.getLatitude(), location.getLongitude());
+		mapPosition.setZoomLevel(SHOW_LOCATION_ZOOM);
+
+		//App.map.getOverlays().remove(mLocationMarker);
+		App.map.getOverlays().remove(mLocationOverlay);
+		App.map.getOverlays().remove(mOrientationOverlay);
+
+		mCurrentLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+		mLocationOverlay = new LocationOverlay(App.map);
+		App.map.getOverlays().add(mLocationOverlay);
+
+		//mLocationMarker = new LocationMarker(App.map);
+		//mLocationMarker.setPosition(mCurrentLocation);
+		//App.map.getOverlays().add(mLocationMarker);
+
+		mLocationOverlay.setPosition(mCurrentLocation, location.getAccuracy());
+
+		mOrientationOverlay = new GenericOverlay(App.map, mDirectionRenderLayer);
+		App.map.getOverlays().add(mOrientationOverlay);
+
+		App.map.setMapPosition(mapPosition);
+		App.map.redrawMap(true);
 
 	}
-
-	GenericOverlay orientationOverlay;
-
-	GeoPoint MyLocation2;
-
-	int i = 0;
 
 	/**
 	 * Disables the "show my location" mode.
@@ -215,29 +154,20 @@ public class LocationHandler {
 			mShowMyLocation = false;
 			disableSnapToLocation(false);
 
-			if (App.map.getOverlays().size() > 2) {
-				App.map.getOverlays().remove(myLocationOverlay);
-				App.map.getOverlays().remove(ts);
-				App.map.getOverlays().remove(orientationOverlay);
-			}
+			//App.map.getOverlays().remove(mLocationMarker);
+			App.map.getOverlays().remove(mLocationOverlay);
+			App.map.getOverlays().remove(mOrientationOverlay);
+
 			App.map.redrawMap(true);
 			mLocationManager.removeUpdates(mLocationListener);
-			// if (circleOverlay != null) {
-			// mapView.getOverlays().remove(circleOverlay);
-			// mapView.getOverlays().remove(itemizedOverlay);
-			// circleOverlay = null;
-			// itemizedOverlay = null;
-			// }
-
-			//mSnapToLocationView.setVisibility(View.GONE);
 
 			return true;
 		}
 		return false;
 	}
 
-	LocationMarker myLocationOverlay;
-	public LocationOverlay ts;
+	//private LocationMarker mLocationMarker;
+	private LocationOverlay mLocationOverlay;
 
 	/**
 	 * Returns the status of the "show my location" mode.
@@ -255,12 +185,12 @@ public class LocationHandler {
 	public void disableSnapToLocation(boolean showToast) {
 		if (mSnapToLocation) {
 			mSnapToLocation = false;
-			//mSnapToLocationView.setChecked(false);
 
-			App.map.setClickable(true);
+			App.map.getEventLayer().enableMove(false);
+			//App.map.setClickable(true);
 
 			if (showToast) {
-				mTileMap.showToastOnUiThread(mTileMap
+				App.activity.showToastOnUiThread(App.activity
 						.getString(R.string.snap_to_location_disabled));
 			}
 		}
@@ -275,10 +205,11 @@ public class LocationHandler {
 		if (!mSnapToLocation) {
 			mSnapToLocation = true;
 
-			App.map.setClickable(false);
+			App.map.getEventLayer().enableMove(false);
+			//App.map.setClickable(false);
 
 			if (showToast) {
-				mTileMap.showToastOnUiThread(mTileMap
+				App.activity.showToastOnUiThread(App.activity
 						.getString(R.string.snap_to_location_enabled));
 			}
 		}
@@ -292,7 +223,7 @@ public class LocationHandler {
 		return mSnapToLocation;
 	}
 
-	DirectionRenderLayer tempZeft = null;
+	DirectionRenderLayer mDirectionRenderLayer = null;
 
 	class MyLocationListener implements LocationListener, SensorEventListener {
 		SensorManager mSensorManager;
@@ -311,7 +242,7 @@ public class LocationHandler {
 					mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
 					SensorManager.SENSOR_DELAY_NORMAL);
 
-			tempZeft = new DirectionRenderLayer(mapView, prePosition);
+			mDirectionRenderLayer = new DirectionRenderLayer(mapView, prePosition);
 
 			arrowBitmap = BitmapFactory.decodeResource(App.activity.getResources(),
 					R.drawable.direction);
@@ -321,53 +252,31 @@ public class LocationHandler {
 		}
 
 		public void rotateDrawable(float angle) {
-
-			if (MyLocation2 != null && tempZeft != null)
-				tempZeft.setLocation(MyLocation2);
+			if (mCurrentLocation != null && mDirectionRenderLayer != null)
+				mDirectionRenderLayer.setLocation(mCurrentLocation);
 
 			synchronized (canvasBitmap) {
+				canvasBitmap.eraseColor(0x00000000);
+				mRotateMatrix.setRotate(angle, mCanvas.getWidth() / 2, mCanvas.getHeight() / 2);
 
-			// arrowBitmap= Bitmap.createScaledBitmap(arrowBitmap, 10, 10, false);
-			// Create blank bitmap of equal size
+				// Draw bitmap onto canvas using matrix
+				mCanvas.drawBitmap(arrowBitmap, mRotateMatrix, null);
+				mCanvas.drawBitmap(arrowBitmap, mRotateMatrix, null);
 
-			canvasBitmap.eraseColor(0x00000000);
-
-			// Create rotation matrix
-			//Matrix scaleMatrix = new Matrix();
-			//rotateMatrix.setScale(.1f, .1f);
-			mRotateMatrix.setRotate(angle, mCanvas.getWidth() / 2, mCanvas.getHeight() / 2);
-
-			// Draw bitmap onto canvas using matrix
-
-			mCanvas.drawBitmap(arrowBitmap, mRotateMatrix, null);
-			// rotateMatrix.setScale(.1f, .1f);
-			mCanvas.drawBitmap(arrowBitmap, mRotateMatrix, null);
-			// canvas.setMatrix(matrix)
-
-			if (tempZeft != null)
-				tempZeft.locationBitmap = canvasBitmap;
+				if (mDirectionRenderLayer != null)
+					mDirectionRenderLayer.locationBitmap = canvasBitmap;
 			}
 		}
 
 		@Override
 		public void onLocationChanged(Location location) {
-
 			rotateDrawable(val);
-
-			Log.d(TAG, "onLocationChanged, "
-					+ " lon:" + location.getLongitude()
-					+ " lat:" + location.getLatitude());
 
 			if (!isShowMyLocationEnabled()) {
 				return;
 			}
 
 			GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
-
-			// this.advancedMapViewer.overlayCircle.setCircleData(point, location.getAccuracy());
-			// this.advancedMapViewer.overlayItem.setPoint(point);
-			// this.advancedMapViewer.circleOverlay.requestRedraw();
-			// this.advancedMapViewer.itemizedOverlay.requestRedraw();
 
 			if (mSetCenter || isSnapToLocationEnabled()) {
 				mSetCenter = false;
@@ -376,7 +285,7 @@ public class LocationHandler {
 			if (mSnapToLocation) {
 
 				App.activity.getCompass().stop();
-				App.map.enableRotation(true);
+				App.map.getEventLayer().enableRotation(true);
 				gotoLastKnownPosition();
 
 			}
@@ -385,17 +294,14 @@ public class LocationHandler {
 
 		@Override
 		public void onProviderDisabled(String provider) {
-			// do nothing
 		}
 
 		@Override
 		public void onProviderEnabled(String provider) {
-			// do nothing
 		}
 
 		@Override
 		public void onStatusChanged(String provider, int status, Bundle extras) {
-			// do nothing
 		}
 
 		boolean isFirstCenter() {
@@ -408,8 +314,6 @@ public class LocationHandler {
 
 		@Override
 		public void onAccuracyChanged(Sensor arg0, int arg1) {
-			// TODO Auto-generated method stub
-
 		}
 
 		float val;

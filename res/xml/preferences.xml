@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-     xmlns:oscim_app="http://app.oscim.org"
+    xmlns:oscim_app="http://app.oscim.org"
     android:title="@string/menu_preferences" >
 
     <PreferenceCategory android:title="@string/preferences_map" >
@@ -37,17 +37,16 @@
             android:title="@string/preferences_text_scale" />
         -->
     </PreferenceCategory>
-     <PreferenceCategory android:title='Cache settings'>
-         <org.oscim.app.preferences.CacheSizePreference
-            android:key="cacheSize"
-            android:title="Cache Size"
-            android:summary="Set tile cache size"
+    <PreferenceCategory android:title="Cache settings" >
+        <org.oscim.app.preferences.CacheSizePreference
             android:defaultValue="30"
+            android:key="cacheSize"
             android:max="50"
+            android:summary="Set tile cache size"
+            android:title="Cache Size"
             oscim_app:min="1"
             oscim_app:unitsLeft=""
-            oscim_app:unitsRight="MB"
-            />
+            oscim_app:unitsRight="MB" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/preferences_theme_title" >
         <ListPreference
@@ -58,6 +57,7 @@
             android:summary="@string/preferences_theme_summary"
             android:title="@string/preferences_theme" />
     </PreferenceCategory>
+    <!--
     <PreferenceCategory android:title="@string/preferences_general" >
         <CheckBoxPreference
             android:key="fullscreen"
@@ -71,21 +71,21 @@
             android:key="wakeLock"
             android:summary="@string/preferences_wake_lock_desc"
             android:title="@string/preferences_wake_lock" />
-        <!--
   	<CheckBoxPreference android:title="@string/preferences_cache_persistence" android:summary="@string/preferences_cache_persistence_desc"
 			android:key="cachePersistence" />
 		<de.sfb.pampa.preferences.CacheSizePreference
 			android:title="@string/preferences_cache_size" android:summary="@string/preferences_cache_size_desc" android:key="cacheSize" />
 		<de.sfb.pampa.preferences.MoveSpeedPreference
 			android:title="@string/preferences_move_speed" android:summary="@string/preferences_move_speed_desc" android:key="moveSpeed" />
-        -->
     </PreferenceCategory>
+    -->
+
+
+    <!--
     <PreferenceCategory android:title="@string/preferences_debug" >
 
-        <!--
        	<CheckBoxPreference android:title="@string/preferences_show_fps_counter" android:summary="@string/preferences_show_fps_counter_desc"
 			android:key="showFpsCounter" />
-        -->
         <CheckBoxPreference
             android:key="drawTileFrames"
             android:summary="@string/preferences_show_tile_frames_desc"
@@ -98,10 +98,11 @@
             android:key="disablePolygons"
             android:summary="@string/preferences_disable_polygons"
             android:title="@string/preferences_disable_polygons" />
-         <CheckBoxPreference
+        <CheckBoxPreference
             android:key="debugLabels"
             android:summary="@string/preferences_debug_labels"
             android:title="@string/preferences_debug_labels" />
     </PreferenceCategory>
+    -->
 
 </PreferenceScreen>

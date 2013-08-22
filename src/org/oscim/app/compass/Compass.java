@@ -15,6 +15,7 @@
 
 package org.oscim.app.compass;
 
+import org.oscim.app.App;
 import org.oscim.app.R;
 import org.oscim.core.MapPosition;
 import org.oscim.layers.Layer;
@@ -33,40 +34,34 @@ public class Compass extends Layer implements SensorEventListener {
 	//private static final String TAG = Compass.class.getName();
 
 	private final SensorManager mSensorManager;
-	private final Sensor mAccSensor;
-	private final Sensor mMagSensor;
-	private final float[] mGravity = new float[3];
-	private final float[] mGeomagnetic = new float[3];
-	private float mAzimuth = 0f;
-	private float mCurrectAzimuth = 0;
+
 	// compass arrow to rotate
 	private final ImageView mArrowView;
 
-	private float mRotation[] = new float[9];
-	private float mInclination[] = new float[9];
-	private float mOrientation[] = new float[3];
+	private final float[] mRotationM = new float[9];
+	private final float[] mRotationV = new float[3];
+	private float mCurRotation;
+	private float mCurTilt;
 
 	private boolean mEnabled;
 
 	@Override
 	public void onUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
 		if (!isEnabled()) {
-			mAzimuth = -mapPosition.angle;
-			this.adjustArrow();
+			mCurRotation = -mapPosition.angle;
+			this.adjustArrow(mCurRotation, mCurRotation);
 		}
 		super.onUpdate(mapPosition, changed, clear);
 	}
 
 	public Compass(Context context, MapView mapView) {
 		super(mapView);
+
 		mSensorManager = (SensorManager) context
 				.getSystemService(Context.SENSOR_SERVICE);
-		mAccSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		mMagSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
-		mArrowView = (ImageView) mapView.findViewById(R.id.imageView2);
+		mArrowView = (ImageView) App.activity.findViewById(R.id.compass);
 	}
-
 
 	public boolean isEnabled() {
 		return mEnabled;
@@ -75,13 +70,12 @@ public class Compass extends Layer implements SensorEventListener {
 	public void start() {
 		if (mEnabled)
 			return;
-
 		mEnabled = true;
-		mSensorManager.registerListener(this, mAccSensor,
-				SensorManager.SENSOR_DELAY_FASTEST);
-		mSensorManager.registerListener(this, mMagSensor,
-				SensorManager.SENSOR_DELAY_FASTEST);
-		mMapView.getMapViewPosition().setRotation(-mCurrectAzimuth);
+
+		Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+		mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
+
+		//mMapView.getMapViewPosition().setRotation(-mCurRotation);
 	}
 
 	public void stop() {
@@ -89,23 +83,13 @@ public class Compass extends Layer implements SensorEventListener {
 			return;
 
 		mEnabled = false;
-
 		mSensorManager.unregisterListener(this);
 	}
 
-	public void adjustArrow() {
-		if (mArrowView == null) {
-			//Log.i(TAG, "arrow view is not set");
-			return;
-		}
-
-		//	Log.i(TAG, "will set rotation from " + currectAzimuth + " to "
-		//		+ azimuth);
-
-		Animation an = new RotateAnimation(-mCurrectAzimuth, -mAzimuth,
-				Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
-				0.5f);
-		mCurrectAzimuth = mAzimuth;
+	public void adjustArrow(float prev, float cur) {
+		Animation an = new RotateAnimation(-prev, -cur,
+				Animation.RELATIVE_TO_SELF, 0.5f,
+				Animation.RELATIVE_TO_SELF, 0.5f);
 
 		an.setDuration(100);
 		an.setRepeatCount(0);
@@ -116,69 +100,59 @@ public class Compass extends Layer implements SensorEventListener {
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		final float alpha = 0.97f;
 
 		synchronized (this) {
-			if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
-				mGravity[0] = alpha * mGravity[0] + (1 - alpha)
-						* event.values[0];
-				mGravity[1] = alpha * mGravity[1] + (1 - alpha)
-						* event.values[1];
-				mGravity[2] = alpha * mGravity[2] + (1 - alpha)
-						* event.values[2];
+			if (event.sensor.getType() != Sensor.TYPE_ROTATION_VECTOR)
+				return;
 
-				// mGravity = event.values;
+			SensorManager.getRotationMatrixFromVector(mRotationM, event.values);
+			SensorManager.getOrientation(mRotationM, mRotationV);
 
-				// Log.e(TAG, Float.toString(mGravity[0]));
+			float rotation = (float)Math.toDegrees(mRotationV[0]);
+
+			float change = rotation - mCurRotation;
+			if (change > 180)
+				change -= 360;
+			else if (change < -180)
+				change += 360;
+
+			// low-pass
+			change *= 0.25;
+
+			rotation = mCurRotation + change;
+
+			if (rotation >  180)
+				rotation -= 360;
+			else if (rotation <  -180)
+				rotation += 360;
+
+			mCurTilt = mCurTilt + 0.25f * (mRotationV[1] - mCurTilt);
+
+			if (Math.abs(change) > 0.01) {
+				adjustArrow(mCurRotation, rotation);
+				mMapView.getMapViewPosition().setRotation(-rotation);
+
+				float tilt = (float) Math.toDegrees(mCurTilt);
+				mMapView.getMapViewPosition().setTilt(-tilt * 1.6f);
+				mMapView.redrawMap(true);
 			}
 
-			if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-				// mGeomagnetic = event.values;
-
-				mGeomagnetic[0] = alpha * mGeomagnetic[0] + (1 - alpha)
-						* event.values[0];
-				mGeomagnetic[1] = alpha * mGeomagnetic[1] + (1 - alpha)
-						* event.values[1];
-				mGeomagnetic[2] = alpha * mGeomagnetic[2] + (1 - alpha)
-						* event.values[2];
-				// Log.e(TAG, Float.toString(event.values[0]));
-
-			}
-
-			boolean success = SensorManager.getRotationMatrix(mRotation, mInclination, mGravity,
-					mGeomagnetic);
-			if (success) {
-				SensorManager.getOrientation(mRotation, mOrientation);
-				// Log.d(TAG, "azimuth (rad): " + azimuth);
-				mAzimuth = (float) Math.toDegrees(mOrientation[0]); // orientation
-				mAzimuth = (mAzimuth + 360) % 360;
-				// Log.d(TAG, "azimuth (deg): " + azimuth);
-				adjustArrow();
-				if (Math.abs(mAzimuth - angle) > .01f) {
-
-					angle = mAzimuth;
-					this.mMapView.getMapViewPosition().setRotation(-this.mAzimuth);
-					mMapView.redrawMap(true);
-				}
-			}
+			mCurRotation = rotation;
 		}
-
 	}
 
 	public void rest() {
-		this.mMapView.getMapViewPosition().setRotation(0);
-		stop();
+		mMapView.getMapViewPosition().setRotation(0);
 
-		mCurrectAzimuth = 0;
-		mAzimuth = 0;
-		adjustArrow();
-		this.mMapView.getMapViewPosition().setRotation(-this.mCurrectAzimuth);
+		stop();
+		adjustArrow(0, 0);
+
+		//mMapView.getMapViewPosition().setRotation(-mCurRotation);
+
 		mMapView.redrawMap(true);
 
 	}
-
-	private float angle;
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
