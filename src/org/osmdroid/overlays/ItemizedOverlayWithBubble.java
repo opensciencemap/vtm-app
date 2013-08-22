@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
-import org.oscim.core.PointF;
+import org.oscim.core.PointD;
 import org.oscim.layers.overlay.ItemizedIconOverlay;
 import org.oscim.layers.overlay.OverlayItem;
 import org.oscim.layers.overlay.OverlayMarker;
@@ -54,14 +54,14 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 		return false;
 	}
 
-	private PointF mTmpPoint = new PointF();
+	private final PointD mTmpPoint = new PointD();
 
 	@Override
 	public void onUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
 		if (mBubble.isOpen()) {
 			GeoPoint gp = mItemWithBubble.getPoint();
 
-			PointF p = mTmpPoint;
+			PointD p = mTmpPoint;
 			mMapView.getMapViewPosition().project(gp, p);
 
 			mBubble.position((int) p.x, (int) p.y);
