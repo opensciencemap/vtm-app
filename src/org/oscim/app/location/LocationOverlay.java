@@ -289,18 +289,21 @@ public class LocationOverlay extends Overlay {
 				+ "uniform vec2 u_dir;"
 				+ "void main() {"
 				+ "  float len = 1.0 - length(v_tex);"
-				///  blur outline by 2px
+				///  outer ring
 				+ "  float a = smoothstep(0.0, 2.0 / u_scale, len);"
-				+ "  float b = smoothstep(4.0 / u_scale, 5.0 / u_scale, len);"
+				///  inner ring
+				+ "  float b = 0.5 * smoothstep(4.0 / u_scale, 5.0 / u_scale, len);"
 				///  center point
-				+ "  float c = 1.0 - smoothstep(14.0 / u_scale, 16.0 / u_scale, 1.0 - len);"
+				+ "  float c = 0.5 * (1.0 - smoothstep(14.0 / u_scale, 16.0 / u_scale, 1.0 - len));"
 				+ "  vec2 dir = normalize(v_tex);"
 				+ "  float d = 1.0 - dot(dir, u_dir); "
-				///  0.5 width of viewshed + antialiasing
-				+ "  d = step(0.5, d);"
-				+ "  a = clamp(d, 0.4, 0.7) * clamp(a - (b + c) * 0.5 , 0.0, 1.0) + c * 0.5;"
-				//+ "  a = a - clamp(d, 0.6, 0.8) * b;"
-				+ "  gl_FragColor = vec4 (0.2, 0.2, 0.8, 1.0) * clamp(a, 0.0, 1.0);"
+				///  0.5 width of viewshed
+				+ "  d = clamp(step(0.5, d), 0.4, 0.7);"
+				///  - subtract inner from outer to create the outline
+				///  - multiply by viewshed
+				///  - add center point
+				+ "  a = d * (a - (b + c)) + c;"
+				+ "  gl_FragColor = vec4(0.2, 0.2, 0.8, 1.0) * a;"
 				+ "}";
 
 	}
