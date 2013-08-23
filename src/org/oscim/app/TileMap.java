@@ -16,7 +16,7 @@
 package org.oscim.app;
 
 import org.oscim.android.MapActivity;
-import org.oscim.app.compass.Compass;
+import org.oscim.app.location.Compass;
 import org.oscim.app.location.LocationDialog;
 import org.oscim.app.location.LocationHandler;
 import org.oscim.app.preferences.EditPreferences;
@@ -87,12 +87,12 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 		mMapLayers.setBaseMap(PreferenceManager.getDefaultSharedPreferences(this));
 
-		mLocation = new LocationHandler(this);
-
 		mMapView.getOverlays().add(new DistanceTouchOverlay(mMapView, this));
 
 		mCompass = new Compass(this, mMapView);
 		mMapView.getOverlays().add(mCompass);
+
+		mLocation = new LocationHandler(this, mCompass);
 
 		App.poiSearch = new POISearch();
 		App.routeSearch = new RouteSearch();
@@ -147,10 +147,12 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		case R.id.menu_compass_enable:
 			if (!item.isChecked()) {
 				mMapView.getEventLayer().enableRotation(false);
-				mCompass.start();
+				mMapView.getEventLayer().enableTilt(false);
+				mCompass.setEnabled(true);
 			} else {
 				mMapView.getEventLayer().enableRotation(true);
-				mCompass.stop();
+				mMapView.getEventLayer().enableTilt(true);
+				mCompass.setEnabled(false);
 			}
 			toggleMenuCheck();
 			return true;
@@ -166,9 +168,9 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 		case R.id.menu_position_follow_location:
 			if (!item.isChecked()) {
-				mLocation.enableSnapToLocation(true);
+				mLocation.enableSnapToLocation();
 			} else {
-				mLocation.disableSnapToLocation(true);
+				mLocation.disableSnapToLocation();
 			}
 			toggleMenuCheck();
 			return true;
@@ -291,6 +293,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		//	menu.findItem(R.id.menu_position_map_center).setVisible(false);
 		//}
 
+		menu.findItem(R.id.menu_position_map_center).setVisible(false);
+
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -391,7 +395,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mCompass.stop();
+		mCompass.setEnabled(false);
 		// release the wake lock if necessary
 		// if (mWakeLock.isHeld()) {
 		// mWakeLock.release();
@@ -486,7 +490,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				Toast toast = Toast.makeText(TileMap.this, text, Toast.LENGTH_LONG);
+				Toast toast = Toast.makeText(TileMap.this, text, Toast.LENGTH_SHORT);
 				toast.show();
 			}
 		});
@@ -496,17 +500,75 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		return mCompass;
 	}
 
+	private final static int MAP_MODE_MANUAL = 0;
+	private final static int MAP_MODE_COMPASS = 1;
+	private final static int MAP_MODE_SHOW_LOCATION = 2;
+	private final static int MAP_MODE_SNAP_LOCATION = 3;
+
+	private int mMapMode = MAP_MODE_MANUAL;
+
 	public void toggleLocation(View V) {
-		mCompass.rest();
-		mCompass.stop();
-
-		mMapView.getEventLayer().enableRotation(true);
-
-		mLocation.enableShowMyLocation(true);
 
 		((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(50);
 
-		mCompass.rest();
+		mMapMode += 1;
+		mMapMode %= 4;
+
+		setInteractionMode(mMapMode);
+	}
+
+	private void setInteractionMode(int mapMode) {
+		switch (mapMode) {
+		case MAP_MODE_MANUAL:
+			mMapView.getEventLayer().enableRotation(true);
+			mMapView.getEventLayer().enableTilt(true);
+
+			mLocation.disableShowMyLocation();
+
+			mCompass.setEnabled(false);
+			mCompass.controlOrientation(false);
+
+			App.activity.showToastOnUiThread("Manual");
+
+			break;
+		case MAP_MODE_SHOW_LOCATION:
+			mMapView.getEventLayer().enableRotation(true);
+			mMapView.getEventLayer().enableTilt(true);
+
+			mCompass.setEnabled(false);
+			mCompass.controlOrientation(false);
+
+			mLocation.enableShowMyLocation(true);
+			App.activity.showToastOnUiThread("Show Location");
+			break;
+		case MAP_MODE_SNAP_LOCATION:
+			mMapView.getEventLayer().enableRotation(true);
+			mMapView.getEventLayer().enableTilt(true);
+
+			mLocation.enableSnapToLocation();
+			//mCompass.setEnabled(true);
+
+			mCompass.controlOrientation(false);
+
+			App.activity.showToastOnUiThread(App.activity
+					.getString(R.string.snap_to_location_enabled));
+			break;
+
+		case MAP_MODE_COMPASS:
+			mMapView.getEventLayer().enableRotation(false);
+			mMapView.getEventLayer().enableTilt(false);
+
+			mCompass.setEnabled(true);
+			mCompass.controlOrientation(true);
+			mLocation.disableShowMyLocation();
+
+			App.activity.showToastOnUiThread("Compass");
+
+			break;
+
+		default:
+			break;
+		}
 
 		App.map.redrawMap(true);
 	}

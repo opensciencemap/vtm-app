@@ -1,5 +1,6 @@
 /*
  * Copyright 2013 Ahmad Saleem
+ * Copyright 2013 Hannes Janetzek
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -13,7 +14,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.oscim.app.compass;
+package org.oscim.app.location;
 
 import org.oscim.app.App;
 import org.oscim.app.R;
@@ -34,22 +35,21 @@ public class Compass extends Layer implements SensorEventListener {
 	//private static final String TAG = Compass.class.getName();
 
 	private final SensorManager mSensorManager;
-
-	// compass arrow to rotate
 	private final ImageView mArrowView;
 
 	private final float[] mRotationM = new float[9];
 	private final float[] mRotationV = new float[3];
+
 	private float mCurRotation;
 	private float mCurTilt;
 
-	private boolean mEnabled;
+	private boolean mControlOrientation;
 
 	@Override
 	public void onUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
-		if (!isEnabled()) {
-			mCurRotation = -mapPosition.angle;
-			this.adjustArrow(mCurRotation, mCurRotation);
+		if (!mControlOrientation) {
+			float rotation = -mapPosition.angle;
+			adjustArrow(rotation, rotation);
 		}
 		super.onUpdate(mapPosition, changed, clear);
 	}
@@ -61,29 +61,31 @@ public class Compass extends Layer implements SensorEventListener {
 				.getSystemService(Context.SENSOR_SERVICE);
 
 		mArrowView = (ImageView) App.activity.findViewById(R.id.compass);
+
+		setEnabled(false);
 	}
 
-	public boolean isEnabled() {
-		return mEnabled;
+	public synchronized float getRotation(){
+		return mCurRotation;
 	}
 
-	public void start() {
-		if (mEnabled)
-			return;
-		mEnabled = true;
-
-		Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-		mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
-
-		//mMapView.getMapViewPosition().setRotation(-mCurRotation);
+	public void controlOrientation(boolean enable) {
+		mControlOrientation = enable;
 	}
 
-	public void stop() {
-		if (!mEnabled)
+	@Override
+	public void setEnabled(boolean enabled) {
+		if (isEnabled() == enabled)
 			return;
 
-		mEnabled = false;
-		mSensorManager.unregisterListener(this);
+		super.setEnabled(enabled);
+
+		if (isEnabled()){
+			Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+			mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
+		} else{
+			mSensorManager.unregisterListener(this);
+		}
 	}
 
 	public void adjustArrow(float prev, float cur) {
@@ -129,7 +131,7 @@ public class Compass extends Layer implements SensorEventListener {
 
 			mCurTilt = mCurTilt + 0.25f * (mRotationV[1] - mCurTilt);
 
-			if (Math.abs(change) > 0.01) {
+			if (mControlOrientation && Math.abs(change) > 0.01) {
 				adjustArrow(mCurRotation, rotation);
 				mMapView.getMapViewPosition().setRotation(-rotation);
 
@@ -140,18 +142,6 @@ public class Compass extends Layer implements SensorEventListener {
 
 			mCurRotation = rotation;
 		}
-	}
-
-	public void rest() {
-		mMapView.getMapViewPosition().setRotation(0);
-
-		stop();
-		adjustArrow(0, 0);
-
-		//mMapView.getMapViewPosition().setRotation(-mCurRotation);
-
-		mMapView.redrawMap(true);
-
 	}
 
 	@Override

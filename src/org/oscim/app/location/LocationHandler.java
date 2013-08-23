@@ -1,5 +1,7 @@
-/* Copyright 2013 Ahmad Al-saleem
+/*
  * Copyright 2010, 2011, 2012 mapsforge.org
+ * Copyright 2013 Hannes Janetzek
+ * Copyright 2013 Ahmad Al-saleem
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -19,18 +21,8 @@ import org.oscim.app.R;
 import org.oscim.app.TileMap;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
-import org.oscim.layers.overlay.GenericOverlay;
-import org.oscim.view.MapView;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -38,70 +30,84 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 
-public class LocationHandler {
+public class LocationHandler implements LocationListener {
 	private final static String TAG = LocationHandler.class.getName();
 
 	private final static int DIALOG_LOCATION_PROVIDER_DISABLED = 2;
-
 	private final static int SHOW_LOCATION_ZOOM = 15;
 
-	private MyLocationListener mLocationListener;
-	private LocationManager mLocationManager;
-	private boolean mShowMyLocation;
+	private final LocationManager mLocationManager;
+	private final LocationOverlay mLocationOverlay;
 
+	private boolean mShowMyLocation;
 	private boolean mSnapToLocation;
 
-	private GenericOverlay mOrientationOverlay;
-	private GeoPoint mCurrentLocation;
+	private boolean mSetCenter;
 
-	private GeoPoint prePosition;
-
-	public LocationHandler(TileMap tileMap) {
-
+	public LocationHandler(TileMap tileMap, Compass compass) {
 		mLocationManager = (LocationManager) tileMap
 				.getSystemService(Context.LOCATION_SERVICE);
-		mLocationListener = new MyLocationListener(App.map);
 
+		mLocationOverlay = new LocationOverlay(App.map, compass);
 	}
 
 	@SuppressWarnings("deprecation")
 	public boolean enableShowMyLocation(boolean centerAtFirstFix) {
-		Log.d(TAG, "enableShowMyLocation " + mShowMyLocation);
 
-		gotoLastKnownPosition();
-
-		if (!mShowMyLocation) {
-			Criteria criteria = new Criteria();
-			criteria.setAccuracy(Criteria.ACCURACY_FINE);
-			String bestProvider = mLocationManager.getBestProvider(criteria, true);
-
-			if (bestProvider == null) {
-				App.activity.showDialog(DIALOG_LOCATION_PROVIDER_DISABLED);
-				return false;
-			}
-
-			mShowMyLocation = true;
-
-			Log.d(TAG, "enableShowMyLocation " + mShowMyLocation);
-
-			mLocationListener.setFirstCenter(centerAtFirstFix);
-
-			mLocationManager.requestLocationUpdates(bestProvider, 1000, 0,
-					mLocationListener);
-
+		if (mShowMyLocation)
 			return true;
+
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_FINE);
+		String bestProvider = mLocationManager.getBestProvider(criteria, true);
+
+		if (bestProvider == null) {
+			App.activity.showDialog(DIALOG_LOCATION_PROVIDER_DISABLED);
+			return false;
 		}
-		return false;
+
+		mShowMyLocation = true;
+		mSetCenter = centerAtFirstFix;
+
+		mLocationManager.requestLocationUpdates(bestProvider, 10000, 10, this);
+
+		Location location = gotoLastKnownPosition();
+		if (location == null)
+			return false;
+
+		mLocationOverlay.setEnabled(true);
+		mLocationOverlay.setPosition(location.getLatitude(),
+				location.getLongitude(),
+				location.getAccuracy());
+
+		App.map.getOverlays().add(2, mLocationOverlay);
+
+		App.map.redrawMap(true);
+		return true;
 	}
 
-	public void gotoLastKnownPosition() {
+	/**
+	 * Disable "show my location" mode.
+	 */
+	public boolean disableShowMyLocation() {
+		if (!mShowMyLocation)
+			return false;
 
+		mShowMyLocation = false;
+
+		disableSnapToLocation();
+
+		mLocationManager.removeUpdates(this);
+		mLocationOverlay.setEnabled(false);
+
+		App.map.getOverlays().remove(mLocationOverlay);
+		App.map.redrawMap(true);
+
+		return true;
+	}
+
+	public Location gotoLastKnownPosition() {
 		Location location = null;
-
-		MapPosition Positontemp = new MapPosition();
-		App.map.getMapViewPosition().getMapPosition(Positontemp);
-
-		prePosition = Positontemp.getGeoPoint();
 
 		for (String provider : mLocationManager.getProviders(true)) {
 			Location l = mLocationManager.getLastKnownLocation(provider);
@@ -116,221 +122,84 @@ public class LocationHandler {
 		if (location == null) {
 			App.activity.showToastOnUiThread(App.activity
 					.getString(R.string.error_last_location_unknown));
-			return;
+			return null;
 		}
 
 		MapPosition mapPosition = new MapPosition();
 		mapPosition.setPosition(location.getLatitude(), location.getLongitude());
 		mapPosition.setZoomLevel(SHOW_LOCATION_ZOOM);
 
-		//App.map.getOverlays().remove(mLocationMarker);
-		App.map.getOverlays().remove(mLocationOverlay);
-		App.map.getOverlays().remove(mOrientationOverlay);
-
-		mCurrentLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
-		mLocationOverlay = new LocationOverlay(App.map);
-		App.map.getOverlays().add(mLocationOverlay);
-
-		//mLocationMarker = new LocationMarker(App.map);
-		//mLocationMarker.setPosition(mCurrentLocation);
-		//App.map.getOverlays().add(mLocationMarker);
-
-		mLocationOverlay.setPosition(mCurrentLocation, location.getAccuracy());
-
-		mOrientationOverlay = new GenericOverlay(App.map, mDirectionRenderLayer);
-		App.map.getOverlays().add(mOrientationOverlay);
-
 		App.map.setMapPosition(mapPosition);
 		App.map.redrawMap(true);
 
+		return location;
 	}
 
-	/**
-	 * Disables the "show my location" mode.
-	 * @return ...
-	 */
-	public boolean disableShowMyLocation() {
-		if (mShowMyLocation) {
-			mShowMyLocation = false;
-			disableSnapToLocation(false);
-
-			//App.map.getOverlays().remove(mLocationMarker);
-			App.map.getOverlays().remove(mLocationOverlay);
-			App.map.getOverlays().remove(mOrientationOverlay);
-
-			App.map.redrawMap(true);
-			mLocationManager.removeUpdates(mLocationListener);
-
-			return true;
-		}
-		return false;
-	}
-
-	//private LocationMarker mLocationMarker;
-	private LocationOverlay mLocationOverlay;
-
-	/**
-	 * Returns the status of the "show my location" mode.
-	 * @return true if the "show my location" mode is enabled, false otherwise.
-	 */
 	public boolean isShowMyLocationEnabled() {
 		return mShowMyLocation;
 	}
 
-	/**
-	 * Disables the "snap to location" mode.
-	 * @param showToast
-	 *            defines whether a toast message is displayed or not.
-	 */
-	public void disableSnapToLocation(boolean showToast) {
-		if (mSnapToLocation) {
-			mSnapToLocation = false;
-
-			App.map.getEventLayer().enableMove(false);
-			//App.map.setClickable(true);
-
-			if (showToast) {
-				App.activity.showToastOnUiThread(App.activity
-						.getString(R.string.snap_to_location_disabled));
-			}
-		}
-	}
-
-	/**
-	 * Enables the "snap to location" mode.
-	 * @param showToast
-	 *            defines whether a toast message is displayed or not.
-	 */
-	public void enableSnapToLocation(boolean showToast) {
-		if (!mSnapToLocation) {
-			mSnapToLocation = true;
-
-			App.map.getEventLayer().enableMove(false);
-			//App.map.setClickable(false);
-
-			if (showToast) {
-				App.activity.showToastOnUiThread(App.activity
-						.getString(R.string.snap_to_location_enabled));
-			}
-		}
-	}
-
-	/**
-	 * Returns the status of the "snap to location" mode.
-	 * @return true if the "snap to location" mode is enabled, false otherwise.
-	 */
 	public boolean isSnapToLocationEnabled() {
 		return mSnapToLocation;
 	}
 
-	DirectionRenderLayer mDirectionRenderLayer = null;
+	public void disableSnapToLocation() {
+		if (mSnapToLocation) {
+			mSnapToLocation = false;
 
-	class MyLocationListener implements LocationListener, SensorEventListener {
-		SensorManager mSensorManager;
-
-		private boolean mSetCenter;
-
-		private final Bitmap arrowBitmap;
-		private final Bitmap canvasBitmap;
-		private final Canvas mCanvas;
-		private final Matrix mRotateMatrix = new Matrix();
-
-		@SuppressWarnings("deprecation")
-		public MyLocationListener(MapView mapView) {
-			mSensorManager = (SensorManager) App.activity.getSystemService(Context.SENSOR_SERVICE);
-			mSensorManager.registerListener(this,
-					mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
-					SensorManager.SENSOR_DELAY_NORMAL);
-
-			mDirectionRenderLayer = new DirectionRenderLayer(mapView, prePosition);
-
-			arrowBitmap = BitmapFactory.decodeResource(App.activity.getResources(),
-					R.drawable.direction);
-			canvasBitmap = arrowBitmap.copy(Bitmap.Config.ARGB_8888, true);
-
-			mCanvas = new Canvas(canvasBitmap);
-		}
-
-		public void rotateDrawable(float angle) {
-			if (mCurrentLocation != null && mDirectionRenderLayer != null)
-				mDirectionRenderLayer.setLocation(mCurrentLocation);
-
-			synchronized (canvasBitmap) {
-				canvasBitmap.eraseColor(0x00000000);
-				mRotateMatrix.setRotate(angle, mCanvas.getWidth() / 2, mCanvas.getHeight() / 2);
-
-				// Draw bitmap onto canvas using matrix
-				mCanvas.drawBitmap(arrowBitmap, mRotateMatrix, null);
-				mCanvas.drawBitmap(arrowBitmap, mRotateMatrix, null);
-
-				if (mDirectionRenderLayer != null)
-					mDirectionRenderLayer.locationBitmap = canvasBitmap;
-			}
-		}
-
-		@Override
-		public void onLocationChanged(Location location) {
-			rotateDrawable(val);
-
-			if (!isShowMyLocationEnabled()) {
-				return;
-			}
-
-			GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
-
-			if (mSetCenter || isSnapToLocationEnabled()) {
-				mSetCenter = false;
-				App.map.setCenter(point);
-			}
-			if (mSnapToLocation) {
-
-				App.activity.getCompass().stop();
-				App.map.getEventLayer().enableRotation(true);
-				gotoLastKnownPosition();
-
-			}
-			//gotoLastKnownPosition();
-		}
-
-		@Override
-		public void onProviderDisabled(String provider) {
-		}
-
-		@Override
-		public void onProviderEnabled(String provider) {
-		}
-
-		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-		}
-
-		boolean isFirstCenter() {
-			return mSetCenter;
-		}
-
-		void setFirstCenter(boolean center) {
-			mSetCenter = center;
-		}
-
-		@Override
-		public void onAccuracyChanged(Sensor arg0, int arg1) {
-		}
-
-		float val;
-
-		@SuppressWarnings("deprecation")
-		@Override
-		public void onSensorChanged(SensorEvent event) {
-
-			if (event.sensor.getType() == Sensor.TYPE_ORIENTATION)
-				if (event.values != null) {
-
-					if (val != -event.values[0]) {
-						val = -event.values[0];
-						rotateDrawable(val);
-
-					}
-				}
+			App.map.getEventLayer().enableMove(true);
 		}
 	}
+
+	public void enableSnapToLocation() {
+		if (!mSnapToLocation) {
+			mSnapToLocation = true;
+			App.map.getEventLayer().enableMove(false);
+			gotoLastKnownPosition();
+		}
+	}
+
+	boolean isFirstCenter() {
+		return mSetCenter;
+	}
+
+	void setFirstCenter(boolean center) {
+		mSetCenter = center;
+	}
+
+	/*** LocationListener ***/
+	@Override
+	public void onLocationChanged(Location location) {
+
+		if (!mShowMyLocation)
+			return;
+
+		double lat = location.getLatitude();
+		double lon = location.getLongitude();
+
+		Log.d(TAG, "update location " + lat + ":" + lon);
+
+		if (mSetCenter || mSnapToLocation) {
+			mSetCenter = false;
+
+			GeoPoint point = new GeoPoint(lat, lon);
+			App.map.setCenter(point);
+			App.map.redrawMap(true);
+		}
+
+		mLocationOverlay.setPosition(lat, lon, location.getAccuracy());
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+	}
+
 }

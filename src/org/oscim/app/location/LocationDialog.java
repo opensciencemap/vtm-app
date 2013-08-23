@@ -64,7 +64,7 @@ public class LocationDialog {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// disable GPS follow mode if it is enabled
-						map.mLocation.disableSnapToLocation(true);
+						map.mLocation.disableSnapToLocation();
 
 						// set the map center and zoom level
 						EditText latitudeView = (EditText) view

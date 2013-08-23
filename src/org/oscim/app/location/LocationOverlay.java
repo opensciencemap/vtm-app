@@ -17,7 +17,6 @@
 package org.oscim.app.location;
 
 import org.oscim.core.Box;
-import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.PointD;
@@ -37,9 +36,39 @@ import android.opengl.GLES20;
 import android.os.SystemClock;
 
 public class LocationOverlay extends Overlay {
+	private final int SHOW_ACCURACY_ZOOM = 16;
 
 	private final PointD mLocation = new PointD();
 	private double mRadius;
+
+	private final Compass mCompass;
+
+	public LocationOverlay(MapView mapView, Compass compass) {
+		super(mapView);
+		mLayer = new LocationIndicator(mapView);
+		mCompass = compass;
+	}
+
+	public void setPosition(double latitude, double longitude, double accuracy) {
+		mLocation.x = MercatorProjection.longitudeToX(longitude);
+		mLocation.y = MercatorProjection.latitudeToY(latitude);
+		mRadius = accuracy / MercatorProjection.calculateGroundResolution(latitude, 1);
+		((LocationIndicator) mLayer).animate(true);
+	}
+
+	@Override
+	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+
+		if (!enabled)
+			((LocationIndicator) mLayer).animate(false);
+		mCompass.setEnabled(true);
+	}
+
+	@Override
+	public void onUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
+		mCompass.setEnabled(mapPosition.zoomLevel >= SHOW_ACCURACY_ZOOM);
+	}
 
 	public class LocationIndicator extends RenderLayer {
 		private int mShaderProgram;
@@ -47,11 +76,9 @@ public class LocationOverlay extends Overlay {
 		private int hMatrixPosition;
 		private int hScale;
 		private int hPhase;
+		private int hDirection;
 
-		private boolean mInitialized;
-
-		private final float CIRCLE_SIZE = 100;
-		private final int SHOW_ACCURACY_ZOOM = 16;
+		private final float CIRCLE_SIZE = 60;
 
 		private final static long ANIM_RATE = 50;
 		private final static long INTERVAL = 2000;
@@ -61,14 +88,16 @@ public class LocationOverlay extends Overlay {
 		private final PointD mScreenPoint = new PointD();
 		private final Box mBBox = new Box();
 
+		private boolean mInitialized;
+
 		private boolean mLocationIsVisible;
+
+		private boolean mRunAnim;
+		private long mAnimStart;
 
 		public LocationIndicator(final MapView mapView) {
 			super(mapView);
 		}
-
-		private boolean mRunAnim;
-		private long mAnimStart;
 
 		private void animate(boolean enable) {
 			if (mRunAnim == enable)
@@ -104,16 +133,19 @@ public class LocationOverlay extends Overlay {
 		public void update(MapPosition curPos, boolean changed, Matrices matrices) {
 
 			if (!mInitialized) {
-				if (!init())
-					return;
-
+				init();
 				mInitialized = true;
-				//newData = true;
-				isReady = true;
 			}
 
-			if (!changed)
+			if (!isEnabled()){
+				isReady = false;
 				return;
+			}
+
+			if (!changed && isReady)
+				return;
+
+			isReady = true;
 
 			int width = mMapView.getWidth();
 			int height = mMapView.getHeight();
@@ -142,16 +174,16 @@ public class LocationOverlay extends Overlay {
 			// clip position to screen boundaries
 			int visible = 0;
 
-			if (x > width)
+			if (x > width - 5)
 				x = width;
-			else if (x < 0)
+			else if (x < 5)
 				x = 0;
 			else
 				visible++;
 
-			if (y > height)
+			if (y > height - 5)
 				y = height;
-			else if (y < 0)
+			else if (y < 5)
 				y = 0;
 			else
 				visible++;
@@ -181,11 +213,14 @@ public class LocationOverlay extends Overlay {
 
 			float radius = CIRCLE_SIZE;
 
+			animate(true);
+			boolean viewShed = false;
 			if (!mLocationIsVisible || pos.zoomLevel < SHOW_ACCURACY_ZOOM) {
-				animate(true);
+				//animate(true);
 			} else {
 				radius = (float) (mRadius * pos.scale);
-				animate(false);
+				viewShed = true;
+				//animate(false);
 			}
 			GLES20.glUniform1f(hScale, radius);
 
@@ -197,11 +232,23 @@ public class LocationOverlay extends Overlay {
 			m.mvp.multiplyMM(m.viewproj, m.mvp);
 			m.mvp.setAsUniform(hMatrixPosition);
 
-			if (mRunAnim) {
-				float phase = Interpolation.swing.apply(animPhase());
-				GLES20.glUniform1f(hPhase, 0.5f + Math.abs(phase - 0.5f));
+			if (!viewShed) {
+				float phase = Math.abs(animPhase() - 0.5f) * 2;
+				//phase = Interpolation.fade.apply(phase);
+				phase = Interpolation.swing.apply(phase);
+
+				GLES20.glUniform1f(hPhase, 0.8f + phase * 0.2f);
+				GLES20.glUniform2f(hDirection, 0, 0);
+
 			} else {
 				GLES20.glUniform1f(hPhase, 1);
+			}
+
+			if (viewShed && mLocationIsVisible) {
+				float rotation = mCompass.getRotation() - 90;
+				GLES20.glUniform2f(hDirection,
+						(float) Math.cos(Math.toRadians(rotation)),
+						(float) Math.sin(Math.toRadians(rotation)));
 			}
 
 			GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
@@ -212,50 +259,49 @@ public class LocationOverlay extends Overlay {
 			if (shader == 0)
 				return false;
 
+			mShaderProgram = shader;
 			hVertexPosition = GLES20.glGetAttribLocation(shader, "a_pos");
 			hMatrixPosition = GLES20.glGetUniformLocation(shader, "u_mvp");
+			hPhase = GLES20.glGetUniformLocation(shader, "u_phase");
+			hScale = GLES20.glGetUniformLocation(shader, "u_scale");
+			hDirection = GLES20.glGetUniformLocation(shader, "u_dir");
 
-			hPhase = GLES20.glGetUniformLocation(shader, "phase");
-			hScale = GLES20.glGetUniformLocation(shader, "scale");
-
-			mShaderProgram = shader;
 			return true;
 		}
 
 		private final static String vShaderStr = ""
 				+ "precision mediump float;"
 				+ "uniform mat4 u_mvp;"
-				+ "uniform float phase;"
-				+ "uniform float scale;"
+				+ "uniform float u_phase;"
+				+ "uniform float u_scale;"
 				+ "attribute vec2 a_pos;"
 				+ "varying vec2 v_tex;"
 				+ "void main() {"
-				+ "  gl_Position = u_mvp * vec4(a_pos * scale * phase, 0.0, 1.0);"
+				+ "  gl_Position = u_mvp * vec4(a_pos * u_scale * u_phase, 0.0, 1.0);"
 				+ "  v_tex = a_pos;"
 				+ "}";
 
 		private final static String fShaderStr = ""
 				+ "precision mediump float;"
 				+ "varying vec2 v_tex;"
-				+ "uniform float scale;"
+				+ "uniform float u_scale;"
+				+ "uniform float u_phase;"
+				+ "uniform vec2 u_dir;"
 				+ "void main() {"
 				+ "  float len = 1.0 - length(v_tex);"
-				///  blur outline by 10px
-				+ "  float a = smoothstep(0.0, 10.0 / scale, len);"
-				+ "  float b = smoothstep(0.0, 1.0, len);"
-				+ "  a = a - b;"
-				+ "  gl_FragColor = vec4 (0.2, 0.2, 0.6, 0.6) * a;"
+				///  blur outline by 2px
+				+ "  float a = smoothstep(0.0, 2.0 / u_scale, len);"
+				+ "  float b = smoothstep(4.0 / u_scale, 5.0 / u_scale, len);"
+				///  center point
+				+ "  float c = 1.0 - smoothstep(14.0 / u_scale, 16.0 / u_scale, 1.0 - len);"
+				+ "  vec2 dir = normalize(v_tex);"
+				+ "  float d = 1.0 - dot(dir, u_dir); "
+				///  0.5 width of viewshed + antialiasing
+				+ "  d = step(0.5, d);"
+				+ "  a = clamp(d, 0.4, 0.7) * clamp(a - (b + c) * 0.5 , 0.0, 1.0) + c * 0.5;"
+				//+ "  a = a - clamp(d, 0.6, 0.8) * b;"
+				+ "  gl_FragColor = vec4 (0.2, 0.2, 0.8, 1.0) * clamp(a, 0.0, 1.0);"
 				+ "}";
 
-	}
-
-	public LocationOverlay(MapView mapView) {
-		super(mapView);
-		mLayer = new LocationIndicator(mapView);
-	}
-
-	public void setPosition(GeoPoint location, double radius) {
-		MercatorProjection.project(location, mLocation);
-		mRadius = radius / MercatorProjection.calculateGroundResolution(location.getLatitude(), 1);
 	}
 }
