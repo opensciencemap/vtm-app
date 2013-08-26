@@ -1,7 +1,12 @@
 package org.oscim.app;
 
 import org.oscim.cache.CacheFileManager;
+import org.oscim.layers.overlay.GenericOverlay;
+import org.oscim.layers.tile.bitmap.BitmapTileLayer;
+import org.oscim.layers.tile.bitmap.MapQuestAerial;
+import org.oscim.layers.tile.bitmap.NaturalEarth;
 import org.oscim.layers.tile.vector.MapTileLayer;
+import org.oscim.renderer.layers.GridRenderLayer;
 import org.oscim.theme.InternalRenderTheme;
 import org.oscim.tilesource.ITileCache;
 import org.oscim.tilesource.TileSource;
@@ -25,6 +30,11 @@ public class MapLayers {
 	private MapTileLayer mBaseLayer;
 	private TileSources mMapDatabase;
 	private ITileCache mCache;
+
+	private GenericOverlay mGridOverlay;
+	private boolean mGridEnabled;
+
+	private int mBackgroundId = -1;
 
 	void setBaseMap(SharedPreferences preferences) {
 		TileSources tileSourceNew;
@@ -87,26 +97,24 @@ public class MapLayers {
 		}
 	}
 
-	void setPreferences(SharedPreferences preferences){
+	void setPreferences(SharedPreferences preferences) {
 		if (preferences.contains("mapDatabase")) {
 			setBaseMap(preferences);
 		}
-		if (preferences.contains("theme")) {
-			String name = preferences.getString("theme",
-					"OSMARENDER");
-			InternalRenderTheme theme = null;
 
+		InternalRenderTheme theme = null;
+
+		if (preferences.contains("theme")) {
+			String name = preferences.getString("theme", "DEFAULT");
 			try {
 				theme = InternalRenderTheme.valueOf(name);
-			} catch (IllegalArgumentException e) {
-			}
-			if (theme == null)
-				mBaseLayer.setRenderTheme(InternalRenderTheme.DEFAULT);
-			else
 				mBaseLayer.setRenderTheme(theme);
-		} else {
-			mBaseLayer.setRenderTheme(InternalRenderTheme.DEFAULT);
+			} catch (IllegalArgumentException e) {
+				theme = null;
+			}
 		}
+		if (theme == null)
+			mBaseLayer.setRenderTheme(InternalRenderTheme.DEFAULT);
 
 		// default cache size 20MB
 		int cacheSize = preferences.getInt("cacheSize", 20);
@@ -114,5 +122,56 @@ public class MapLayers {
 		if (mCache != null)
 			mCache.setCacheSize(cacheSize * (1 << 20));
 
+	}
+
+	void enableGridOverlay(boolean enable) {
+		if (mGridEnabled == enable)
+			return;
+
+		if (enable) {
+			if (mGridOverlay == null)
+				mGridOverlay = new GenericOverlay(App.map, new GridRenderLayer(App.map));
+
+			App.map.getOverlays().add(mGridOverlay);
+		} else {
+			App.map.getOverlays().remove(mGridOverlay);
+		}
+
+		mGridEnabled = enable;
+		App.map.redrawMap(true);
+	}
+
+	boolean isGridEnabled() {
+		return mGridEnabled;
+	}
+
+	BitmapTileLayer mBackgroundLayer;
+
+	void setBackgroundMap(int id) {
+		if (id == mBackgroundId)
+			return;
+
+		App.map.getLayerManager().remove(mBackgroundLayer);
+		mBackgroundLayer = null;
+
+		switch (id) {
+		case R.id.menu_layer_mapquest:
+			mBackgroundLayer = new BitmapTileLayer(App.map, MapQuestAerial.INSTANCE);
+			break;
+
+		case R.id.menu_layer_naturalearth:
+			mBackgroundLayer = new BitmapTileLayer(App.map, NaturalEarth.INSTANCE);
+			break;
+		default:
+			id = -1;
+		}
+		if (mBackgroundLayer != null)
+			App.map.setBackgroundMap(mBackgroundLayer);
+
+		mBackgroundId = id;
+	}
+
+	int getBackgroundId() {
+		return mBackgroundId;
 	}
 }

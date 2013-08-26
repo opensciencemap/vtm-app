@@ -92,9 +92,8 @@
                 android:title="@string/menu_layer_naturalearth"/>
             <item
                 android:id="@+id/menu_layer_mapquest"
-                android:checkable="false"
-                android:title="@string/menu_layer_mapquest"
-                android:visible="false"/>
+                android:checkable="true"
+                android:title="@string/menu_layer_mapquest"/>
             <item
                 android:id="@+id/menu_layer_grid"
                 android:checkable="true"

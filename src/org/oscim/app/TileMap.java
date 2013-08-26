@@ -21,12 +21,7 @@ import org.oscim.app.location.LocationDialog;
 import org.oscim.app.location.LocationHandler;
 import org.oscim.app.preferences.EditPreferences;
 import org.oscim.core.GeoPoint;
-import org.oscim.layers.overlay.GenericOverlay;
-import org.oscim.layers.tile.bitmap.BitmapTileLayer;
-import org.oscim.layers.tile.bitmap.MapQuestAerial;
-import org.oscim.layers.tile.bitmap.NaturalEarth;
 import org.oscim.overlay.DistanceTouchOverlay;
-import org.oscim.renderer.layers.GridRenderLayer;
 import org.oscim.view.DebugSettings;
 import org.oscim.view.MapView;
 import org.osmdroid.location.POI;
@@ -69,8 +64,6 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	Compass mCompass;
 
-	boolean naturalOn;
-	boolean mapQuestOn;
 	private final MapLayers mMapLayers = new MapLayers();
 
 	@Override
@@ -99,19 +92,20 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 		registerForContextMenu(mMapView);
 
-		final Intent intent = getIntent();
-		if (intent != null) {
-			Uri uri = intent.getData();
-			if (uri != null) {
-				String scheme = uri.getSchemeSpecificPart();
-				Log.d(TAG, "got intent " + (scheme == null ? "" : scheme));
-			}
-		}
+		handleIntent(getIntent(), true);
 	}
 
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
+		handleIntent(intent, false);
+	}
+
+
+	private void handleIntent(Intent intent, boolean start){
+		if (intent == null)
+			return;
+
 		Uri uri = intent.getData();
 		if (uri != null) {
 			String scheme = uri.getSchemeSpecificPart();
@@ -175,58 +169,23 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			toggleMenuCheck();
 			return true;
 
-			//case R.id.menu_position_enable_animation:
-			//	if (!item.isChecked()) {
-			//		mLocation.mLocationOverlay.StopAnimation = false;
-			//	} else {
-			//		mLocation.mLocationOverlay.StopAnimation = true;
-			//	}
-			//	toggleMenuCheck();
-			//	return true;
-
-		case R.id.menu_layer_naturalearth:
-			if (!item.isChecked()) {
-				naturalOn = true;
-				mapQuestOn = false;
-				App.map.getLayerManager().remove(lastAdd);
-				lastAdd = new BitmapTileLayer(App.map, NaturalEarth.INSTANCE);
-
-				App.map.setBackgroundMap(lastAdd);
-				App.map.render();
-			} else {
-				App.map.getLayerManager().remove(lastAdd);
-				App.map.render();
-			}
-			toggleMenuCheck();
-			return true;
-
 		case R.id.menu_layer_mapquest:
-			if (!item.isChecked()) {
-				mapQuestOn = true;
-				naturalOn = false;
-				App.map.getLayerManager().remove(lastAdd);
-				lastAdd = new BitmapTileLayer(App.map, MapQuestAerial.INSTANCE);
-				App.map.setBackgroundMap(lastAdd);
-				App.map.render();
-			} else {
-				App.map.getLayerManager().remove(lastAdd);
-				App.map.render();
-			}
+		case R.id.menu_layer_naturalearth:
+			int bgId = item.getItemId();
+			// toggle if already enabled
+			if (bgId == mMapLayers.getBackgroundId())
+				bgId = -1;
+
+			mMapLayers.setBackgroundMap(bgId);
+			mMapView.redrawMap(true);
+
 			toggleMenuCheck();
 			return true;
 
 		case R.id.menu_layer_grid:
-			if (!item.isChecked()) {
-				GridShown = true;
-				App.map.getOverlays().remove(mGridOverlay);
-				mGridOverlay = new GenericOverlay(mMapView, new GridRenderLayer(mMapView));
-				App.map.getOverlays().add(mGridOverlay);
-				App.map.render();
-			} else {
-				App.map.getOverlays().remove(mGridOverlay);
-				GridShown = false;
-				App.map.render();
-			}
+			mMapLayers.enableGridOverlay(!mMapLayers.isGridEnabled());
+			mMapView.redrawMap(true);
+
 			toggleMenuCheck();
 			return true;
 
@@ -250,32 +209,31 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		}
 	}
 
-	GenericOverlay mGridOverlay;
-	BitmapTileLayer lastAdd;
-
 	private void toggleMenuCheck() {
-		mMenu.findItem(R.id.menu_compass_enable).setChecked(mCompass.isEnabled());
-		mMenu.findItem(R.id.menu_position_my_location_enable).setChecked(
-				mLocation.isShowMyLocationEnabled());
+
+		mMenu.findItem(R.id.menu_compass_enable)
+				.setChecked(mCompass.isEnabled());
+		mMenu.findItem(R.id.menu_position_my_location_enable)
+				.setChecked(mLocation.isShowMyLocationEnabled());
+
 		if (mLocation.isShowMyLocationEnabled()) {
-			mMenu.findItem(R.id.menu_position_follow_location).setVisible(true);
-			//mMenu.findItem(R.id.menu_position_enable_animation).setVisible(true);
+			mMenu.findItem(R.id.menu_position_follow_location)
+					.setVisible(true);
 		}
 
-		mMenu.findItem(R.id.menu_position_follow_location).setChecked(
-				mLocation.isSnapToLocationEnabled());
-		//if (mLocation.mLocationOverlay != null)
-		//	mMenu.findItem(R.id.menu_position_enable_animation).setChecked(
-		//			!mLocation.mLocationOverlay.StopAnimation);
+		mMenu.findItem(R.id.menu_position_follow_location)
+				.setChecked(mLocation.isSnapToLocationEnabled());
 
-		mMenu.findItem(R.id.menu_layer_naturalearth).setChecked(naturalOn);
-		mMenu.findItem(R.id.menu_layer_mapquest).setChecked(mapQuestOn);
-		mMenu.findItem(R.id.menu_layer_grid).setChecked(GridShown);
+		int bgId = mMapLayers.getBackgroundId();
+		mMenu.findItem(R.id.menu_layer_naturalearth)
+				.setChecked(bgId == R.id.menu_layer_naturalearth);
 
-		App.map.render();
+		mMenu.findItem(R.id.menu_layer_mapquest)
+				.setChecked(bgId == R.id.menu_layer_mapquest);
+
+		mMenu.findItem(R.id.menu_layer_grid)
+				.setChecked(mMapLayers.isGridEnabled());
 	}
-
-	boolean GridShown;
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
@@ -494,10 +452,6 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				toast.show();
 			}
 		});
-	}
-
-	public Compass getCompass() {
-		return mCompass;
 	}
 
 	private final static int MAP_MODE_MANUAL = 0;
