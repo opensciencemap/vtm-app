@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:oscim_app="http://app.oscim.org"
     android:title="@string/menu_preferences" >
 
     <PreferenceCategory android:title="@string/preferences_map" >
@@ -35,6 +36,18 @@
             android:summary="@string/preferences_text_scale_desc"
             android:title="@string/preferences_text_scale" />
         -->
+    </PreferenceCategory>
+     <PreferenceCategory android:title='Cache settings'>
+         <org.oscim.app.preferences.CacheSizePreference
+            android:key="cacheSize"
+            android:title="Cache Size"
+            android:summary="Set tile cache size"
+            android:defaultValue="30"
+            android:max="50"
+            oscim_app:min="1"
+            oscim_app:unitsLeft=""
+            oscim_app:unitsRight="MB"
+            />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/preferences_theme_title" >
         <ListPreference

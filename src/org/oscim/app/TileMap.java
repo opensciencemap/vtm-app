@@ -20,6 +20,7 @@ import org.oscim.app.compass.Compass;
 import org.oscim.app.location.LocationDialog;
 import org.oscim.app.location.LocationHandler;
 import org.oscim.app.preferences.EditPreferences;
+import org.oscim.cache.CacheFileManager;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.layers.overlay.GenericOverlay;
@@ -30,8 +31,10 @@ import org.oscim.layers.tile.vector.MapTileLayer;
 import org.oscim.overlay.DistanceTouchOverlay;
 import org.oscim.renderer.layers.GridRenderLayer;
 import org.oscim.theme.InternalRenderTheme;
+import org.oscim.tilesource.ITileCache;
 import org.oscim.tilesource.TileSource;
 import org.oscim.tilesource.TileSources;
+import org.oscim.tilesource.common.UrlTileSource;
 import org.oscim.tilesource.mapfile.MapFileTileSource;
 import org.oscim.tilesource.mapnik.MapnikVectorTileSource;
 import org.oscim.tilesource.oscimap.OSciMap1TileSource;
@@ -76,6 +79,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	private static final int DIALOG_ENTER_COORDINATES = 0;
 	private static final int DIALOG_LOCATION_PROVIDER_DISABLED = 2;
 
+	private static final String CACHE_DIRECTORY = "/Android/data/org.oscim.app/cache/";
+
 	// Intents
 	//private static final int SELECT_RENDER_THEME_FILE = 1;
 	protected static final int POIS_REQUEST = 2;
@@ -94,6 +99,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	boolean naturalOn;
 	boolean mapQuestOn;
+
+	private ITileCache mCache;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -191,6 +198,15 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 			default:
 				break;
+			}
+
+			if (tileSource instanceof UrlTileSource) {
+				mCache = new CacheFileManager(this);
+				mCache.setStoragePath(CACHE_DIRECTORY + dbname);
+				mCache.setCacheSize(512 * (1 << 10));
+				tileSource.setCache(mCache);
+			} else{
+				mCache = null;
 			}
 
 			if (mBaseLayer == null) {
@@ -736,6 +752,12 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			// getWindow().getWindowManager().getDefaultDisplay().getRotation());
 			// getWindow().getWindowManager().getDefaultDisplay().getOrientation());
 		}
+
+		// default cache size 20MB
+		int cacheSize = preferences.getInt("cacheSize", 20);
+
+		if (mCache != null)
+			mCache.setCacheSize(cacheSize * (1 << 20));
 
 		// try {
 		// String textScaleDefault =
