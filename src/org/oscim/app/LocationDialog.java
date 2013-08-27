@@ -41,9 +41,7 @@ public class LocationDialog {
 
 		SeekBar zoomlevel = (SeekBar) dialog.findViewById(R.id.zoomLevel);
 		zoomlevel.setMax(MapViewPosition.MAX_ZOOMLEVEL);
-
-		//FIXME zoomlevel.setProgress(mapView.getMapPosition().getMapPosition().zoomLevel);
-		zoomlevel.setProgress(12);
+		zoomlevel.setProgress(10);
 
 		final TextView textView = (TextView) dialog.findViewById(R.id.zoomlevelValue);
 		textView.setText(String.valueOf(zoomlevel.getProgress()));
@@ -81,9 +79,8 @@ public class LocationDialog {
 						int zoom = zoomLevelView.getProgress();
 
 						MapPosition mapPosition = new MapPosition();
-						mapPosition.setPosition(latitude,longitude);
+						mapPosition.setPosition(latitude, longitude);
 						mapPosition.setZoomLevel(zoom);
-
 						App.map.setMapPosition(mapPosition);
 					}
 				});

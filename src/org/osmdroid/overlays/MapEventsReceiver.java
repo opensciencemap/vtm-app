@@ -25,4 +25,13 @@ public interface MapEventsReceiver {
 	 *         by other objects.
 	 */
 	boolean longPressHelper(GeoPoint p);
+	
+	
+	/**
+	 * @param p1, p2
+	 *            the position where the event occurred for 2 finger.
+	 * @return true if the event has been "consumed" and should not be handled
+	 *         by other objects.
+	 */
+	boolean longPressHelper(GeoPoint p1, GeoPoint p2);
 }

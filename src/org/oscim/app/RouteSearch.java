@@ -16,15 +16,16 @@
 package org.oscim.app;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import org.oscim.core.GeoPoint;
-import org.oscim.overlay.ItemizedOverlay;
-import org.oscim.overlay.OverlayItem;
-import org.oscim.overlay.OverlayItem.HotspotPlace;
-import org.oscim.overlay.PathOverlay;
+import org.oscim.layers.overlay.ItemizedOverlay;
+import org.oscim.layers.overlay.OverlayItem;
+import org.oscim.layers.overlay.OverlayItem.HotspotPlace;
+import org.oscim.layers.overlay.PathOverlay;
 import org.oscim.view.MapView;
 import org.osmdroid.location.GeocoderNominatim;
 import org.osmdroid.overlays.DefaultInfoWindow;
@@ -50,6 +51,39 @@ public class RouteSearch {
 	protected final ItemizedOverlayWithBubble<ExtendedOverlayItem> mItineraryMarkers;
 
 	protected GeoPoint mStartPoint, mDestinationPoint;
+	public GeoPoint getmStartPoint() {
+		return mStartPoint;
+	}
+
+	public void setmStartPoint(GeoPoint mStartPoint) {
+		this.mStartPoint = mStartPoint;
+
+	}
+
+	boolean longPress2Point(GeoPoint p1, GeoPoint p2) {
+		removeAllOverlay();
+		mStartPoint = p1;
+		markerStart = putMarkerItem(markerStart, mStartPoint, START_INDEX,
+				R.string.departure, R.drawable.marker_departure, -1);
+		mDestinationPoint = p2;
+		//new GeoPoint((GeoPoint) tempClickedGeoPoint);
+		markerDestination = putMarkerItem(markerDestination, mDestinationPoint, DEST_INDEX,
+				R.string.destination,
+				R.drawable.marker_destination, -1);
+		getRouteAsync();
+		return true;
+	}
+
+
+
+	public GeoPoint getmDestinationPoint() {
+		return mDestinationPoint;
+	}
+
+	public void setmDestinationPoint(GeoPoint mDestinationPoint) {
+		this.mDestinationPoint = mDestinationPoint;
+	}
+
 	protected final ArrayList<GeoPoint> mViaPoints;
 
 	protected static int START_INDEX = -2, DEST_INDEX = -1;
@@ -273,6 +307,7 @@ public class RouteSearch {
 			Locale locale = Locale.getDefault();
 			routeManager.addRequestOption("locale=" + locale.getLanguage() + "_"
 					+ locale.getCountry());
+			routeManager.addRequestOption("routeType=pedestrian");
 			return routeManager.getRoute(waypoints);
 		}
 
@@ -280,6 +315,47 @@ public class RouteSearch {
 		protected void onPostExecute(Route result) {
 			mRoute = result;
 			updateRouteMarkers(result);
+
+
+
+			DecimalFormat twoDForm = new DecimalFormat("#.#");
+			DecimalFormat oneDForm = new DecimalFormat("#");
+			int hour = ((int) result.duration / 3600);
+			int minute = ((int) result.duration % 3600) / 60;
+			String time = "";
+			if (hour == 0 && minute == 0) {
+				time = "?";
+			}
+			else if (hour == 0 && minute != 0) {
+				time = minute + "m";
+			} else {
+				time = hour + "h " + minute + "m";
+			}
+			//Log.d(TAG,"Hour: "+hour+" Min: "+minute+" Duration: "+result.duration);
+			//			tileMap.mapInfo.setVisibility(View.VISIBLE);//			tileMap.mapInfo.setTextSize((float) 20.0);
+			double dis = ((double) (mStartPoint.distanceTo(mDestinationPoint))) / 1000;
+			String distance;
+			String shortpath;
+			if (dis < 100) {
+				distance = twoDForm.format(dis);
+			} else {
+				distance = oneDForm.format(dis);
+			}
+			if (result.length == 0) {
+				shortpath = "?";
+			}
+			else if (result.length < 100) {
+				shortpath = twoDForm.format(result.length);
+			} else {
+				shortpath = oneDForm.format(result.length);
+			}
+			//			tileMap.mapInfo.setText(" Direct distance: "+distance+" km" +
+			//					"\n Shortest path: " + shortpath
+			//					+ " km \n By car: "
+			//					+time);
+			App.activity.setRouteBar(distance + " km ", shortpath + " km ", time);
+
+
 		}
 	}
 

@@ -1,6 +1,5 @@
 /* Copyright 2010, 2011, 2012 mapsforge.org
  * Copyright 2012 Hannes Janetzek
- * Copyright 2012 osmdroidbonuspack: M.Kergall
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -21,7 +20,13 @@ import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.database.MapDatabases;
 import org.oscim.database.MapOptions;
-import org.oscim.layers.tile.MapTileLayer;
+import org.oscim.layers.MapEventLayer;
+import org.oscim.layers.overlay.GenericOverlay;
+import org.oscim.layers.tile.bitmap.BitmapTileLayer;
+import org.oscim.layers.tile.bitmap.NaturalEarth;
+import org.oscim.layers.tile.vector.MapTileLayer;
+import org.oscim.overlay.DistanceTouchOverlay;
+import org.oscim.renderer.layers.GridRenderLayer;
 import org.oscim.theme.InternalRenderTheme;
 import org.oscim.utils.AndroidUtils;
 import org.oscim.view.DebugSettings;
@@ -36,6 +41,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -49,12 +55,15 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class TileMap extends MapActivity implements MapEventsReceiver {
-	static final String TAG = TileMap.class.getSimpleName();
+	static final String TAG = TileMap.class.getName();
 
-	//MapView mMapView;
+	private static final boolean LENS_OVERLAY = false;
 
 	private static final String BUNDLE_SHOW_MY_LOCATION = "showMyLocation";
 	private static final String BUNDLE_SNAP_TO_LOCATION = "snapToLocation";
@@ -69,7 +78,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	private MapDatabases mMapDatabase;
 
-	//private WakeLock mWakeLock;
+	// private WakeLock mWakeLock;
 	private Menu mMenu = null;
 
 	POISearch mPoiSearch;
@@ -90,29 +99,30 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		App.map = mMapView;
 		App.activity = this;
 
+		//App.map.setBackgroundMap(new BitmapTileLayer(App.map, NaturalEarth.INSTANCE));
+
 		mMapView.setClickable(true);
 		mMapView.setFocusable(true);
 
 		mLocation = new LocationHandler(this);
-
+		initRouteBar();
 		// get the pointers to different system services
-		//PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		//mWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "AMV");
+		// PowerManager powerManager = (PowerManager)
+		// getSystemService(Context.POWER_SERVICE);
+		// mWakeLock =
+		// powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "AMV");
 
 		if (savedInstanceState != null &&
 				savedInstanceState.getBoolean(BUNDLE_SHOW_MY_LOCATION) &&
 				savedInstanceState.getBoolean(BUNDLE_SNAP_TO_LOCATION))
 			mLocation.enableSnapToLocation(false);
 
-		MapEventsOverlay overlay = new MapEventsOverlay(mMapView, this);
-		mMapView.getOverlays().add(overlay);
+		mMapView.getOverlays().add(new MapEventsOverlay(mMapView, this));
 
 		App.poiSearch = mPoiSearch = new POISearch();
 
 		registerForContextMenu(mMapView);
 		mRouteSearch = new RouteSearch();
-
-		//map.getOverlays().add(new AreaSelectionOverlay(map));
 
 		final Intent intent = getIntent();
 		if (intent != null) {
@@ -254,7 +264,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		case R.id.menu_position_map_center:
 			MapPosition mapCenter = mBaseLayer.getMapFileCenter();
 			if (mapCenter != null)
-				mMapView.setMapPosition(mapCenter);
+				mMapView.setCenter(mapCenter.getGeoPoint());
 			return true;
 
 		case R.id.menu_preferences:
@@ -316,12 +326,96 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	// SELECT_MAP_FILE);
 	// }
 
-	//	private void startRenderThemePicker() {
-	//		FilePicker.setFileDisplayFilter(FILE_FILTER_EXTENSION_XML);
-	//		FilePicker.setFileSelectFilter(new ValidRenderTheme());
-	//		startActivityForResult(new Intent(this, FilePicker.class),
-	//				SELECT_RENDER_THEME_FILE);
-	//	}
+	// private void startRenderThemePicker() {
+	// FilePicker.setFileDisplayFilter(FILE_FILTER_EXTENSION_XML);
+	// FilePicker.setFileSelectFilter(new ValidRenderTheme());
+	// startActivityForResult(new Intent(this, FilePicker.class),
+	// SELECT_RENDER_THEME_FILE);
+	// }
+
+	TextView distance = null;
+	TextView routeLength = null;
+	TextView carTime = null;
+	ImageView distanceView = null;
+	ImageView routeLengthView = null;
+	ImageView carTimeView = null;
+	ImageView Yes = null;
+	ImageView No = null;
+	RelativeLayout routeBar = null;
+
+	private void initRouteBar() {
+		routeBar = (RelativeLayout) findViewById(R.id.routeBar);
+		distance = (TextView) findViewById(R.id.distance);
+		routeLength = (TextView) findViewById(R.id.routeLength);
+		carTime = (TextView) findViewById(R.id.carTime);
+		distanceView = (ImageView) findViewById(R.id.distanceView);
+		routeLengthView = (ImageView) findViewById(R.id.routeLengthView);
+		carTimeView = (ImageView) findViewById(R.id.carTimeView);
+		Yes = (ImageView) findViewById(R.id.yes);
+		No = (ImageView) findViewById(R.id.no);
+		routeBar.setVisibility(View.INVISIBLE);
+		distance.setVisibility(View.INVISIBLE);
+		routeLength.setVisibility(View.INVISIBLE);
+		carTime.setVisibility(View.INVISIBLE);
+		distanceView.setVisibility(View.INVISIBLE);
+		routeLengthView.setVisibility(View.INVISIBLE);
+		carTimeView.setVisibility(View.INVISIBLE);
+		Yes.setVisibility(View.INVISIBLE);
+		Yes.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				HideRouteBar();
+			}
+		});
+		No.setVisibility(View.INVISIBLE);
+		No.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				HideAllRouteBar();
+				mRouteSearch.removeAllOverlay();
+			}
+		});
+	}
+
+	public void setRouteBar(String dis, String route, String time) {
+		routeBar.setVisibility(View.VISIBLE);
+		distance.setVisibility(View.VISIBLE);
+		routeLength.setVisibility(View.VISIBLE);
+		carTime.setVisibility(View.VISIBLE);
+		distanceView.setVisibility(View.VISIBLE);
+		routeLengthView.setVisibility(View.VISIBLE);
+		carTimeView.setVisibility(View.VISIBLE);
+		distance.setText(dis);
+		distance.setTextColor(Color.WHITE);
+		routeLength.setText(route);
+		routeLength.setTextColor(Color.WHITE);
+		carTime.setText(time);
+		carTime.setTextColor(Color.WHITE);
+		Yes.setVisibility(View.VISIBLE);
+		No.setVisibility(View.VISIBLE);
+	}
+
+	private void HideRouteBar() {
+		routeBar.setVisibility(View.INVISIBLE);
+		distance.setVisibility(View.INVISIBLE);
+		routeLength.setVisibility(View.INVISIBLE);
+		carTime.setVisibility(View.INVISIBLE);
+		distanceView.setVisibility(View.INVISIBLE);
+		routeLengthView.setVisibility(View.INVISIBLE);
+		carTimeView.setVisibility(View.INVISIBLE);
+	}
+
+	private void HideAllRouteBar() {
+		routeBar.setVisibility(View.INVISIBLE);
+		distance.setVisibility(View.INVISIBLE);
+		routeLength.setVisibility(View.INVISIBLE);
+		carTime.setVisibility(View.INVISIBLE);
+		distanceView.setVisibility(View.INVISIBLE);
+		routeLengthView.setVisibility(View.INVISIBLE);
+		carTimeView.setVisibility(View.INVISIBLE);
+		Yes.setVisibility(View.INVISIBLE);
+		No.setVisibility(View.INVISIBLE);
+	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -372,16 +466,17 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		// startActivity(new Intent(this, EditPreferences.class));
 		// }
 		// } else
-		//		if (requestCode == SELECT_RENDER_THEME_FILE && resultCode == RESULT_OK
-		//				&& intent != null
-		//				&& intent.getStringExtra(FilePicker.SELECTED_FILE) != null) {
-		//			try {
-		//				map.setRenderTheme(intent
-		//						.getStringExtra(FilePicker.SELECTED_FILE));
-		//			} catch (FileNotFoundException e) {
-		//				showToastOnUiThread(e.getLocalizedMessage());
-		//			}
-		//		}
+		// if (requestCode == SELECT_RENDER_THEME_FILE && resultCode ==
+		// RESULT_OK
+		// && intent != null
+		// && intent.getStringExtra(FilePicker.SELECTED_FILE) != null) {
+		// try {
+		// map.setRenderTheme(intent
+		// .getStringExtra(FilePicker.SELECTED_FILE));
+		// } catch (FileNotFoundException e) {
+		// showToastOnUiThread(e.getLocalizedMessage());
+		// }
+		// }
 	}
 
 	static boolean isPreHoneyComb() {
@@ -419,9 +514,9 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	protected void onPause() {
 		super.onPause();
 		// release the wake lock if necessary
-		//if (mWakeLock.isHeld()) {
-		//	mWakeLock.release();
-		//}
+		// if (mWakeLock.isHeld()) {
+		// mWakeLock.release();
+		// }
 	}
 
 	LocationDialog mLocationDialog;
@@ -460,7 +555,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				mBaseLayer.setRenderTheme(InternalRenderTheme.DEFAULT);
 			else
 				mBaseLayer.setRenderTheme(theme);
-		} else{
+		} else {
 			mBaseLayer.setRenderTheme(InternalRenderTheme.DEFAULT);
 		}
 
@@ -499,9 +594,10 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		// scaleBarUnitDefault);
 		// mapScaleBar.setImperialUnits(scaleBarUnit.equals("imperial"));
 
-		//if (preferences.getBoolean("wakeLock", false) && !mWakeLock.isHeld()) {
-		//	mWakeLock.acquire();
-		//}
+		// if (preferences.getBoolean("wakeLock", false) && !mWakeLock.isHeld())
+		// {
+		// mWakeLock.acquire();
+		// }
 
 		boolean drawTileFrames = preferences.getBoolean("drawTileFrames", false);
 		boolean drawTileCoordinates = preferences.getBoolean("drawTileCoordinates", false);
@@ -556,7 +652,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		}
 	}
 
-	//----------- Context Menu when clicking on the map
+	// ----------- Context Menu when clicking on the map
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -574,7 +670,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		//	Log.d(TAG, "context menu item selected " + item.getItemId());
+		// Log.d(TAG, "context menu item selected " + item.getItemId());
 
 		if (mPoiSearch.onContextItemSelected(item))
 			return true;
@@ -585,7 +681,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		return super.onContextItemSelected(item);
 	}
 
-	//------------ MapEventsReceiver implementation
+	// ------------ MapEventsReceiver implementation
 
 	@Override
 	public boolean singleTapUpHelper(GeoPoint p) {
@@ -596,9 +692,21 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	@Override
 	public boolean longPressHelper(GeoPoint p) {
-		mRouteSearch.longPress(p);
+		if (p != null)
+			mRouteSearch.longPress(p);
 
 		openContextMenu(mMapView);
+
+		return true;
+	}
+
+	@Override
+	public boolean longPressHelper(final GeoPoint p1, final GeoPoint p2) {
+		TileMap.this.runOnUiThread(new Runnable() {
+			public void run() {
+				mRouteSearch.longPress2Point(p1, p2);
+			}
+		});
 
 		return true;
 	}

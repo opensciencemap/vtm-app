@@ -15,7 +15,6 @@
 package org.oscim.app;
 
 import org.oscim.core.GeoPoint;
-import org.oscim.core.MapPosition;
 
 import android.content.Context;
 import android.location.Criteria;
@@ -108,17 +107,12 @@ public class LocationHandler {
 		}
 
 		if (bestLocation != null) {
-
 			//byte zoom = mTileMap.map.getMapPosition().getZoomLevel();
 			//if (zoom < 12)
 			//byte zoom = (byte) 12;
 
-			MapPosition mapPosition = new MapPosition();
-			mapPosition.setPosition(bestLocation.getLatitude(),
-					bestLocation.getLongitude());
-			mapPosition.setZoomLevel(12);
-
-			App.map.setMapPosition(mapPosition);
+			GeoPoint p = new GeoPoint ( bestLocation.getLatitude(),bestLocation.getLongitude());
+			App.map.setCenter(p);
 
 		} else {
 			mTileMap.showToastOnUiThread(mTileMap
