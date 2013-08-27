@@ -16,11 +16,8 @@ package org.oscim.app.filefilter;
 
 import java.io.File;
 
-import org.oscim.database.IMapDatabase;
-import org.oscim.database.IMapDatabase.OpenResult;
-import org.oscim.database.MapDatabases;
-import org.oscim.database.MapOptions;
-import org.oscim.database.mapfile.MapDatabase;
+import org.oscim.tilesource.TileSource.OpenResult;
+import org.oscim.tilesource.mapfile.MapFileTileSource;
 
 /**
  * Accepts all valid map files.
@@ -30,13 +27,11 @@ public final class ValidMapFile implements ValidFileFilter {
 
 	@Override
 	public boolean accept(File file) {
-		IMapDatabase mapDatabase = new MapDatabase();
-		MapOptions options = new MapOptions(MapDatabases.MAP_READER);
-		options.put("file", file.getAbsolutePath());
+		MapFileTileSource mapFileSource = new MapFileTileSource();
+		mapFileSource.setMapFile(file.getAbsolutePath());
 
-		this.openResult = mapDatabase.open(options);
-
-		mapDatabase.close();
+		this.openResult = mapFileSource.open();
+		mapFileSource.close();
 		return this.openResult.isSuccess();
 	}
 

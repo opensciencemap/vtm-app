@@ -18,16 +18,17 @@ package org.oscim.app;
 import org.oscim.app.preferences.EditPreferences;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
-import org.oscim.database.MapDatabases;
-import org.oscim.database.MapOptions;
-import org.oscim.layers.MapEventLayer;
-import org.oscim.layers.overlay.GenericOverlay;
-import org.oscim.layers.tile.bitmap.BitmapTileLayer;
-import org.oscim.layers.tile.bitmap.NaturalEarth;
 import org.oscim.layers.tile.vector.MapTileLayer;
 import org.oscim.overlay.DistanceTouchOverlay;
 import org.oscim.renderer.layers.GridRenderLayer;
 import org.oscim.theme.InternalRenderTheme;
+import org.oscim.tilesource.TileSource;
+import org.oscim.tilesource.TileSources;
+import org.oscim.tilesource.mapfile.MapFileTileSource;
+import org.oscim.tilesource.mapnik.MapnikVectorTileSource;
+import org.oscim.tilesource.oscimap.OSciMap1TileSource;
+import org.oscim.tilesource.oscimap2.OSciMap2TileSource;
+import org.oscim.tilesource.oscimap4.OSciMap4TileSource;
 import org.oscim.utils.AndroidUtils;
 import org.oscim.view.DebugSettings;
 import org.oscim.view.MapActivity;
@@ -76,7 +77,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	LocationHandler mLocation;
 
-	private MapDatabases mMapDatabase;
+	private TileSources mMapDatabase;
 
 	// private WakeLock mWakeLock;
 	private Menu mMenu = null;
@@ -135,54 +136,57 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	}
 
 	private void setMapDatabase(SharedPreferences preferences) {
-		MapDatabases mapDatabaseNew;
+		TileSources tileSourceNew;
 		String dbname = preferences.getString("mapDatabase",
-				MapDatabases.OSCIMAP_READER.name());
+				TileSources.OPENSCIENCEMAP2.name());
 
 		try {
-			mapDatabaseNew = MapDatabases.valueOf(dbname);
+			tileSourceNew = TileSources.valueOf(dbname);
 		} catch (IllegalArgumentException e) {
-			mapDatabaseNew = MapDatabases.OSCIMAP_READER;
+			showToastOnUiThread("invalid db: " + dbname);
+			tileSourceNew = TileSources.OPENSCIENCEMAP2;
 		}
 
-		if (mapDatabaseNew != mMapDatabase) {
-			Log.d(TAG, "set map database " + mapDatabaseNew);
-			MapOptions options = null;
+		if (tileSourceNew != mMapDatabase) {
+			Log.d(TAG, "set tile source " + tileSourceNew);
 
-			switch (mapDatabaseNew) {
-			case PBMAP_READER:
-				options = new MapOptions(mapDatabaseNew);
-				options.put("url",
-						"http://city.informatik.uni-bremen.de:80/osmstache/test/");
+			TileSource tileSource = null;
+
+			switch (tileSourceNew) {
+			case OPENSCIENCEMAP1:
+				tileSource = new OSciMap1TileSource();
+				tileSource.setOption("url", "http://city.informatik.uni-bremen.de/osmstache/test");
 				break;
-			case OSCIMAP_READER:
-				options = new MapOptions(mapDatabaseNew);
-				options.put("url",
-						"http://city.informatik.uni-bremen.de:80/osci/map-live/");
-				//"http://city.informatik.uni-bremen.de:80/osci/oscim/");
+			case OPENSCIENCEMAP2:
+				tileSource = new OSciMap2TileSource();
+				tileSource.setOption("url", "http://city.informatik.uni-bremen.de/osci/map-live");
 				break;
-			case TEST_READER:
-				options = new MapOptions(MapDatabases.OSCIMAP_READER);
-				options.put("url",
-						"http://city.informatik.uni-bremen.de:8000/");
+			case OPENSCIENCEMAP4:
+				tileSource = new OSciMap4TileSource();
+				tileSource.setOption("url", "http://city.informatik.uni-bremen.de/osci/testing");
 				break;
-			case MAP_READER:
-				options = new MapOptions(mapDatabaseNew);
-				options.put("file",
-						"/storage/sdcard0/Download/bremen.map");
+			case MAPSFORGE:
+				tileSource = new MapFileTileSource();
+				tileSource.setOption("file", "/storage/sdcard0/germany.map");
 				break;
+			case MAPNIK_VECTOR:
+				tileSource = new MapnikVectorTileSource();
+				tileSource.setOption("url", "http://d1s11ojcu7opje.cloudfront.net/dev/764e0b8d");
+				break;
+
 			default:
 				break;
 			}
 
-			if (mBaseLayer == null)
-				mBaseLayer = mMapView.setBaseMap(options);
-			else
-				mBaseLayer.setMapDatabase(options);
+			if (mBaseLayer == null) {
+				mBaseLayer = mMapView.setBaseMap(tileSource);
+				if (LENS_OVERLAY)
+					mMapView.getOverlays().add(new MapLensEvents(mMapView,
+							this, mBaseLayer.getTileLayer()));
+			} else
+				mBaseLayer.setTileSource(tileSource);
 
-
-			//mMapView.setMapDatabase(options);
-			mMapDatabase = mapDatabaseNew;
+			mMapDatabase = tileSourceNew;
 		}
 	}
 
@@ -302,11 +306,11 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				R.id.menu_position_my_location_disable,
 				!mLocation.isShowMyLocationEnabled());
 
-		if (mMapDatabase == MapDatabases.MAP_READER) {
-			//menu.findItem(R.id.menu_mapfile).setVisible(true);
+		if (mMapDatabase == TileSources.MAPSFORGE) {
+			// menu.findItem(R.id.menu_mapfile).setVisible(true);
 			menu.findItem(R.id.menu_position_map_center).setVisible(true);
 		} else {
-			//menu.findItem(R.id.menu_mapfile).setVisible(false);
+			// menu.findItem(R.id.menu_mapfile).setVisible(false);
 			menu.findItem(R.id.menu_position_map_center).setVisible(false);
 		}
 

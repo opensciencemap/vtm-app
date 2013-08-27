@@ -2,17 +2,19 @@
 <resources>
 
     <string-array name="preferences_map_database_keys">
-        <item>PBMAP_READER</item>
-        <item>OSCIMAP_READER</item>
-        <item>TEST_READER</item>
-        <item>MAP_READER</item>
+        <item>OPENSCIENCEMAP1</item>
+        <item>OPENSCIENCEMAP2</item>
+        <item>OPENSCIENCEMAP4</item>
+        <item>MAPNIK_VECTOR</item>
+        <item>MAPSFORGE</item>
         <!-- <item>POSTGIS_READER</item> -->
     </string-array>
     <string-array name="preferences_map_generator_values">
-        <item>OpenScienceMap</item>
+        <item>OpenScienceMap1</item>
         <item>OpenScienceMap2</item>
-        <item>VectorTileServer</item>
-        <item>MapFile</item>
+        <item>OpenScienceMap4</item>
+        <item>Mapnik-Vector</item>
+        <item>Mapsforge File</item>
         <!-- <item>PostGIS</item> -->
     </string-array>
 
@@ -21,11 +23,13 @@
     <string-array name="preferences_map_theme_keys">
         <item>OSMARENDER</item>
         <item>TRONRENDER</item>
-    </string-array>
+        <item>MAPNIK</item>
+        </string-array>
     <string-array name="preferences_map_theme_values">
         <item>Default</item>
         <item>Tubes</item>
-    </string-array>
+        <item>Mapnik</item>
+        </string-array>
 
     <string name="preferences_map_theme_default">OSMARENDER</string>
     <string name="preferences_debug">Debug settings</string>

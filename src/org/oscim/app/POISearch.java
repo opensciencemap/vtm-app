@@ -25,7 +25,6 @@ import org.oscim.layers.overlay.OverlayItem.HotspotPlace;
 import org.oscim.view.MapView;
 import org.osmdroid.location.FlickrPOIProvider;
 import org.osmdroid.location.FourSquareProvider;
-import org.osmdroid.location.GeoNamesPOIProvider;
 import org.osmdroid.location.NominatimPOIProvider;
 import org.osmdroid.location.OverpassPOIProvider;
 import org.osmdroid.location.POI;

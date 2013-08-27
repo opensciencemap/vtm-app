@@ -16,7 +16,7 @@ package org.oscim.app.filefilter;
 
 import java.io.FileFilter;
 
-import org.oscim.database.IMapDatabase.OpenResult;
+import org.oscim.tilesource.TileSource.OpenResult;
 
 /**
  * An extension of the {@link FileFilter} interface.
