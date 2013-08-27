@@ -29,7 +29,6 @@ import org.oscim.tilesource.mapnik.MapnikVectorTileSource;
 import org.oscim.tilesource.oscimap.OSciMap1TileSource;
 import org.oscim.tilesource.oscimap2.OSciMap2TileSource;
 import org.oscim.tilesource.oscimap4.OSciMap4TileSource;
-import org.oscim.utils.AndroidUtils;
 import org.oscim.view.DebugSettings;
 import org.oscim.view.MapActivity;
 import org.oscim.view.MapView;
@@ -641,19 +640,13 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	 *            the text message to display
 	 */
 	void showToastOnUiThread(final String text) {
-
-		if (AndroidUtils.currentThreadIsUiThread()) {
-			Toast toast = Toast.makeText(this, text, Toast.LENGTH_LONG);
-			toast.show();
-		} else {
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					Toast toast = Toast.makeText(TileMap.this, text, Toast.LENGTH_LONG);
-					toast.show();
-				}
-			});
-		}
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				Toast toast = Toast.makeText(TileMap.this, text, Toast.LENGTH_LONG);
+				toast.show();
+			}
+		});
 	}
 
 	// ----------- Context Menu when clicking on the map
