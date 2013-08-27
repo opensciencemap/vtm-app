@@ -11,10 +11,8 @@
                 android:title="@string/menu_find"/>
             <item
                 android:id="@+id/menu_position_my_location_enable"
-                android:title="@string/menu_position_my_location_enable"/>
-            <item
-                android:id="@+id/menu_position_my_location_disable"
-                android:title="@string/menu_position_my_location_disable"/>
+                android:title="@string/menu_position_my_location_enable" android:checkable="true"/>
+            <item android:id="@+id/item1" android:title=" -Follow my location" android:checkable="true" android:visible="false" android:checked="false"/><item android:id="@+id/item2" android:title=" -Animation" android:checkable="true" android:visible="false" android:checked="true"/>
             <item
                 android:id="@+id/menu_rotation_enable"
                 android:checkable="true"
@@ -36,6 +34,8 @@
             <item
                 android:id="@+id/menu_position_map_center"
                 android:title="@string/menu_position_map_file_center"/>
+            
+            
         </menu>
     </item>
     <!--
@@ -51,7 +51,7 @@
         android:id="@+id/menu_preferences"
         android:icon="@drawable/ic_menu_options"
         android:showAsAction="never"
-        android:title="@string/menu_preferences"/>
+        android:title="Settings"/>
 
     <!-- android:icon="@drawable/ic_menu_mapmode" -->
     <!-- android:icon="@drawable/ic_menu_archive" -->
@@ -74,5 +74,12 @@
         android:id="@+id/menu_info_about"
         android:icon="@drawable/info"
         android:title="@string/menu_info_about"/>
+    <item android:id="@+id/item3" android:title="Layers" android:icon="@drawable/layers2">
+        <menu>
+            <item android:id="@+id/item4" android:title="Naturla Earth" android:checkable="true"/>
+            <item android:id="@+id/item5" android:title="Map Quest Arial" android:checkable="false" android:visible="false"/>
+            <item android:id="@+id/item6" android:title="Grid" android:checkable="true"/>
+        </menu>
+    </item>
 
 </menu>

@@ -13,8 +13,11 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.oscim.app;
+package org.oscim.app.location;
 
+import org.oscim.app.App;
+import org.oscim.app.R;
+import org.oscim.app.TileMap;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.view.MapView;
@@ -31,7 +34,7 @@ import android.widget.TextView;
 
 public class LocationDialog {
 
-	void prepareDialog(MapView mapView, final Dialog dialog) {
+	public void prepareDialog(MapView mapView, final Dialog dialog) {
 		EditText editText = (EditText) dialog.findViewById(R.id.latitude);
 		GeoPoint mapCenter = mapView.getMapViewPosition().getMapCenter();
 		editText.setText(Double.toString(mapCenter.getLatitude()));
@@ -48,7 +51,7 @@ public class LocationDialog {
 		zoomlevel.setOnSeekBarChangeListener(new SeekBarChangeListener(textView));
 	}
 
-	Dialog createDialog(final TileMap map) {
+	public Dialog createDialog(final TileMap map) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(map);
 		builder.setIcon(android.R.drawable.ic_menu_mylocation);
 		builder.setTitle(R.string.menu_position_enter_coordinates);
