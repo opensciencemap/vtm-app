@@ -137,7 +137,7 @@ public class LocationOverlay extends Overlay {
 				mInitialized = true;
 			}
 
-			if (!isEnabled()){
+			if (!isEnabled()) {
 				isReady = false;
 				return;
 			}
@@ -215,10 +215,12 @@ public class LocationOverlay extends Overlay {
 
 			animate(true);
 			boolean viewShed = false;
-			if (!mLocationIsVisible || pos.zoomLevel < SHOW_ACCURACY_ZOOM) {
+			if (!mLocationIsVisible /* || pos.zoomLevel < SHOW_ACCURACY_ZOOM */) {
 				//animate(true);
 			} else {
-				radius = (float) (mRadius * pos.scale);
+				if (pos.zoomLevel >= SHOW_ACCURACY_ZOOM)
+					radius = (float) (mRadius * pos.scale);
+
 				viewShed = true;
 				//animate(false);
 			}
@@ -305,6 +307,31 @@ public class LocationOverlay extends Overlay {
 				+ "  a = d * (a - (b + c)) + c;"
 				+ "  gl_FragColor = vec4(0.2, 0.2, 0.8, 1.0) * a;"
 				+ "}";
+
+		//private final static String fShaderStr = ""
+		//		+ "precision mediump float;"
+		//		+ "varying vec2 v_tex;"
+		//		+ "uniform float u_scale;"
+		//		+ "uniform float u_phase;"
+		//		+ "uniform vec2 u_dir;"
+		//		+ "void main() {"
+		//		+ "  float len = 1.0 - length(v_tex);"
+		//		///  outer ring
+		//		+ "  float a = smoothstep(0.0, 2.0 / u_scale, len);"
+		//		///  inner ring
+		//		+ "  float b = 0.8 * smoothstep(3.0 / u_scale, 4.0 / u_scale, len);"
+		//		///  center point
+		//		+ "  float c = 0.5 * (1.0 - smoothstep(14.0 / u_scale, 16.0 / u_scale, 1.0 - len));"
+		//		+ "  vec2 dir = normalize(v_tex);"
+		//		+ "  float d = dot(dir, u_dir); "
+		//		///  0.5 width of viewshed
+		//		+ "  d = clamp(smoothstep(0.7, 0.7 + 2.0/u_scale, d) * len, 0.0, 1.0);"
+		//		///  - subtract inner from outer to create the outline
+		//		///  - multiply by viewshed
+		//		///  - add center point
+		//		+ "  a = max(d, (a - (b + c)) + c);"
+		//		+ "  gl_FragColor = vec4(0.2, 0.2, 0.8, 1.0) * a;"
+		//		+ "}";
 
 	}
 }
