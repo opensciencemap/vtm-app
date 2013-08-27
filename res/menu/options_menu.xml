@@ -7,7 +7,7 @@
         android:title="@string/menu_position">
         <menu>
             <item
-                android:id="@+id/menu_nearby"
+                android:id="@+id/menu_poi_nearby"
                 android:title="@string/menu_find"/>
             <item
                 android:id="@+id/menu_position_my_location_enable"

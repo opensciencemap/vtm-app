@@ -47,15 +47,12 @@ import org.osmdroid.overlays.MapEventsReceiver;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -66,16 +63,11 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class TileMap extends MapActivity implements MapEventsReceiver {
 	static final String TAG = TileMap.class.getName();
 
-	private static final String BUNDLE_SHOW_MY_LOCATION = "showMyLocation";
-	private static final String BUNDLE_SNAP_TO_LOCATION = "snapToLocation";
 	private static final int DIALOG_ENTER_COORDINATES = 0;
 	private static final int DIALOG_LOCATION_PROVIDER_DISABLED = 2;
 
@@ -89,11 +81,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	private TileSources mMapDatabase;
 
-	// private WakeLock mWakeLock;
 	private Menu mMenu = null;
 
-	POISearch mPoiSearch;
-	public RouteSearch mRouteSearch;
 	Compass mCompass;
 	private MapTileLayer mBaseLayer;
 
@@ -122,30 +111,15 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 		mLocation = new LocationHandler(this);
 
-		initRouteBar();
-		// get the pointers to different system services
-		// PowerManager powerManager = (PowerManager)
-		// getSystemService(Context.POWER_SERVICE);
-		// mWakeLock =
-		// powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "AMV");
+		mMapView.getOverlays().add(new DistanceTouchOverlay(mMapView, this));
 
-		compassInit();
-
-		if (savedInstanceState != null &&
-				savedInstanceState.getBoolean(BUNDLE_SHOW_MY_LOCATION) &&
-				savedInstanceState.getBoolean(BUNDLE_SNAP_TO_LOCATION))
-			mLocation.enableSnapToLocation(false);
-
-		mMapView.getOverlays().add(new MapEventLayer(mMapView));
-
-		mMapView.getOverlays().add(new DistanceTouchOverlay(mMapView,
-				this));
+		mCompass = new Compass(this, mMapView);
 		mMapView.getOverlays().add(mCompass);
 
-		App.poiSearch = mPoiSearch = new POISearch();
+		App.poiSearch = new POISearch();
+		App.routeSearch = new RouteSearch();
 
 		registerForContextMenu(mMapView);
-		mRouteSearch = new RouteSearch();
 
 		final Intent intent = getIntent();
 		if (intent != null) {
@@ -265,7 +239,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			toggleMenuCheck();
 			return true;
 
-		case R.id.menu_nearby:
+		case R.id.menu_poi_nearby:
 			Intent intent = new Intent(this, POIActivity.class);
 			startActivityForResult(intent, TileMap.POIS_REQUEST);
 			return true;
@@ -510,90 +484,6 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		return mMapView.onTrackballEvent(event);
 	}
 
-	TextView distance = null;
-	TextView routeLength = null;
-	TextView carTime = null;
-	ImageView distanceView = null;
-	ImageView routeLengthView = null;
-	ImageView carTimeView = null;
-	ImageView Yes = null;
-	ImageView No = null;
-	RelativeLayout routeBar = null;
-
-	private void initRouteBar() {
-		routeBar = (RelativeLayout) findViewById(R.id.routeBar);
-		distance = (TextView) findViewById(R.id.distance);
-		routeLength = (TextView) findViewById(R.id.routeLength);
-		carTime = (TextView) findViewById(R.id.carTime);
-		distanceView = (ImageView) findViewById(R.id.distanceView);
-		routeLengthView = (ImageView) findViewById(R.id.routeLengthView);
-		carTimeView = (ImageView) findViewById(R.id.carTimeView);
-		Yes = (ImageView) findViewById(R.id.yes);
-		No = (ImageView) findViewById(R.id.no);
-		routeBar.setVisibility(View.INVISIBLE);
-		distance.setVisibility(View.INVISIBLE);
-		routeLength.setVisibility(View.INVISIBLE);
-		carTime.setVisibility(View.INVISIBLE);
-		distanceView.setVisibility(View.INVISIBLE);
-		routeLengthView.setVisibility(View.INVISIBLE);
-		carTimeView.setVisibility(View.INVISIBLE);
-		Yes.setVisibility(View.INVISIBLE);
-		Yes.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				HideRouteBar();
-			}
-		});
-		No.setVisibility(View.INVISIBLE);
-		No.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				HideAllRouteBar();
-				mRouteSearch.removeAllOverlay();
-			}
-		});
-	}
-
-	public void setRouteBar(String dis, String route, String time) {
-		routeBar.setVisibility(View.VISIBLE);
-		distance.setVisibility(View.VISIBLE);
-		routeLength.setVisibility(View.VISIBLE);
-		carTime.setVisibility(View.VISIBLE);
-		distanceView.setVisibility(View.VISIBLE);
-		routeLengthView.setVisibility(View.VISIBLE);
-		carTimeView.setVisibility(View.VISIBLE);
-		distance.setText(dis);
-		distance.setTextColor(Color.WHITE);
-		routeLength.setText(route);
-		routeLength.setTextColor(Color.WHITE);
-		carTime.setText(time);
-		carTime.setTextColor(Color.WHITE);
-		Yes.setVisibility(View.VISIBLE);
-		No.setVisibility(View.VISIBLE);
-	}
-
-	private void HideRouteBar() {
-		routeBar.setVisibility(View.INVISIBLE);
-		distance.setVisibility(View.INVISIBLE);
-		routeLength.setVisibility(View.INVISIBLE);
-		carTime.setVisibility(View.INVISIBLE);
-		distanceView.setVisibility(View.INVISIBLE);
-		routeLengthView.setVisibility(View.INVISIBLE);
-		carTimeView.setVisibility(View.INVISIBLE);
-	}
-
-	private void HideAllRouteBar() {
-		routeBar.setVisibility(View.INVISIBLE);
-		distance.setVisibility(View.INVISIBLE);
-		routeLength.setVisibility(View.INVISIBLE);
-		carTime.setVisibility(View.INVISIBLE);
-		distanceView.setVisibility(View.INVISIBLE);
-		routeLengthView.setVisibility(View.INVISIBLE);
-		carTimeView.setVisibility(View.INVISIBLE);
-		Yes.setVisibility(View.INVISIBLE);
-		No.setVisibility(View.INVISIBLE);
-	}
-
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		switch (requestCode) {
@@ -603,9 +493,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				int id = intent.getIntExtra("ID", 0);
 				Log.d(TAG, "result: POIS_REQUEST: " + id);
 
-				mPoiSearch.poiMarkers.showBubbleOnItem(id);
-
-				POI poi = mPoiSearch.getPOIs().get(id);
+				App.poiSearch.poiMarkers.showBubbleOnItem(id);
+				POI poi = App.poiSearch.getPOIs().get(id);
 
 				if (poi.bbox != null)
 					mMapView.getMapViewPosition().animateTo(poi.bbox);
@@ -807,10 +696,6 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putBoolean(BUNDLE_SHOW_MY_LOCATION, mLocation.isShowMyLocationEnabled());
-		// outState.putBoolean(BUNDLE_CENTER_AT_FIRST_FIX,
-		// mMyLocationListener.isCenterAtFirstFix());
-		// outState.putBoolean(BUNDLE_SNAP_TO_LOCATION, mSnapToLocation);
 	}
 
 	/**
@@ -830,6 +715,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	}
 
 	// ----------- Context Menu when clicking on the map
+	private GeoPoint mLongPressGeoPoint;
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -838,21 +725,21 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.map_menu, menu);
 
-		if (mPoiSearch.getPOIs().isEmpty())
-			menu.removeItem(R.id.menu_clear_poi);
+		if (App.poiSearch.getPOIs().isEmpty())
+			menu.removeItem(R.id.menu_poi_clear);
 
-		if (mRouteSearch.isEmpty())
-			menu.removeItem(R.id.menu_clear_route);
+		if (App.routeSearch.isEmpty())
+			menu.removeItem(R.id.menu_route_clear);
 	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		// Log.d(TAG, "context menu item selected " + item.getItemId());
 
-		if (mPoiSearch.onContextItemSelected(item))
+		if (App.poiSearch.onContextItemSelected(item, mLongPressGeoPoint))
 			return true;
 
-		if (mRouteSearch.onContextItemSelected(item))
+		if (App.routeSearch.onContextItemSelected(item, mLongPressGeoPoint))
 			return true;
 
 		return super.onContextItemSelected(item);
@@ -862,56 +749,22 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	@Override
 	public boolean singleTapUpHelper(GeoPoint p) {
-		mPoiSearch.singleTapUp();
-		mRouteSearch.singleTapUp();
+		App.poiSearch.singleTapUp();
+		App.routeSearch.singleTapUp();
 		return false;
 	}
 
 	@Override
 	public boolean longPressHelper(GeoPoint p) {
-		if (p != null)
-			mRouteSearch.longPress(p);
-
+		mLongPressGeoPoint = p;
 		openContextMenu(mMapView);
-
 		return true;
 	}
 
 	@Override
 	public boolean longPressHelper(final GeoPoint p1, final GeoPoint p2) {
-		TileMap.this.runOnUiThread(new Runnable() {
-			public void run() {
-				mRouteSearch.longPress2Point(p1, p2);
-			}
-		});
-
+		App.routeSearch.showRoute(p1, p2);
 		return true;
-	}
-
-	private void compassInit() {
-		mCompass = new Compass(this, mMapView);
-
-		// neither rotation or compass should work at a time
-		mMapView.enableRotation(false);
-		mCompass.start();
-	}
-
-	public void restart(View V) {
-		mCompass.rest();
-		mCompass.stop();
-
-		mMapView.enableRotation(true);;
-		mLocation.enableShowMyLocation(true);
-
-		mLocation.enableShowMyLocation(true);
-		Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
-		// Vibrate for 500 milliseconds
-
-		v.vibrate(500);
-		mCompass.rest();
-		App.map.redrawMap(true);
-
 	}
 
 	public Compass getCompass() {

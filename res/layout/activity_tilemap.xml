@@ -11,75 +11,68 @@
         android:layout_height="fill_parent" />
 
     <RelativeLayout
-        android:id="@+id/routeBar"
+        android:id="@+id/route_bar"
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="25dip"
-        android:background="#ff000000">
+        android:background="#dd000000">
 
         <ImageView
-                android:id="@+id/distanceView"
+                android:id="@+id/route_bar_distance_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/plane" />
 
             <TextView
-                android:id="@+id/distance"
+                android:id="@+id/route_bar_distance"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:textSize="14sp"
+                android:textColor="#fff"
                 android:gravity="center"
-                android:layout_toRightOf="@+id/distanceView"/>
+                android:layout_toRightOf="@+id/route_bar_distance_icon"/>
 
             <ImageView
-                android:id="@+id/routeLengthView"
+                android:id="@+id/route_bar_route_length_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/car"
-                android:layout_toRightOf="@+id/distance"/>
+                android:layout_toRightOf="@+id/route_bar_distance"/>
 
             <TextView
-                android:id="@+id/routeLength"
+                android:id="@+id/route_bar_route_length"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:textSize="14sp"
+                android:textColor="#fff"
                 android:gravity="center"
-                android:layout_toRightOf="@+id/routeLengthView"/>
-
-
+                android:layout_toRightOf="@+id/route_bar_route_length_icon"/>
 
             <ImageView
-                android:id="@+id/carTimeView"
+                android:id="@+id/route_bar_travel_time_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/time"
-                android:layout_toRightOf="@+id/routeLength"/>
+                android:layout_toRightOf="@+id/route_bar_route_length"/>
 
             <TextView
-                android:id="@+id/carTime"
+                android:id="@+id/route_bar_travel_time"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:textSize="14sp"
                 android:gravity="center"
-                android:layout_toRightOf="@+id/carTimeView" />
-
-
+                android:textColor="#fff"
+                android:layout_toRightOf="@+id/route_bar_travel_time_icon" />
 
             <ImageView
-                android:id="@+id/no"
+                android:id="@+id/route_bar_clear"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/no"
                 android:clickable="true"
                 android:layout_alignParentRight="true"/>
 
-             <ImageView
-                android:id="@+id/yes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/yes"
-                android:clickable="true"
-                android:layout_toLeftOf="@+id/no"/>
+
 
     </RelativeLayout>
     <ToggleButton

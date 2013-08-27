@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.oscim.android.AndroidGraphics;
 import org.oscim.core.BoundingBox;
+import org.oscim.core.GeoPoint;
 import org.oscim.layers.overlay.OverlayItem;
 import org.oscim.layers.overlay.OverlayItem.HotspotPlace;
 import org.oscim.layers.overlay.OverlayMarker;
@@ -304,15 +305,15 @@ public class POISearch {
 		poiMarkers.hideBubble();
 	}
 
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onContextItemSelected(MenuItem item, GeoPoint geoPoint) {
 		switch (item.getItemId()) {
-		case R.id.menu_nearby:
+		case R.id.menu_poi_nearby:
 			Intent intent = new Intent(App.activity, POIActivity.class);
 			intent.putExtra("ID", poiMarkers.getBubbledItemId());
 			App.activity.startActivityForResult(intent, TileMap.POIS_REQUEST);
 			return true;
 
-		case R.id.menu_clear_poi:
+		case R.id.menu_poi_clear:
 			poiMarkers.removeAllItems();
 			mPOIs.clear();
 			App.map.redrawMap(true);

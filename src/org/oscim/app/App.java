@@ -25,9 +25,11 @@ public class App extends Application {
 	public static final String TAG = TileMap.class.getName();
 
 	public static MapView map;
-	public static POISearch poiSearch;
 	public static Resources res;
 	public static TileMap activity;
+
+	public static POISearch poiSearch;
+	public static RouteSearch routeSearch;
 
 	@Override
 	public void onCreate() {

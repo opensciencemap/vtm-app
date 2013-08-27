@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.oscim.android.AndroidGraphics;
 import org.oscim.core.GeoPoint;
-import org.oscim.layers.overlay.OverlayItem;
 import org.oscim.layers.overlay.OverlayItem.HotspotPlace;
 import org.oscim.layers.overlay.OverlayMarker;
 import org.oscim.layers.overlay.PathOverlay;
@@ -32,90 +31,83 @@ import org.osmdroid.overlays.DefaultInfoWindow;
 import org.osmdroid.overlays.ExtendedOverlayItem;
 import org.osmdroid.overlays.ItemizedOverlayWithBubble;
 import org.osmdroid.routing.Route;
-import org.osmdroid.routing.RouteNode;
 import org.osmdroid.routing.RouteProvider;
 import org.osmdroid.routing.provider.OSRMRouteProvider;
 
+import android.app.Activity;
 import android.location.Address;
 import android.os.AsyncTask;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class RouteSearch {
-	protected Route mRoute;
-	protected final PathOverlay mRouteOverlay;
-	protected final ItemizedOverlayWithBubble<ExtendedOverlayItem> mRouteMarkers;
-	protected final ItemizedOverlayWithBubble<ExtendedOverlayItem> mItineraryMarkers;
+	private static int START_INDEX = -2, DEST_INDEX = -1;
 
-	protected GeoPoint mStartPoint, mDestinationPoint;
+	private final PathOverlay mRouteOverlay;
+	//private final ItemizedOverlayWithBubble<ExtendedOverlayItem> mRouteMarkers;
+	private final ItemizedOverlayWithBubble<ExtendedOverlayItem> mItineraryMarkers;
 
-	public GeoPoint getmStartPoint() {
-		return mStartPoint;
-	}
+	private final RouteBar mRouteBar;
 
-	public void setmStartPoint(GeoPoint mStartPoint) {
-		this.mStartPoint = mStartPoint;
+	private GeoPoint mStartPoint, mDestinationPoint;
+	private final ArrayList<GeoPoint> mViaPoints;
 
-	}
+	private ExtendedOverlayItem markerStart, markerDestination;
 
-	boolean longPress2Point(GeoPoint p1, GeoPoint p2) {
-		removeAllOverlay();
-		mStartPoint = p1;
-		markerStart = putMarkerItem(markerStart, mStartPoint, START_INDEX,
-				R.string.departure, R.drawable.marker_departure, -1);
-		mDestinationPoint = p2;
-		//new GeoPoint((GeoPoint) tempClickedGeoPoint);
-		markerDestination = putMarkerItem(markerDestination, mDestinationPoint, DEST_INDEX,
-				R.string.destination,
-				R.drawable.marker_destination, -1);
-		getRouteAsync();
-		return true;
-	}
-
-	public GeoPoint getmDestinationPoint() {
-		return mDestinationPoint;
-	}
-
-	public void setmDestinationPoint(GeoPoint mDestinationPoint) {
-		this.mDestinationPoint = mDestinationPoint;
-	}
-
-	protected final ArrayList<GeoPoint> mViaPoints;
-
-	protected static int START_INDEX = -2, DEST_INDEX = -1;
-	protected ExtendedOverlayItem markerStart, markerDestination;
+	private UpdateRouteTask mRouteTask;
 
 	RouteSearch() {
 		mViaPoints = new ArrayList<GeoPoint>();
 
 		// Itinerary markers:
 		ArrayList<ExtendedOverlayItem> waypointsItems = new ArrayList<ExtendedOverlayItem>();
+
 		mItineraryMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map,
 				App.activity, null, waypointsItems,
-
 				new ViaPointInfoWindow(R.layout.itinerary_bubble, App.map));
 
-		updateIternaryMarkers();
+		//updateIternaryMarkers();
 
 		//Route and Directions
-		ArrayList<ExtendedOverlayItem> routeItems = new ArrayList<ExtendedOverlayItem>();
-		mRouteMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map, App.activity,
-				null, routeItems);
+		//ArrayList<ExtendedOverlayItem> routeItems = new ArrayList<ExtendedOverlayItem>();
+		//mRouteMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map, App.activity,
+		//		null, routeItems);
 
 		mRouteOverlay = new PathOverlay(App.map, 0xAA0000FF, 3);
 
+		// TODO use LayerGroup
 		App.map.getOverlays().add(mRouteOverlay);
-		App.map.getOverlays().add(mRouteMarkers);
+		//App.map.getOverlays().add(mRouteMarkers);
 		App.map.getOverlays().add(mItineraryMarkers);
+
+		mRouteBar = new RouteBar(App.activity);
+	}
+
+	/**
+	 * Retrieve route between p1 and p2 and update overlays.
+	 */
+	public void showRoute(GeoPoint p1, GeoPoint p2) {
+		clearOverlays();
+
+		mStartPoint = p1;
+		markerStart = putMarkerItem(markerStart, mStartPoint, START_INDEX,
+				R.string.departure, R.drawable.marker_departure, -1);
+
+		mDestinationPoint = p2;
+		markerDestination = putMarkerItem(markerDestination, mDestinationPoint, DEST_INDEX,
+				R.string.destination,
+				R.drawable.marker_destination, -1);
+
+		getRouteAsync();
 	}
 
 	/**
 	 * Reverse Geocoding
-	 * @param p
-	 *            ...
-	 * @return ...
 	 */
 	public String getAddress(GeoPoint p) {
 		GeocoderNominatim geocoder = new GeocoderNominatim(App.activity);
@@ -159,7 +151,6 @@ public class RouteSearch {
 		@Override
 		protected void onPostExecute(String result) {
 			marker.setDescription(result);
-			//itineraryMarkers.showBubbleOnItem(???, map); //open bubble on the item
 		}
 	}
 
@@ -173,9 +164,8 @@ public class RouteSearch {
 		OverlayMarker marker = AndroidGraphics.makeMarker(App.res, markerResId,
 				HotspotPlace.BOTTOM_CENTER);
 
-		String title = App.res.getString(titleResId);
-
-		ExtendedOverlayItem overlayItem = new ExtendedOverlayItem(title, "", p);
+		ExtendedOverlayItem overlayItem =
+				new ExtendedOverlayItem(App.res.getString(titleResId), "", p);
 
 		overlayItem.setMarker(marker);
 
@@ -190,6 +180,7 @@ public class RouteSearch {
 
 		//Start geocoding task to update the description of the marker with its address:
 		new GeocodingTask().execute(overlayItem);
+
 		return overlayItem;
 	}
 
@@ -200,11 +191,11 @@ public class RouteSearch {
 	}
 
 	public void removePoint(int index) {
-		if (index == START_INDEX)
+		if (index == START_INDEX) {
 			mStartPoint = null;
-		else if (index == DEST_INDEX)
+		} else if (index == DEST_INDEX) {
 			mDestinationPoint = null;
-		else
+		} else
 			mViaPoints.remove(index);
 
 		getRouteAsync();
@@ -233,54 +224,41 @@ public class RouteSearch {
 	}
 
 	//------------ Route and Directions
+	private void updateOverlays(Route route) {
+		//mRouteMarkers.removeAllItems();
 
-	private void putRouteNodes(Route route) {
-		mRouteMarkers.removeAllItems();
-
-		OverlayMarker marker = AndroidGraphics.makeMarker(App.res, R.drawable.marker_node, null);
-
-		int n = route.nodes.size();
-		//TypedArray iconIds = App.res.obtainTypedArray(R.array.direction_icons);
-		for (int i = 0; i < n; i++) {
-			RouteNode node = route.nodes.get(i);
-			String instructions = (node.instructions == null ? "" : node.instructions);
-			ExtendedOverlayItem nodeMarker = new ExtendedOverlayItem(
-					"Step " + (i + 1), instructions, node.location);
-
-			nodeMarker.setSubDescription(route.getLengthDurationText(node.length, node.duration));
-			nodeMarker.setMarkerHotspot(OverlayItem.HotspotPlace.CENTER);
-			nodeMarker.setMarker(marker);
-			//int iconId = iconIds.getResourceId(node.mManeuverType, R.drawable.ic_empty);
-			//if (iconId != R.drawable.ic_empty) {
-			//	Drawable icon = App.res.getDrawable(iconId);
-			//	nodeMarker.setImage(icon);
-			//}
-			mRouteMarkers.addItem(nodeMarker);
-		}
-	}
-
-	void updateRouteMarkers(Route route) {
-		mRouteMarkers.removeAllItems();
 		mRouteOverlay.clearPath();
 
-		if (route == null)
-			return;
-
-		if (route.status == Route.STATUS_DEFAULT)
-			Toast.makeText(App.map.getContext(), "We have a problem to get the route",
+		if (route == null || route.status == Route.STATUS_DEFAULT) {
+			Toast.makeText(App.map.getContext(),
+					App.res.getText(R.string.route_lookup_error),
 					Toast.LENGTH_SHORT).show();
+			return;
+		}
 
 		mRouteOverlay.setPoints(route.routeHigh);
 
-		//RouteProvider.buildRouteOverlay(mRouteOverlay, route);
+		//OverlayMarker marker = AndroidGraphics.makeMarker(App.res, R.drawable.marker_node, null);
 
-		putRouteNodes(route);
+		//int n = route.nodes.size();
+		//for (int i = 0; i < n; i++) {
+		//	RouteNode node = route.nodes.get(i);
+		//	String instructions = (node.instructions == null ? "" : node.instructions);
+		//	ExtendedOverlayItem nodeMarker = new ExtendedOverlayItem(
+		//			"Step " + (i + 1), instructions, node.location);
+		//
+		//	nodeMarker.setSubDescription(route.getLengthDurationText(node.length, node.duration));
+		//	nodeMarker.setMarkerHotspot(OverlayItem.HotspotPlace.CENTER);
+		//	nodeMarker.setMarker(marker);
+		//
+		//	mRouteMarkers.addItem(nodeMarker);
+		//}
 
 		App.map.redrawMap(true);
 	}
 
-	void removeAllOverlay() {
-		mRouteMarkers.removeAllItems(true);
+	void clearOverlays() {
+		//mRouteMarkers.removeAllItems(true);
 		mItineraryMarkers.removeAllItems(true);
 
 		mRouteOverlay.clearPath();
@@ -294,126 +272,91 @@ public class RouteSearch {
 	/**
 	 * Async task to get the route in a separate thread.
 	 */
-	class UpdateRouteTask extends AsyncTask<WayPoints, Void, Route> {
+	class UpdateRouteTask extends AsyncTask<List<GeoPoint>, Void, Route> {
 		@Override
-		protected Route doInBackground(WayPoints... wp) {
-			WayPoints waypoints = wp[0];
-			//RouteProvuder routeProvider = new GoogleRouteProvider();
-			RouteProvider routeProvider = new OSRMRouteProvider();
+		protected Route doInBackground(List<GeoPoint>... wp) {
+			List<GeoPoint> waypoints = wp[0];
+
 			//RouteProvider routeProvider = new MapQuestRouteProvider();
 			//Locale locale = Locale.getDefault();
 			//routeProvider.addRequestOption("locale=" + locale.getLanguage() + "_"
 			//		+ locale.getCountry());
 			//routeProvider.addRequestOption("routeType=pedestrian");
+
+			//RouteProvider routeProvider = new GoogleRouteProvider();
+			RouteProvider routeProvider = new OSRMRouteProvider();
 			return routeProvider.getRoute(waypoints);
 		}
 
 		@Override
 		protected void onPostExecute(Route result) {
-			mRoute = result;
-			updateRouteMarkers(result);
 
-			DecimalFormat twoDForm = new DecimalFormat("#.#");
-			DecimalFormat oneDForm = new DecimalFormat("#");
-			int hour = ((int) result.duration / 3600);
-			int minute = ((int) result.duration % 3600) / 60;
-			String time = "";
-			if (hour == 0 && minute == 0) {
-				time = "?";
-			}
-			else if (hour == 0 && minute != 0) {
-				time = minute + "m";
-			} else {
-				time = hour + "h " + minute + "m";
-			}
-			//Log.d(TAG,"Hour: "+hour+" Min: "+minute+" Duration: "+result.duration);
-			//			tileMap.mapInfo.setVisibility(View.VISIBLE);//			tileMap.mapInfo.setTextSize((float) 20.0);
-			double dis = ((double) (mStartPoint.distanceTo(mDestinationPoint))) / 1000;
-			String distance;
-			String shortpath;
-			if (dis < 100) {
-				distance = twoDForm.format(dis);
-			} else {
-				distance = oneDForm.format(dis);
-			}
-			if (result.length == 0) {
-				shortpath = "?";
-			}
-			else if (result.length < 100) {
-				shortpath = twoDForm.format(result.length);
-			} else {
-				shortpath = oneDForm.format(result.length);
-			}
-			//			tileMap.mapInfo.setText(" Direct distance: "+distance+" km" +
-			//					"\n Shortest path: " + shortpath
-			//					+ " km \n By car: "
-			//					+time);
-			App.activity.setRouteBar(distance + " km ", shortpath + " km ", time);
+			updateOverlays(result);
+			mRouteBar.set(result);
 
+			mRouteTask = null;
 		}
 	}
 
-	class WayPoints extends ArrayList<GeoPoint> {
-		public WayPoints(int i) {
-			super(i);
-		}
-
-		private static final long serialVersionUID = 1L;
-	}
-
+	@SuppressWarnings("unchecked")
 	public void getRouteAsync() {
-		mRoute = null;
+		if (mRouteTask != null) {
+			mRouteTask.cancel(true);
+			mRouteTask = null;
+		}
+
 		if (mStartPoint == null || mDestinationPoint == null) {
-			updateRouteMarkers(mRoute);
+			mRouteOverlay.clearPath();
 			return;
 		}
-		WayPoints waypoints = new WayPoints(2);
+
+		List<GeoPoint> waypoints = new ArrayList<GeoPoint>();
 		waypoints.add(mStartPoint);
 		//add intermediate via points:
 		for (GeoPoint p : mViaPoints) {
 			waypoints.add(p);
 		}
 		waypoints.add(mDestinationPoint);
-		new UpdateRouteTask().execute(waypoints);
-	}
 
-	GeoPoint tempClickedGeoPoint; //any other way to pass the position to the menu ???
-
-	boolean longPress(GeoPoint p) {
-		tempClickedGeoPoint = p;
-		return true;
+		mRouteTask = new UpdateRouteTask();
+		mRouteTask.execute(waypoints);
 	}
 
 	void singleTapUp() {
-		mRouteMarkers.hideBubble();
+		//mRouteMarkers.hideBubble();
 		mItineraryMarkers.hideBubble();
 	}
 
-	boolean onContextItemSelected(MenuItem item) {
+	boolean onContextItemSelected(MenuItem item, GeoPoint geoPoint) {
 		switch (item.getItemId()) {
-		case R.id.menu_departure:
-			mStartPoint = tempClickedGeoPoint;
+		case R.id.menu_route_departure:
+			mStartPoint = geoPoint;
+
 			markerStart = putMarkerItem(markerStart, mStartPoint, START_INDEX,
 					R.string.departure, R.drawable.marker_departure, -1);
+
 			getRouteAsync();
 			return true;
 
-		case R.id.menu_destination:
-			mDestinationPoint = tempClickedGeoPoint;
+		case R.id.menu_route_destination:
+			mDestinationPoint = geoPoint;
+
 			markerDestination = putMarkerItem(markerDestination, mDestinationPoint, DEST_INDEX,
 					R.string.destination,
 					R.drawable.marker_destination, -1);
+
 			getRouteAsync();
 			return true;
 
-		case R.id.menu_viapoint:
-			GeoPoint viaPoint = tempClickedGeoPoint;
+		case R.id.menu_route_viapoint:
+			GeoPoint viaPoint = geoPoint;
 			addViaPoint(viaPoint);
+
 			getRouteAsync();
 			return true;
 
-		case R.id.menu_clear_route:
-			removeAllOverlay();
+		case R.id.menu_route_clear:
+			clearOverlays();
 			return true;
 
 		default:
@@ -447,6 +390,72 @@ public class RouteSearch {
 			mSelectedPoint = ((Integer) item.getRelatedObject()).intValue();
 			super.onOpen(item);
 		}
+	}
 
+	class RouteBar {
+
+		TextView mDistance = null;
+		TextView mRouteLength = null;
+		TextView mTravelTime = null;
+		ImageView mClearButton = null;
+		RelativeLayout mRouteBarView = null;
+
+		RouteBar(Activity activity) {
+
+			mRouteBarView = (RelativeLayout) activity.findViewById(R.id.route_bar);
+			mDistance = (TextView) activity.findViewById(R.id.route_bar_distance);
+			mRouteLength = (TextView) activity.findViewById(R.id.route_bar_route_length);
+			mTravelTime = (TextView) activity.findViewById(R.id.route_bar_travel_time);
+
+			mClearButton = (ImageView) activity.findViewById(R.id.route_bar_clear);
+
+			mRouteBarView.setVisibility(View.INVISIBLE);
+
+			mClearButton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					mRouteBarView.setVisibility(View.INVISIBLE);
+					clearOverlays();
+				}
+			});
+		}
+
+		public void set(Route result) {
+			DecimalFormat twoDForm = new DecimalFormat("#.#");
+			DecimalFormat oneDForm = new DecimalFormat("#");
+			int hour = ((int) result.duration / 3600);
+			int minute = ((int) result.duration % 3600) / 60;
+			String time = "";
+			if (hour == 0 && minute == 0) {
+				time = "?";
+			}
+			else if (hour == 0 && minute != 0) {
+				time = minute + "m";
+			} else {
+				time = hour + "h " + minute + "m";
+			}
+
+			double dis = ((double) (mStartPoint.distanceTo(mDestinationPoint))) / 1000;
+			String distance;
+			String shortpath;
+			if (dis < 100) {
+				distance = twoDForm.format(dis);
+			} else {
+				distance = oneDForm.format(dis);
+			}
+			if (result.length == 0) {
+				shortpath = "?";
+			}
+			else if (result.length < 100) {
+				shortpath = twoDForm.format(result.length);
+			} else {
+				shortpath = oneDForm.format(result.length);
+			}
+
+			mRouteBarView.setVisibility(View.VISIBLE);
+			mDistance.setText(distance + " km");
+			mTravelTime.setText(time);
+			mRouteLength.setText(shortpath + " km");
+		}
 	}
 }
