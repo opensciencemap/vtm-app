@@ -34,7 +34,7 @@ public class LocationHandler implements LocationListener {
 	private final static String TAG = LocationHandler.class.getName();
 
 	private final static int DIALOG_LOCATION_PROVIDER_DISABLED = 2;
-	private final static int SHOW_LOCATION_ZOOM = 15;
+	private final static int SHOW_LOCATION_ZOOM = 14;
 
 	private final LocationManager mLocationManager;
 	private final LocationOverlay mLocationOverlay;
@@ -108,14 +108,20 @@ public class LocationHandler implements LocationListener {
 
 	public Location gotoLastKnownPosition() {
 		Location location = null;
+		float bestAccuracy = Float.MAX_VALUE;
 
 		for (String provider : mLocationManager.getProviders(true)) {
 			Location l = mLocationManager.getLastKnownLocation(provider);
 			if (l == null)
 				continue;
 
-			if (location == null || l.getAccuracy() < location.getAccuracy()) {
+			float accuracy = l.getAccuracy();
+			if (accuracy <= 0)
+				accuracy = Float.MAX_VALUE;
+
+			if (location == null || accuracy <= bestAccuracy) {
 				location = l;
+				bestAccuracy = accuracy;
 			}
 		}
 
@@ -126,9 +132,12 @@ public class LocationHandler implements LocationListener {
 		}
 
 		MapPosition mapPosition = new MapPosition();
-		mapPosition.setPosition(location.getLatitude(), location.getLongitude());
-		mapPosition.setZoomLevel(SHOW_LOCATION_ZOOM);
+		App.map.getMapPosition(mapPosition);
 
+		if (mapPosition.zoomLevel < SHOW_LOCATION_ZOOM)
+			mapPosition.setZoomLevel(SHOW_LOCATION_ZOOM);
+
+		mapPosition.setPosition(location.getLatitude(), location.getLongitude());
 		App.map.setMapPosition(mapPosition);
 		App.map.redrawMap(true);
 
