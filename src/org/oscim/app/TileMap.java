@@ -140,13 +140,9 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 		case R.id.menu_compass_enable:
 			if (!item.isChecked()) {
-				mMapView.getEventLayer().enableRotation(false);
-				mMapView.getEventLayer().enableTilt(false);
-				mCompass.setEnabled(true);
+				setInteractionMode(MAP_MODE_COMPASS);
 			} else {
-				mMapView.getEventLayer().enableRotation(true);
-				mMapView.getEventLayer().enableTilt(true);
-				mCompass.setEnabled(false);
+				setInteractionMode(MAP_MODE_MANUAL);
 			}
 			toggleMenuCheck();
 			return true;
@@ -212,7 +208,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	private void toggleMenuCheck() {
 
 		mMenu.findItem(R.id.menu_compass_enable)
-				.setChecked(mCompass.isEnabled());
+				.setChecked(mCompass.isEnabled() && mCompass.controlView());
+
 		mMenu.findItem(R.id.menu_position_my_location_enable)
 				.setChecked(mLocation.isShowMyLocationEnabled());
 
@@ -480,7 +477,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			mLocation.disableShowMyLocation();
 
 			mCompass.setEnabled(false);
-			mCompass.controlOrientation(false);
+			mCompass.controlView(false);
 
 			App.activity.showToastOnUiThread("Manual");
 
@@ -490,7 +487,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			mMapView.getEventLayer().enableTilt(true);
 
 			mCompass.setEnabled(false);
-			mCompass.controlOrientation(false);
+			mCompass.controlView(false);
 
 			mLocation.enableShowMyLocation(true);
 			App.activity.showToastOnUiThread("Show Location");
@@ -502,7 +499,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			mLocation.enableSnapToLocation();
 			//mCompass.setEnabled(true);
 
-			mCompass.controlOrientation(false);
+			mCompass.controlView(false);
 
 			App.activity.showToastOnUiThread(App.activity
 					.getString(R.string.snap_to_location_enabled));
@@ -513,7 +510,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			mMapView.getEventLayer().enableTilt(false);
 
 			mCompass.setEnabled(true);
-			mCompass.controlOrientation(true);
+			mCompass.controlView(true);
 			mLocation.disableShowMyLocation();
 
 			App.activity.showToastOnUiThread("Compass");

@@ -79,9 +79,14 @@ public class Compass extends Layer implements SensorEventListener {
 		return mCurRotation;
 	}
 
-	public void controlOrientation(boolean enable) {
+	public void controlView(boolean enable) {
 		mControlOrientation = enable;
 	}
+
+	public boolean controlView() {
+		return mControlOrientation;
+	}
+
 
 	@Override
 	public void setEnabled(boolean enabled) {
