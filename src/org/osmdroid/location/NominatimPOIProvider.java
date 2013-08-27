@@ -192,7 +192,7 @@ public class NominatimPOIProvider implements POIProvider {
 			String lon = Double.toString(p.getLongitude());
 			lon = lon.substring(0, Math.min(lon.length(), 7));
 			urlString.append(lat + "," + lon);
-			//limit the size of url as much as possible, as post method is not supported. 
+			//limit the size of url as much as possible, as post method is not supported.
 		}
 		return getThem(urlString.toString());
 	}

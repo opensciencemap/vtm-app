@@ -20,7 +20,7 @@ import java.util.List;
 import org.oscim.app.R;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.MapPosition;
-import org.oscim.overlay.OverlayItem;
+import org.oscim.layers.overlay.OverlayItem;
 import org.oscim.view.MapView;
 import org.osmdroid.location.FlickrPOIProvider;
 import org.osmdroid.location.POI;
@@ -111,7 +111,7 @@ public class POIOverlay extends ItemizedOverlayWithBubble<ExtendedOverlayItem> {
 
 					poiMarker.setMarker(mMarker);
 					poiMarker.setMarkerHotspot(OverlayItem.HotspotPlace.CENTER);
-					//thumbnail loading moved in POIInfoWindow.onOpen for better performances. 
+					//thumbnail loading moved in POIInfoWindow.onOpen for better performances.
 					poiMarker.setRelatedObject(poi);
 
 					addItem(poiMarker);
@@ -135,7 +135,7 @@ public class POIOverlay extends ItemizedOverlayWithBubble<ExtendedOverlayItem> {
 			mButton = (Button) mView.findViewById(R.id.bubble_moreinfo);
 			mImage = (ImageView) mView.findViewById(R.id.bubble_image);
 
-			//bonuspack_bubble layouts already contain a "more info" button. 
+			//bonuspack_bubble layouts already contain a "more info" button.
 			mButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {

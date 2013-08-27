@@ -5,8 +5,8 @@ import java.util.List;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.PointF;
-import org.oscim.overlay.ItemizedIconOverlay;
-import org.oscim.overlay.OverlayItem;
+import org.oscim.layers.overlay.ItemizedIconOverlay;
+import org.oscim.layers.overlay.OverlayItem;
 import org.oscim.view.MapView;
 import org.osmdroid.utils.BonusPackHelper;
 

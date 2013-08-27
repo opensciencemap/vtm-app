@@ -3,7 +3,7 @@ package org.osmdroid.routing;
 import java.util.ArrayList;
 
 import org.oscim.core.GeoPoint;
-import org.oscim.overlay.PathOverlay;
+import org.oscim.layers.overlay.PathOverlay;
 import org.oscim.view.MapView;
 import org.osmdroid.routing.provider.GoogleRouteProvider;
 import org.osmdroid.routing.provider.MapQuestRouteProvider;

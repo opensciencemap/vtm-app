@@ -46,12 +46,12 @@ public class PicasaPOIProvider implements POIProvider {
 		url.append("," + boundingBox.getMaxLongitude());
 		url.append("," + boundingBox.getMaxLatitude());
 		url.append("&max-results=" + maxResults);
-		url.append("&thumbsize=64c"); //thumbnail size: 64, cropped. 
+		url.append("&thumbsize=64c"); //thumbnail size: 64, cropped.
 		url.append("&fields=openSearch:totalResults,entry(summary,media:group/media:thumbnail,media:group/media:title,gphoto:*,georss:where,link)");
 		if (query != null)
 			url.append("&q=" + URLEncoder.encode(query));
 		if (mAccessToken != null) {
-			//TODO: warning: not tested... 
+			//TODO: warning: not tested...
 			url.append("&access_token=" + mAccessToken);
 		}
 		return url.toString();

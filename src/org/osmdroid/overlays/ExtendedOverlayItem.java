@@ -1,7 +1,7 @@
 package org.osmdroid.overlays;
 
 import org.oscim.core.GeoPoint;
-import org.oscim.overlay.OverlayItem;
+import org.oscim.layers.overlay.OverlayItem;
 import org.oscim.view.MapView;
 
 import android.graphics.Point;
