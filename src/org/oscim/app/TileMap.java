@@ -525,14 +525,15 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		case SHOW_LOCATION:
 			mLocation.setMode(LocationHandler.Mode.SHOW);
 			mCompass.setMode(Compass.Mode.OFF);
-			App.activity.showToastOnUiThread("Show Location");
+			App.activity.showToastOnUiThread(App.activity
+			.getString(R.string.menu_position_my_location_enable));
 			break;
 
 		case SNAP_LOCATION:
 			mLocation.setMode(LocationHandler.Mode.SNAP);
 			mCompass.setMode(Compass.Mode.OFF);
 			App.activity.showToastOnUiThread(App.activity
-					.getString(R.string.snap_to_location_enabled));
+					.getString(R.string.menu_position_follow_location));
 			break;
 
 		case COMPASS_2D:
