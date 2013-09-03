@@ -243,8 +243,6 @@ public class LocationOverlay extends Overlay {
 				phase = Interpolation.swing.apply(phase);
 
 				GLES20.glUniform1f(hPhase, 0.8f + phase * 0.2f);
-				GLES20.glUniform2f(hDirection, 0, 0);
-
 			} else {
 				GLES20.glUniform1f(hPhase, 1);
 			}
@@ -254,6 +252,8 @@ public class LocationOverlay extends Overlay {
 				GLES20.glUniform2f(hDirection,
 						(float) Math.cos(Math.toRadians(rotation)),
 						(float) Math.sin(Math.toRadians(rotation)));
+			} else{
+				GLES20.glUniform2f(hDirection, 0, 0);
 			}
 
 			GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
@@ -292,8 +292,12 @@ public class LocationOverlay extends Overlay {
 				+ "uniform float u_scale;"
 				+ "uniform float u_phase;"
 				+ "uniform vec2 u_dir;"
+
 				+ "void main() {"
 				+ "  float len = 1.0 - length(v_tex);"
+				+ "  if (u_dir.x == 0.0 && u_dir.y == 0.0){"
+				+ "  gl_FragColor = vec4(0.2, 0.2, 0.8, 1.0) * len;"
+				+ "  } else {"
 				///  outer ring
 				+ "  float a = smoothstep(0.0, 2.0 / u_scale, len);"
 				///  inner ring
@@ -309,7 +313,7 @@ public class LocationOverlay extends Overlay {
 				///  - add center point
 				+ "  a = d * (a - (b + c)) + c;"
 				+ "  gl_FragColor = vec4(0.2, 0.2, 0.8, 1.0) * a;"
-				+ "}";
+				+ "}}";
 
 		//private final static String fShaderStr = ""
 		//		+ "precision mediump float;"
