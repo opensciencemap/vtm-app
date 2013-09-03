@@ -29,8 +29,8 @@ import org.oscim.renderer.RenderLayer;
 import org.oscim.utils.FastMath;
 import org.oscim.utils.GlUtils;
 import org.oscim.utils.Interpolation;
-import org.oscim.view.MapView;
-import org.oscim.view.MapViewPosition;
+import org.oscim.view.Map;
+import org.oscim.view.Viewport;
 
 import android.opengl.GLES20;
 import android.os.SystemClock;
@@ -43,9 +43,9 @@ public class LocationOverlay extends Overlay {
 
 	private final Compass mCompass;
 
-	public LocationOverlay(MapView mapView, Compass compass) {
-		super(mapView);
-		mLayer = new LocationIndicator(mapView);
+	public LocationOverlay(Map map, Compass compass) {
+		super(map);
+		mLayer = new LocationIndicator(map);
 		mCompass = compass;
 	}
 
@@ -98,7 +98,7 @@ public class LocationOverlay extends Overlay {
 		private boolean mRunAnim;
 		private long mAnimStart;
 
-		public LocationIndicator(final MapView mapView) {
+		public LocationIndicator(final Map map) {
 			super();
 		}
 
@@ -119,13 +119,13 @@ public class LocationOverlay extends Overlay {
 						return;
 
 					long diff = SystemClock.elapsedRealtime() - lastRun;
-					mMapView.postDelayed(this, Math.min(ANIM_RATE, diff));
-					mMapView.render();
+					mMap.postDelayed(this, Math.min(ANIM_RATE, diff));
+					mMap.render();
 				}
 			};
 
 			mAnimStart = SystemClock.elapsedRealtime();
-			mMapView.postDelayed(action, ANIM_RATE);
+			mMap.postDelayed(action, ANIM_RATE);
 		}
 
 		private float animPhase() {
@@ -150,14 +150,14 @@ public class LocationOverlay extends Overlay {
 
 			isReady = true;
 
-			int width = mMapView.getWidth();
-			int height = mMapView.getHeight();
+			int width = mMap.getWidth();
+			int height = mMap.getHeight();
 
-			MapViewPosition mapViewPosition = mMapView.getMapViewPosition();
+			Viewport mapPosition = mMap.getViewport();
 
 			// clamp location to a position that can be
 			// savely translated to screen coordinates
-			mapViewPosition.getViewBox(mBBox);
+			mapPosition.getViewBox(mBBox);
 
 			double x = mLocation.x;
 			double y = mLocation.y;
@@ -169,7 +169,7 @@ public class LocationOverlay extends Overlay {
 
 			// get position of Location in pixel relative to
 			// screen center
-			mapViewPosition.project(x, y, mScreenPoint);
+			mapPosition.project(x, y, mScreenPoint);
 
 			x = mScreenPoint.x + width / 2;
 			y = mScreenPoint.y + height / 2;
@@ -194,7 +194,7 @@ public class LocationOverlay extends Overlay {
 			mLocationIsVisible = (visible == 2);
 
 			// set location indicator position
-			mapViewPosition.fromScreenPixels(x, y, mIndicatorPosition);
+			mapPosition.fromScreenPixels(x, y, mIndicatorPosition);
 		}
 
 		@Override

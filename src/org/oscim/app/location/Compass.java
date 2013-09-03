@@ -20,7 +20,7 @@ import org.oscim.app.App;
 import org.oscim.app.R;
 import org.oscim.core.MapPosition;
 import org.oscim.layers.Layer;
-import org.oscim.view.MapView;
+import org.oscim.view.Map;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -70,8 +70,8 @@ public class Compass extends Layer implements SensorEventListener {
 		super.onUpdate(mapPosition, changed, clear);
 	}
 
-	public Compass(Context context, MapView mapView) {
-		super(mapView);
+	public Compass(Context context, Map map) {
+		super(map);
 
 		mSensorManager = (SensorManager) context
 				.getSystemService(Context.SENSOR_SERVICE);
@@ -104,18 +104,18 @@ public class Compass extends Layer implements SensorEventListener {
 		if (mode == Mode.OFF) {
 			setEnabled(false);
 
-			mMapView.getEventLayer().enableRotation(true);
-			mMapView.getEventLayer().enableTilt(true);
+			mMap.getEventLayer().enableRotation(true);
+			mMap.getEventLayer().enableTilt(true);
 		} else if (mMode == Mode.OFF) {
 			setEnabled(true);
 		}
 
 		if (mode == Mode.C3D) {
-			mMapView.getEventLayer().enableRotation(false);
-			mMapView.getEventLayer().enableTilt(false);
+			mMap.getEventLayer().enableRotation(false);
+			mMap.getEventLayer().enableTilt(false);
 		} else if (mode == Mode.C2D) {
-			mMapView.getEventLayer().enableRotation(false);
-			mMapView.getEventLayer().enableTilt(true);
+			mMap.getEventLayer().enableRotation(false);
+			mMap.getEventLayer().enableTilt(true);
 		}
 
 		mMode = mode;
@@ -242,15 +242,15 @@ public class Compass extends Layer implements SensorEventListener {
 
 			if (Math.abs(change) > 0.01) {
 				adjustArrow(mCurRotation, rotation);
-				mMapView.getMapViewPosition().setRotation(-rotation);
+				mMap.getViewport().setRotation(-rotation);
 				redraw = true;
 			}
 
 			if (mMode == Mode.C3D)
-				redraw |= mMapView.getMapViewPosition().setTilt(-mCurTilt * 1.5f);
+				redraw |= mMap.getViewport().setTilt(-mCurTilt * 1.5f);
 
 			if (redraw)
-				mMapView.redrawMap(true);
+				mMap.updateMap(true);
 		}
 		mCurRotation = rotation;
 	}

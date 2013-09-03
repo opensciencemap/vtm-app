@@ -10,7 +10,7 @@ import org.oscim.core.PointD;
 import org.oscim.layers.overlay.ItemizedIconOverlay;
 import org.oscim.layers.overlay.OverlayItem;
 import org.oscim.layers.overlay.OverlayMarker;
-import org.oscim.view.MapView;
+import org.oscim.view.Map;
 import org.osmdroid.utils.BonusPackHelper;
 
 import android.content.Context;
@@ -63,15 +63,15 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 			GeoPoint gp = mItemWithBubble.getPoint();
 
 			PointD p = mTmpPoint;
-			mMapView.getMapViewPosition().project(gp, p);
+			mMap.getViewport().project(gp, p);
 
 			mBubble.position((int) p.x, (int) p.y);
 		}
 	}
 
-	public ItemizedOverlayWithBubble(MapView mapView, Context context, OverlayMarker marker,
+	public ItemizedOverlayWithBubble(Map map, Context context, OverlayMarker marker,
 			List<Item> aList, InfoWindow bubble) {
-		super(mapView, aList, marker, null);
+		super(map, aList, marker, null);
 
 		mItemsList = aList;
 		if (bubble != null) {
@@ -96,9 +96,9 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 		mOnItemGestureListener = this;
 	}
 
-	public ItemizedOverlayWithBubble(MapView mapView, Context context, OverlayMarker marker,
+	public ItemizedOverlayWithBubble(Map map, Context context, OverlayMarker marker,
 			List<Item> aList) {
-		this(mapView, context, marker, aList, null);
+		this(map, context, marker, aList, null);
 	}
 
 	void showBubble(int index) {
@@ -111,7 +111,7 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 	 * many ItemizedOverlays.
 	 * @param index
 	 *            of the overlay item to show
-	 * @param mapView
+	 * @param map
 	 *            ...
 	 */
 	@SuppressWarnings("unchecked")
@@ -119,11 +119,11 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 		ExtendedOverlayItem eItem = (ExtendedOverlayItem) (getItem(index));
 		mItemWithBubble = eItem;
 		if (eItem != null) {
-			eItem.showBubble(mBubble, (MapView) mMapView);
+			eItem.showBubble(mBubble, (Map) mMap);
 
-			mMapView.getMapViewPosition().animateTo(eItem.mGeoPoint);
+			mMap.getViewport().animateTo(eItem.mGeoPoint);
 
-			mMapView.updateMap(true);
+			mMap.updateMap(true);
 			setFocus((Item) eItem);
 		}
 	}

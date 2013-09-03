@@ -1,17 +1,15 @@
 package org.oscim.app;
 
 import org.oscim.cache.CacheFileManager;
+import org.oscim.layers.Layer;
 import org.oscim.layers.labeling.LabelLayer;
 import org.oscim.layers.overlay.BuildingOverlay;
-import org.oscim.layers.Layer;
 import org.oscim.layers.overlay.GenericOverlay;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.bitmap.MapQuestAerial;
 import org.oscim.layers.tile.bitmap.NaturalEarth;
 import org.oscim.layers.tile.vector.MapTileLayer;
-import org.oscim.renderer.GLRenderer;
 import org.oscim.renderer.layers.GridRenderLayer;
-import org.oscim.theme.IRenderTheme;
 import org.oscim.theme.InternalRenderTheme;
 import org.oscim.theme.ThemeLoader;
 import org.oscim.tilesource.ITileCache;
@@ -106,9 +104,9 @@ public class MapLayers {
 
 		if (mBaseLayer == null) {
 			mBaseLayer = App.map.setBaseMap(tileSource);
-			App.map.getLayerManager().add(2,
+			App.map.getLayers().add(2,
 					new BuildingOverlay(App.map, mBaseLayer.getTileLayer()));
-			App.map.getLayerManager().add(3, new LabelLayer(App.map, mBaseLayer.getTileLayer()));
+			App.map.getLayers().add(3, new LabelLayer(App.map, mBaseLayer.getTileLayer()));
 		} else
 			mBaseLayer.setTileSource(tileSource);
 
@@ -148,9 +146,9 @@ public class MapLayers {
 			if (mGridOverlay == null)
 				mGridOverlay = new GenericOverlay(App.map, new GridRenderLayer());
 
-			App.map.getOverlays().add(mGridOverlay);
+			App.map.getLayers().add(mGridOverlay);
 		} else {
-			App.map.getOverlays().remove(mGridOverlay);
+			App.map.getLayers().remove(mGridOverlay);
 		}
 
 		mGridEnabled = enable;
@@ -165,7 +163,7 @@ public class MapLayers {
 		if (id == mBackgroundId)
 			return;
 
-		App.map.getLayerManager().remove(mBackgroundLayer);
+		App.map.getLayers().remove(mBackgroundLayer);
 		mBackgroundLayer = null;
 
 		switch (id) {
@@ -184,7 +182,7 @@ public class MapLayers {
 		if (mBackgroundLayer instanceof BitmapTileLayer)
 			App.map.setBackgroundMap((BitmapTileLayer) mBackgroundLayer);
 		else
-			App.map.getLayerManager().add(0, mBackroundPlaceholder);
+			App.map.getLayers().add(0, mBackroundPlaceholder);
 
 		mBackgroundId = id;
 	}

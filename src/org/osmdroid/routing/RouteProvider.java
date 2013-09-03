@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.overlay.PathOverlay;
-import org.oscim.view.MapView;
+import org.oscim.view.Map;
 import org.osmdroid.routing.provider.GoogleRouteProvider;
 import org.osmdroid.routing.provider.MapQuestRouteProvider;
 import org.osmdroid.routing.provider.OSRMRouteProvider;
@@ -49,7 +49,7 @@ public abstract class RouteProvider {
 
 	/**
 	 * Builds an overlay for the route shape with a default (and nice!) color.
-	 * @param mapView
+	 * @param map
 	 *            ..
 	 * @param route
 	 *            ..
@@ -57,11 +57,11 @@ public abstract class RouteProvider {
 	 *            ..
 	 * @return route shape overlay
 	 */
-	public static PathOverlay buildRouteOverlay(MapView mapView, Route route) {
+	public static PathOverlay buildRouteOverlay(Map map, Route route) {
 		int lineColor = 0x800000FF;
 		float lineWidth = 2.5f;
 
-		PathOverlay routeOverlay = new PathOverlay(mapView, lineColor, lineWidth);
+		PathOverlay routeOverlay = new PathOverlay(map, lineColor, lineWidth);
 		if (route != null) {
 			routeOverlay.setPoints(route.routeHigh);
 		}

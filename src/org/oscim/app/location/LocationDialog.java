@@ -20,8 +20,8 @@ import org.oscim.app.R;
 import org.oscim.app.TileMap;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
-import org.oscim.view.MapView;
-import org.oscim.view.MapViewPosition;
+import org.oscim.view.Map;
+import org.oscim.view.Viewport;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -34,16 +34,16 @@ import android.widget.TextView;
 
 public class LocationDialog {
 
-	public void prepareDialog(MapView mapView, final Dialog dialog) {
+	public void prepareDialog(Map map, final Dialog dialog) {
 		EditText editText = (EditText) dialog.findViewById(R.id.latitude);
-		GeoPoint mapCenter = mapView.getMapViewPosition().getMapCenter();
+		GeoPoint mapCenter = map.getViewport().getMapCenter();
 		editText.setText(Double.toString(mapCenter.getLatitude()));
 
 		editText = (EditText) dialog.findViewById(R.id.longitude);
 		editText.setText(Double.toString(mapCenter.getLongitude()));
 
 		SeekBar zoomlevel = (SeekBar) dialog.findViewById(R.id.zoomLevel);
-		zoomlevel.setMax(MapViewPosition.MAX_ZOOMLEVEL);
+		zoomlevel.setMax(Viewport.MAX_ZOOMLEVEL);
 		zoomlevel.setProgress(10);
 
 		final TextView textView = (TextView) dialog.findViewById(R.id.zoomlevelValue);

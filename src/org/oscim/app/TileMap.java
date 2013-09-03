@@ -15,8 +15,8 @@
 
 package org.oscim.app;
 
-import org.oscim.android.AndroidMapView;
 import org.oscim.android.MapActivity;
+import org.oscim.android.MapView;
 import org.oscim.app.location.Compass;
 import org.oscim.app.location.LocationDialog;
 import org.oscim.app.location.LocationHandler;
@@ -44,7 +44,6 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -71,20 +70,20 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_tilemap);
-		App.view = (AndroidMapView) findViewById(R.id.mapView);
+		App.view = (MapView) findViewById(R.id.mapView);
 		App.view.setClickable(true);
 		App.view.setFocusable(true);
 
-		App.map = mMapView;
+		App.map = mMap;
 		App.activity = this;
 
 		mMapLayers = new MapLayers();
 		mMapLayers.setBaseMap(PreferenceManager.getDefaultSharedPreferences(this));
 
-		mMapView.getOverlays().add(new DistanceTouchOverlay(mMapView, this));
+		mMap.getLayers().add(new DistanceTouchOverlay(mMap, this));
 
-		mCompass = new Compass(this, mMapView);
-		mMapView.getOverlays().add(mCompass);
+		mCompass = new Compass(this, mMap);
+		mMap.getLayers().add(mCompass);
 
 		mLocation = new LocationHandler(this, mCompass);
 
@@ -187,12 +186,12 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				bgId = -1;
 
 			mMapLayers.setBackgroundMap(bgId);
-			mMapView.updateMap(true);
+			mMap.updateMap(true);
 			break;
 
 		case R.id.menu_layer_grid:
 			mMapLayers.enableGridOverlay(!mMapLayers.isGridEnabled());
-			mMapView.updateMap(true);
+			mMap.updateMap(true);
 			break;
 
 		case R.id.menu_position_enter_coordinates:
@@ -202,7 +201,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		//case R.id.menu_position_map_center:
 		//	MapPosition mapCenter = mBaseLayer.getMapFileCenter();
 		//	if (mapCenter != null)
-		//		mMapView.setCenter(mapCenter.getGeoPoint());
+		//		mMap.setCenter(mapCenter.getGeoPoint());
 		//	break;
 
 		case R.id.menu_preferences:
@@ -265,8 +264,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	//@Override
 	//public boolean onTrackballEvent(MotionEvent event) {
-	//	// forward the event to the MapView
-	//	return mMapView.onTrackballEvent(event);
+	//	// forward the event to the Map
+	//	return mMap.onTrackballEvent(event);
 	//}
 
 	@Override
@@ -282,16 +281,16 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				POI poi = App.poiSearch.getPOIs().get(id);
 
 				if (poi.bbox != null)
-					mMapView.getMapViewPosition().animateTo(poi.bbox);
+					mMap.getViewport().animateTo(poi.bbox);
 				else
-					mMapView.getMapViewPosition().animateTo(poi.location);
+					mMap.getViewport().animateTo(poi.location);
 			}
 			break;
 		//case SELECT_RENDER_THEME_FILE:
 		//	if (resultCode == RESULT_OK && intent != null
 		//			&& intent.getStringExtra(FilePicker.SELECTED_FILE) != null) {
 		//		try {
-		//			mMapView.setRenderTheme(intent
+		//			mMap.setRenderTheme(intent
 		//					.getStringExtra(FilePicker.SELECTED_FILE));
 		//		} catch (FileNotFoundException e) {
 		//			showToastOnUiThread(e.getLocalizedMessage());
@@ -376,7 +375,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	protected void onPrepareDialog(int id, final Dialog dialog) {
 		if (id == DIALOG_ENTER_COORDINATES) {
 
-			mLocationDialog.prepareDialog(mMapView, dialog);
+			mLocationDialog.prepareDialog(mMap, dialog);
 
 		} else {
 			super.onPrepareDialog(id, dialog);
@@ -426,7 +425,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		boolean drawUnmatchedWays = preferences.getBoolean("drawUnmatchedWays", false);
 		boolean debugLabels = preferences.getBoolean("debugLabels", false);
 
-		DebugSettings cur = mMapView.getDebugSettings();
+		DebugSettings cur = mMap.getDebugSettings();
 		if (cur.disablePolygons != disablePolygons
 				|| cur.drawTileCoordinates != drawTileCoordinates
 				|| cur.drawTileFrames != drawTileFrames
@@ -436,10 +435,10 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			DebugSettings debugSettings = new DebugSettings(drawTileCoordinates,
 					drawTileFrames, disablePolygons, drawUnmatchedWays, debugLabels);
 
-			mMapView.setDebugSettings(debugSettings);
+			mMap.setDebugSettings(debugSettings);
 		}
 
-		mMapView.updateMap(true);
+		mMap.updateMap(true);
 	}
 
 	@Override

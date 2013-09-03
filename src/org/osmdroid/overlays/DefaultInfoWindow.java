@@ -1,6 +1,6 @@
 package org.osmdroid.overlays;
 
-import org.oscim.android.AndroidMapView;
+import org.oscim.android.MapView;
 import org.oscim.app.App;
 import org.osmdroid.utils.BonusPackHelper;
 
@@ -39,7 +39,7 @@ public class DefaultInfoWindow extends InfoWindow {
 		}
 	}
 
-	public DefaultInfoWindow(int layoutResId, AndroidMapView mapView) {
+	public DefaultInfoWindow(int layoutResId, MapView mapView) {
 		super(layoutResId, mapView);
 
 		if (mTitleId == 0)

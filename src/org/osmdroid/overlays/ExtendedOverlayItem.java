@@ -2,7 +2,7 @@ package org.osmdroid.overlays;
 
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.overlay.OverlayItem;
-import org.oscim.view.MapView;
+import org.oscim.view.Map;
 
 import android.graphics.drawable.Drawable;
 
@@ -94,10 +94,10 @@ public class ExtendedOverlayItem extends OverlayItem {
 	 * and centers the map on the item. <br>
 	 * @param bubble
 	 *            ...
-	 * @param mapView
+	 * @param map
 	 *            ...
 	 */
-	public void showBubble(InfoWindow bubble, MapView mapView) {
+	public void showBubble(InfoWindow bubble, Map map) {
 		// offset the bubble to be top-centered on the marker:
 		//		Drawable marker = getMarker(0 /* OverlayItem.ITEM_STATE_FOCUSED_MASK */);
 		//		int markerWidth = 0, markerHeight = 0;

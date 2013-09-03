@@ -24,7 +24,7 @@ import org.oscim.core.GeoPoint;
 import org.oscim.layers.overlay.OverlayItem;
 import org.oscim.layers.overlay.OverlayItem.HotspotPlace;
 import org.oscim.layers.overlay.OverlayMarker;
-import org.oscim.view.MapView;
+import org.oscim.view.Map;
 import org.osmdroid.location.FlickrPOIProvider;
 import org.osmdroid.location.FourSquareProvider;
 import org.osmdroid.location.GeoNamesPOIProvider;
@@ -63,7 +63,7 @@ public class POISearch {
 		poiMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map, App.activity, null,
 				poiItems, new POIInfoWindow(App.map));
 
-		App.map.getOverlays().add(poiMarkers);
+		App.map.getLayers().add(poiMarkers);
 
 		mMarkers = new OverlayMarker[5];
 
@@ -246,7 +246,7 @@ public class POISearch {
 		private Button mButton;
 		private ImageView mImage;
 
-		public POIInfoWindow(MapView mapView) {
+		public POIInfoWindow(Map map) {
 			super(R.layout.bonuspack_bubble, App.view);
 
 			mButton = (Button) mView.findViewById(R.id.bubble_moreinfo);

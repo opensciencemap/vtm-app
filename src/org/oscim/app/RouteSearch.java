@@ -79,9 +79,9 @@ public class RouteSearch {
 		mRouteOverlay = new PathOverlay(App.map, 0xAA0000FF, 3);
 
 		// TODO use LayerGroup
-		App.map.getOverlays().add(mRouteOverlay);
+		App.map.getLayers().add(mRouteOverlay);
 		//App.map.getOverlays().add(mRouteMarkers);
-		App.map.getOverlays().add(mItineraryMarkers);
+		App.map.getLayers().add(mItineraryMarkers);
 
 		mRouteBar = new RouteBar(App.activity);
 	}

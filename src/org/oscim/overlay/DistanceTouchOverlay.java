@@ -22,7 +22,7 @@ import java.util.TimerTask;
 import org.oscim.backend.input.MotionEvent;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.InputLayer;
-import org.oscim.view.MapView;
+import org.oscim.view.Map;
 import org.osmdroid.overlays.MapEventsReceiver;
 
 
@@ -41,14 +41,14 @@ public class DistanceTouchOverlay extends InputLayer {
 	private int mPointer2 = POINTER_UP;
 
 	/**
-	 * @param mapView
-	 *            the MapView
+	 * @param map
+	 *            the Map
 	 * @param receiver
 	 *            the object that will receive/handle the events. It must
 	 *            implement MapEventsReceiver interface.
 	 */
-	public DistanceTouchOverlay(MapView mapView, MapEventsReceiver receiver) {
-		super(mapView);
+	public DistanceTouchOverlay(Map map, MapEventsReceiver receiver) {
+		super(map);
 		mReceiver = receiver;
 	}
 
@@ -138,7 +138,7 @@ public class DistanceTouchOverlay extends InputLayer {
 		// dont forward long press when two fingers are down.
 		// maybe should be only done if our timer is still running.
 		// ... not sure if this is even needed
-		GeoPoint p = mMapView.getMapViewPosition().fromScreenPixels(e.getX(), e.getY());
+		GeoPoint p = mMap.getViewport().fromScreenPixels(e.getX(), e.getY());
 		return mReceiver.longPressHelper(p);
 
 	}
@@ -149,10 +149,10 @@ public class DistanceTouchOverlay extends InputLayer {
 
 			@Override
 			public void run() {
-				final GeoPoint p1 = mMapView.getMapViewPosition().fromScreenPixels(mCurX1, mCurY1);
-				final GeoPoint p2 = mMapView.getMapViewPosition().fromScreenPixels(mCurX2, mCurY2);
+				final GeoPoint p1 = mMap.getViewport().fromScreenPixels(mCurX1, mCurY1);
+				final GeoPoint p2 = mMap.getViewport().fromScreenPixels(mCurX2, mCurY2);
 
-				mMapView.post(new Runnable() {
+				mMap.post(new Runnable() {
 					@Override
 					public void run() {
 						mReceiver.longPressHelper(p1, p2);

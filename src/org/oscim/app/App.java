@@ -14,8 +14,8 @@
  */
 package org.oscim.app;
 
-import org.oscim.android.AndroidMapView;
-import org.oscim.view.MapView;
+import org.oscim.android.MapView;
+import org.oscim.view.Map;
 
 import android.app.Application;
 import android.content.res.Resources;
@@ -24,8 +24,8 @@ public class App extends Application {
 
 	public static final String TAG = TileMap.class.getName();
 
-	public static MapView map;
-	public static AndroidMapView view;
+	public static Map map;
+	public static MapView view;
 	public static Resources res;
 	public static TileMap activity;
 
