@@ -15,6 +15,7 @@
 package org.oscim.cache;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.oscim.core.Tile;
@@ -30,17 +31,17 @@ import android.util.Log;
  * FIXME: REWRITE
  */
 @SuppressLint("DefaultLocale")
-public class CacheFileManager implements ITileCache {
-	private final static String TAG = CacheFileManager.class.getName();
+public class TileCache implements ITileCache {
+	private final static String TAG = TileCache.class.getName();
 	private final static boolean DEBUG = false;
 
 	// size of cache in bytes
 	private long mCacheLimit;
 
-	private String CACHE_DIRECTORY;
+	//private String CACHE_DIRECTORY;
 	private static final String CACHE_FILE = "%d-%d-%d.tile";
 
-	final TileStats mDatasource;
+	final TileStats mTileStats;
 	private File mCacheDir;
 
 	private volatile long mCacheSize = 0;
@@ -48,10 +49,12 @@ public class CacheFileManager implements ITileCache {
 
 	private ArrayList<Tile> mCommitHitList;
 
-	public CacheFileManager(Context context) {
+	public TileCache(Context context, String cacheDirectory, String dbName) {
 		mContext = context;
-		mDatasource = new TileStats(context);
-		mDatasource.open();
+		mTileStats = new TileStats(context);
+		mTileStats.open();
+
+		setStoragePath(cacheDirectory + dbName);
 
 		// FIXME get size from Database or read once in asyncTask!
 		// also use asyncTask for limiting cache:
@@ -96,7 +99,7 @@ public class CacheFileManager implements ITileCache {
 			tiles = mCommitHitList.toArray(tiles);
 			mCommitHitList.clear();
 
-			mDatasource.setTileHit(tiles);
+			mTileStats.setTileHit(tiles);
 		}
 	}
 
@@ -156,17 +159,39 @@ public class CacheFileManager implements ITileCache {
 	@Override
 	public void setCacheSize(long size) {
 		this.mCacheLimit = size;
+
+		if (size == 0) {
+			mTileStats.clearStats();
+			deleteFiles();
+
+		}
 	}
 
-	@Override
-	public void setStoragePath(String path) {
-		this.CACHE_DIRECTORY = path;
+	private void deleteFiles() {
+		File file = mCacheDir;
+
+		if (file.exists()) {
+			String path = file.getAbsolutePath();
+			String deleteCmd = "rm -r " + path +"/*";
+			Log.d(TAG, "delete cache: " + deleteCmd);
+
+			Runtime runtime = Runtime.getRuntime();
+			try {
+				runtime.exec(deleteCmd);
+
+			} catch (IOException e) {
+				Log.d(TAG, "delete failed: " + e);
+			}
+		}
+	}
+
+	private void setStoragePath(String path) {
 		String state = Environment.getExternalStorageState();
 
 		String externalStorageDirectory = Environment.getExternalStorageDirectory()
 				.getAbsolutePath();
 
-		String cacheDirectoryPath = externalStorageDirectory + CACHE_DIRECTORY;
+		String cacheDirectoryPath = externalStorageDirectory + path;
 
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
 			// We can read and write the media
@@ -175,7 +200,7 @@ public class CacheFileManager implements ITileCache {
 		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
 			// We can only read the media
 			mCacheDir = mContext.getCacheDir();
-			Log.d(TAG, "SDCARD not writing!");
+			Log.d(TAG, "SDCARD is read only!");
 		} else {
 			// Something else is wrong. It may be one of many other states, but all we need
 			//  to know is we can neither read nor write
@@ -253,8 +278,8 @@ public class CacheFileManager implements ITileCache {
 			}
 			/* get the middle haeufigkeit */
 			//Log.d("Cache", "middle is: " + datasource.getMiddleHits());
-			ArrayList<String> always = (ArrayList<String>) mDatasource
-					.getAllTileFileAboveHits(mDatasource.getMiddleHits());
+			ArrayList<String> always = (ArrayList<String>) mTileStats
+					.getAllTileFileAboveHits(mTileStats.getMiddleHits());
 
 			//long limit = MAX_SIZE - 1024 * 1024;
 

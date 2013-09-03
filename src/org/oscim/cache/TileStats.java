@@ -24,8 +24,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
-import android.util.Log;
 
 /*
  * This class implements the operations on the tilehits table,
@@ -34,9 +34,48 @@ import android.util.Log;
  */
 @SuppressLint("DefaultLocale")
 public class TileStats {
-	private static final String TAG = TileStats.class.getName();
-	private SQLiteDatabase database;
-	private SQLiteHelper dbHelper;
+
+	//private static final String TAG = TileStats.class.getName();
+
+	/* This class implement the sqldatabase for oscim map.
+	 * It defines the schema of the tables to store the tile access
+	 * information. */
+	class SQLiteHelper extends SQLiteOpenHelper {
+
+		public static final String TABLE_NAME = "tilehit";
+		public static final String COLUMN_ID = "_id";
+		public static final String COLUMN_TileName = "_name";
+		public static final String COLUMN_Hit = "hits";
+
+		private static final String DATABASE_NAME = "tilehit.db";
+		private static final int DATABASE_VERSION = 1;
+
+		// Database creation sql statement
+		private static final String DATABASE_CREATE =
+				"create table "
+						+ TABLE_NAME + "("
+						+ COLUMN_ID + " integer primary key, "
+						+ COLUMN_TileName + " text not null, "
+						+ COLUMN_Hit + " integer);";
+
+		public SQLiteHelper(Context context) {
+			super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		}
+
+		@Override
+		public void onCreate(SQLiteDatabase db) {
+			db.execSQL(DATABASE_CREATE);
+		}
+
+		@Override
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+			onCreate(db);
+
+		}
+	}
+
+	private final SQLiteHelper dbHelper;
 	public static String Lock = "dblock";
 
 	//	private String[] allColumns = { SQLiteHelper.COLUMN_ID,
@@ -46,16 +85,17 @@ public class TileStats {
 		dbHelper = new SQLiteHelper(context);
 	}
 
-	public void open() throws SQLException {
-		//Log.d(TAG, "in dbHelper open");
-		if (dbHelper == null) {
-			Log.d(TAG, "dbHelper is null!");
-		}
-		database = dbHelper.getWritableDatabase();
+	public SQLiteDatabase open() throws SQLException {
+		return dbHelper.getWritableDatabase();
 	}
 
-	public void close() {
-		dbHelper.close();
+
+	public void clearStats() {
+		synchronized (Lock) {
+			SQLiteDatabase db = open();
+			dbHelper.onUpgrade(db, 0, 0);
+			db.close();
+		}
 	}
 
 	/**
@@ -66,7 +106,7 @@ public class TileStats {
 	public void setTileHit(String TileName) {
 		//ContentValues values = new ContentValues();
 		synchronized (Lock) {
-			open();
+			SQLiteDatabase database = open();
 			String insert =
 					"INSERT OR IGNORE INTO " + SQLiteHelper.TABLE_NAME + "(_name,hits)"
 							+ " VALUES ('"
@@ -96,8 +136,7 @@ public class TileStats {
 			@Override
 			protected Boolean doInBackground(Tile... commits) {
 				synchronized (Lock) {
-					open();
-					SQLiteDatabase db = database;
+					SQLiteDatabase db = open();
 					for (final Tile tile : commits) {
 						//System.out.println("commit " + tile);
 
@@ -133,7 +172,9 @@ public class TileStats {
 	 */
 	public int getHitsByTile(String TileName) {
 		synchronized (Lock) {
-			open();
+
+			SQLiteDatabase database = open();
+
 			Cursor cursor = database.query(SQLiteHelper.TABLE_NAME, new String[] { "hits" },
 					"_name=?",
 					new String[] { TileName }, null, null, null);
@@ -153,7 +194,8 @@ public class TileStats {
 	 */
 	public List<String> getAllTileFileUnderHits(int hit) {
 		synchronized (Lock) {
-			open();
+			SQLiteDatabase database = open();
+
 			List<String> TileFiles = new ArrayList<String>();
 			Cursor cursor = database.query(SQLiteHelper.TABLE_NAME, new String[] { "_name" },
 					"hits<=?", new String[] { String.valueOf(hit) }, null, null, null);
@@ -177,7 +219,8 @@ public class TileStats {
 	 */
 	public List<String> getAllTileFileAboveHits(int hit) {
 		synchronized (Lock) {
-			open();
+			SQLiteDatabase database = open();
+
 			List<String> TileFiles = new ArrayList<String>();
 			Cursor cursor = database.query(SQLiteHelper.TABLE_NAME, new String[] { "_name" },
 					"hits>?", new String[] { String.valueOf(hit) }, null, null, null);
@@ -199,7 +242,7 @@ public class TileStats {
 	 */
 	public int getMiddleHits() {
 		synchronized (Lock) {
-			open();
+			SQLiteDatabase database = open();
 			Cursor c = database.rawQuery(
 					"select max(hits) from " + SQLiteHelper.TABLE_NAME,
 					null);
@@ -229,10 +272,11 @@ public class TileStats {
 	 */
 	public void deleteTileFile(String name) {
 		synchronized (Lock) {
-			open();
+			SQLiteDatabase database = open();
+
 			database.delete(SQLiteHelper.TABLE_NAME, SQLiteHelper.COLUMN_ID
 					+ " = '" + name + "'", null);
-			close();
+			database.close();
 		}
 	}
 }

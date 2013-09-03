@@ -14,9 +14,11 @@
  */
 package org.oscim.app.preferences;
 
+import org.oscim.app.App;
 import org.oscim.app.R;
 
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 
 /**
@@ -28,10 +30,19 @@ public class EditPreferences extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
+
+		Preference button = (Preference) findPreference("clear_cache");
+		button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference arg0) {
+				App.activity.getMapLayers().deleteCache();
+				return true;
+			}
+		});
 	}
 
 	@Override
-	public void finish(){
+	public void finish() {
 		super.finish();
 		overridePendingTransition(R.anim.slide_left, R.anim.slide_right2);
 	}
