@@ -15,7 +15,6 @@
 package org.oscim.cache;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.oscim.core.Tile;
@@ -160,28 +159,16 @@ public class TileCache implements ITileCache {
 	public void setCacheSize(long size) {
 		this.mCacheLimit = size;
 
-		if (size == 0) {
-			mTileStats.clearStats();
-			deleteFiles();
+		if (size > 0)
+			return;
 
-		}
-	}
+		mTileStats.clearStats();
 
-	private void deleteFiles() {
-		File file = mCacheDir;
+		if (mCacheDir.exists()) {
+			for (File f : mCacheDir.listFiles())
+				f.delete();
 
-		if (file.exists()) {
-			String path = file.getAbsolutePath();
-			String deleteCmd = "rm -r " + path +"/*";
-			Log.d(TAG, "delete cache: " + deleteCmd);
-
-			Runtime runtime = Runtime.getRuntime();
-			try {
-				runtime.exec(deleteCmd);
-
-			} catch (IOException e) {
-				Log.d(TAG, "delete failed: " + e);
-			}
+			mCacheSize = 0;
 		}
 	}
 
