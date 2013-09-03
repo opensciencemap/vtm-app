@@ -160,6 +160,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 		case R.id.menu_compass_2d:
 			if (!item.isChecked()) {
+				mMapView.getMapViewPosition().setTilt(0);
 				mCompass.setMode(Compass.Mode.C2D);
 			} else {
 				mCompass.setMode(Compass.Mode.OFF);
@@ -532,6 +533,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			break;
 
 		case COMPASS_2D:
+			mMapView.getMapViewPosition().setTilt(0);
 			mLocation.setMode(LocationHandler.Mode.SHOW);
 			mCompass.setMode(Compass.Mode.C2D);
 			App.activity.showToastOnUiThread("Compass 2D");
