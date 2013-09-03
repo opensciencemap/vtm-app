@@ -34,10 +34,10 @@ public class CacheFile implements ITileCache.TileReader, ITileCache.TileWriter{
 	//private final static String TAG = CacheFile.class.getName();
 
 	final File mFile;
-	final CacheFileManager mCacheManager;
+	final TileCache mCacheManager;
 	final Tile mTile;
 
-	CacheFile(CacheFileManager cm, Tile t, File f){
+	CacheFile(TileCache cm, Tile t, File f){
 		mCacheManager = cm;
 		mFile = f;
 		mTile = t;

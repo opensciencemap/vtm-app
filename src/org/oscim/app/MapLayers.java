@@ -1,6 +1,6 @@
 package org.oscim.app;
 
-import org.oscim.cache.CacheFileManager;
+import org.oscim.cache.TileCache;
 import org.oscim.layers.Layer;
 import org.oscim.layers.overlay.GenericOverlay;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
@@ -91,8 +91,7 @@ public class MapLayers {
 		}
 
 		if (tileSource instanceof UrlTileSource) {
-			mCache = new CacheFileManager(App.activity);
-			mCache.setStoragePath(CACHE_DIRECTORY + dbname);
+			mCache = new TileCache(App.activity, CACHE_DIRECTORY, dbname);
 			mCache.setCacheSize(512 * (1 << 10));
 			tileSource.setCache(mCache);
 		} else {
@@ -185,5 +184,10 @@ public class MapLayers {
 
 	int getBackgroundId() {
 		return mBackgroundId;
+	}
+
+	public void deleteCache(){
+		if (mCache != null)
+			mCache.setCacheSize(0);
 	}
 }

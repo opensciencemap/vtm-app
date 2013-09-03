@@ -66,6 +66,10 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	private MapLayers mMapLayers;
 
+	public MapLayers getMapLayers() {
+		return mMapLayers;
+	}
+
 	private DistanceTouchOverlay mDistanceTouch;
 
 	@Override
