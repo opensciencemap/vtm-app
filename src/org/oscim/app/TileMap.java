@@ -84,9 +84,16 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		App.activity = this;
 
 		mMapLayers = new MapLayers();
-		mMapLayers.setBaseMap(PreferenceManager.getDefaultSharedPreferences(this));
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		mMapLayers.setBaseMap(prefs);
 
-		mMap.getLayers().add(new DistanceTouchOverlay(mMap, this));
+		if (!prefs.contains("distanceTouch"))
+			prefs.edit().putBoolean("distanceTouch", true).apply();
+
+		if (prefs.getBoolean("distanceTouch", true)) {
+			mDistanceTouch = new DistanceTouchOverlay(mMap, this);
+			mMap.getLayers().add(mDistanceTouch);
+		}
 
 		mCompass = new Compass(this, mMap);
 		mMap.getLayers().add(mCompass);
@@ -412,6 +419,17 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			// getWindow().getWindowManager().getDefaultDisplay().getOrientation());
 		}
 
+		boolean distanceTouch = preferences.getBoolean("distanceTouch", true);
+		if (distanceTouch) {
+			if (mDistanceTouch == null){
+				mDistanceTouch = new DistanceTouchOverlay(mMap, this);
+				mMap.getLayers().add(mDistanceTouch);
+			}
+		} else {
+			mMap.getLayers().remove(mDistanceTouch);
+			mDistanceTouch = null;
+		}
+
 		// try {
 		// String textScaleDefault =
 		// getString(R.string.preferences_text_scale_default);
@@ -577,6 +595,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	@Override
 	public boolean longPressHelper(final GeoPoint p1, final GeoPoint p2) {
+		((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(50);
+		showToastOnUiThread("Distance Touch!");
 		App.routeSearch.showRoute(p1, p2);
 		return true;
 	}
