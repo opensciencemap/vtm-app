@@ -58,13 +58,13 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	//private static final int SELECT_RENDER_THEME_FILE = 1;
 	protected static final int POIS_REQUEST = 2;
 
-	public LocationHandler mLocation;
+	private LocationHandler mLocation;
 
 	private Menu mMenu = null;
 
-	Compass mCompass;
+	private Compass mCompass;
 
-	private final MapLayers mMapLayers = new MapLayers();
+	private MapLayers mMapLayers;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +78,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		App.map = mMapView;
 		App.activity = this;
 
+		mMapLayers = new MapLayers();
 		mMapLayers.setBaseMap(PreferenceManager.getDefaultSharedPreferences(this));
 
 		mMapView.getOverlays().add(new DistanceTouchOverlay(mMapView, this));
@@ -93,6 +94,14 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		registerForContextMenu(App.view);
 
 		handleIntent(getIntent(), true);
+	}
+
+	public Compass getCompass() {
+		return mCompass;
+	}
+
+	public LocationHandler getLocationHandler() {
+		return mLocation;
 	}
 
 	@Override
@@ -127,42 +136,48 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		switch (item.getItemId()) {
 		case R.id.menu_info_about:
 			startActivity(new Intent(this, InfoView.class));
-			return true;
+			break;
 
 		case R.id.menu_position:
-			return true;
+			break;
 
 		case R.id.menu_poi_nearby:
 			Intent intent = new Intent(this, POIActivity.class);
 			startActivityForResult(intent, TileMap.POIS_REQUEST);
-			return true;
+			break;
 
-		case R.id.menu_compass_enable:
+		case R.id.menu_compass_2d:
 			if (!item.isChecked()) {
-				setInteractionMode(MAP_MODE_COMPASS);
+				mCompass.setMode(Compass.Mode.C2D);
 			} else {
-				setInteractionMode(MAP_MODE_MANUAL);
+				mCompass.setMode(Compass.Mode.OFF);
 			}
-			toggleMenuCheck();
-			return true;
+			break;
+
+		case R.id.menu_compass_3d:
+			if (!item.isChecked()) {
+				mCompass.setMode(Compass.Mode.C3D);
+			} else {
+				mCompass.setMode(Compass.Mode.OFF);
+			}
+			break;
 
 		case R.id.menu_position_my_location_enable:
 			if (!item.isChecked()) {
-				mLocation.enableShowMyLocation(true);
+				mLocation.setMode(LocationHandler.Mode.SHOW);
+				mLocation.setCenterOnFirstFix();
 			} else {
-				mLocation.disableShowMyLocation();
+				mLocation.setMode(LocationHandler.Mode.OFF);
 			}
-			toggleMenuCheck();
-			return true;
+			break;
 
 		case R.id.menu_position_follow_location:
 			if (!item.isChecked()) {
-				mLocation.enableSnapToLocation();
+				mLocation.setMode(LocationHandler.Mode.SNAP);
 			} else {
-				mLocation.disableSnapToLocation();
+				mLocation.setMode(LocationHandler.Mode.OFF);
 			}
-			toggleMenuCheck();
-			return true;
+			break;
 
 		case R.id.menu_layer_mapquest:
 		case R.id.menu_layer_naturalearth:
@@ -173,52 +188,48 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 			mMapLayers.setBackgroundMap(bgId);
 			mMapView.updateMap(true);
-
-			toggleMenuCheck();
-			return true;
+			break;
 
 		case R.id.menu_layer_grid:
 			mMapLayers.enableGridOverlay(!mMapLayers.isGridEnabled());
 			mMapView.updateMap(true);
-
-			toggleMenuCheck();
-			return true;
+			break;
 
 		case R.id.menu_position_enter_coordinates:
 			showDialog(DIALOG_ENTER_COORDINATES);
-			return true;
+			break;
 
-			//case R.id.menu_position_map_center:
-			//	MapPosition mapCenter = mBaseLayer.getMapFileCenter();
-			//	if (mapCenter != null)
-			//		mMapView.setCenter(mapCenter.getGeoPoint());
-			//	return true;
+		//case R.id.menu_position_map_center:
+		//	MapPosition mapCenter = mBaseLayer.getMapFileCenter();
+		//	if (mapCenter != null)
+		//		mMapView.setCenter(mapCenter.getGeoPoint());
+		//	break;
 
 		case R.id.menu_preferences:
 			startActivity(new Intent(this, EditPreferences.class));
 			overridePendingTransition(R.anim.slide_right, R.anim.slide_left2);
-			return true;
+			break;
 
 		default:
 			return false;
 		}
+
+		toggleMenuCheck();
+
+		return true;
 	}
 
 	private void toggleMenuCheck() {
 
-		mMenu.findItem(R.id.menu_compass_enable)
-				.setChecked(mCompass.isEnabled() && mCompass.controlView());
+		mMenu.findItem(R.id.menu_compass_2d)
+				.setChecked(mCompass.getMode() == Compass.Mode.C2D);
+		mMenu.findItem(R.id.menu_compass_3d)
+				.setChecked(mCompass.getMode() == Compass.Mode.C3D);
 
 		mMenu.findItem(R.id.menu_position_my_location_enable)
-				.setChecked(mLocation.isShowMyLocationEnabled());
-
-		if (mLocation.isShowMyLocationEnabled()) {
-			mMenu.findItem(R.id.menu_position_follow_location)
-					.setVisible(true);
-		}
-
+				.setChecked(mLocation.getMode() == LocationHandler.Mode.SHOW);
 		mMenu.findItem(R.id.menu_position_follow_location)
-				.setChecked(mLocation.isSnapToLocationEnabled());
+				.setChecked(mLocation.getMode() == LocationHandler.Mode.SNAP);
 
 		int bgId = mMapLayers.getBackgroundId();
 		mMenu.findItem(R.id.menu_layer_naturalearth)
@@ -343,13 +354,15 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mLocation.disableShowMyLocation();
+		//mLocation.disableShowMyLocation();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mCompass.setEnabled(false);
+		mCompass.pause();
+
+		//mCompass.setEnabled(false);
 		// release the wake lock if necessary
 		// if (mWakeLock.isHeld()) {
 		// mWakeLock.release();
@@ -373,6 +386,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		mCompass.resume();
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		mMapLayers.setPreferences(preferences);
@@ -448,70 +463,61 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		});
 	}
 
-	private final static int MAP_MODE_MANUAL = 0;
-	private final static int MAP_MODE_COMPASS = 1;
-	private final static int MAP_MODE_SHOW_LOCATION = 2;
-	private final static int MAP_MODE_SNAP_LOCATION = 3;
+	private enum Mode {
+		DEFAULT,
+		SHOW_LOCATION,
+		SNAP_LOCATION,
+		COMPASS_2D,
+		COMPASS_3D,
+	}
 
-	private int mMapMode = MAP_MODE_MANUAL;
+	private int mMapMode = 0;
 
 	public void toggleLocation(View V) {
 
 		((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(50);
 
 		mMapMode += 1;
-		mMapMode %= 4;
+		mMapMode %= Mode.values().length;
 
 		setInteractionMode(mMapMode);
 	}
 
 	private void setInteractionMode(int mapMode) {
-		switch (mapMode) {
-		case MAP_MODE_MANUAL:
-			mMapView.getEventLayer().enableRotation(true);
-			mMapView.getEventLayer().enableTilt(true);
+		Mode m = Mode.values()[mapMode];
 
-			mLocation.disableShowMyLocation();
+		switch (m) {
+		case DEFAULT:
 
-			mCompass.setEnabled(false);
-			mCompass.controlView(false);
+			mLocation.setMode(LocationHandler.Mode.OFF);
+			mCompass.setMode(Compass.Mode.OFF);
 
 			App.activity.showToastOnUiThread("Manual");
 
 			break;
-		case MAP_MODE_SHOW_LOCATION:
-			mMapView.getEventLayer().enableRotation(true);
-			mMapView.getEventLayer().enableTilt(true);
-
-			mCompass.setEnabled(false);
-			mCompass.controlView(false);
-
-			mLocation.enableShowMyLocation(true);
+		case SHOW_LOCATION:
+			mLocation.setMode(LocationHandler.Mode.SHOW);
+			mCompass.setMode(Compass.Mode.OFF);
 			App.activity.showToastOnUiThread("Show Location");
 			break;
-		case MAP_MODE_SNAP_LOCATION:
-			mMapView.getEventLayer().enableRotation(true);
-			mMapView.getEventLayer().enableTilt(true);
 
-			mLocation.enableSnapToLocation();
-			//mCompass.setEnabled(true);
-
-			mCompass.controlView(false);
-
+		case SNAP_LOCATION:
+			mLocation.setMode(LocationHandler.Mode.SNAP);
+			mCompass.setMode(Compass.Mode.OFF);
 			App.activity.showToastOnUiThread(App.activity
 					.getString(R.string.snap_to_location_enabled));
 			break;
 
-		case MAP_MODE_COMPASS:
-			mMapView.getEventLayer().enableRotation(false);
-			mMapView.getEventLayer().enableTilt(false);
+		case COMPASS_2D:
+			mLocation.setMode(LocationHandler.Mode.SHOW);
+			mCompass.setMode(Compass.Mode.C2D);
+			App.activity.showToastOnUiThread("Compass 2D");
+			break;
 
-			mCompass.setEnabled(true);
-			mCompass.controlView(true);
-			mLocation.disableShowMyLocation();
-
-			App.activity.showToastOnUiThread("Compass");
-
+		case COMPASS_3D:
+			mLocation.setMode(LocationHandler.Mode.SHOW);
+			mCompass.setMode(Compass.Mode.C3D);
+			App.activity.showToastOnUiThread("Compass 3D");
 			break;
 
 		default:

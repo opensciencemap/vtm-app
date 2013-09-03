@@ -3,6 +3,7 @@ package org.oscim.app;
 import org.oscim.cache.CacheFileManager;
 import org.oscim.layers.labeling.LabelLayer;
 import org.oscim.layers.overlay.BuildingOverlay;
+import org.oscim.layers.Layer;
 import org.oscim.layers.overlay.GenericOverlay;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.bitmap.MapQuestAerial;
@@ -39,24 +40,33 @@ public class MapLayers {
 	private GenericOverlay mGridOverlay;
 	private boolean mGridEnabled;
 
-	private int mBackgroundId = -1;
+	// FIXME -> implement LayerGroup
+	private int mBackgroundId = -2;
+	private Layer mBackroundPlaceholder;
+	private Layer mBackgroundLayer;
+
+	public MapLayers() {
+		mBackroundPlaceholder = new Layer(null) {
+		};
+		setBackgroundMap(-1);
+	}
 
 	void setBaseMap(SharedPreferences preferences) {
 		TileSources tileSourceNew;
 		String dbname = preferences.getString("mapDatabase",
-				TileSources.OPENSCIENCEMAP2.name());
+				TileSources.OPENSCIENCEMAP4.name());
 
 		try {
 			tileSourceNew = TileSources.valueOf(dbname);
 		} catch (IllegalArgumentException e) {
-			App.activity.showToastOnUiThread("invalid db: " + dbname);
-			tileSourceNew = TileSources.OPENSCIENCEMAP2;
+			tileSourceNew = TileSources.OPENSCIENCEMAP4;
 		}
 
 		if (tileSourceNew == mMapDatabase)
 			return;
 
 		Log.d(TAG, "set tile source " + tileSourceNew);
+
 		TileSource tileSource = null;
 
 		switch (tileSourceNew) {
@@ -151,8 +161,6 @@ public class MapLayers {
 		return mGridEnabled;
 	}
 
-	BitmapTileLayer mBackgroundLayer;
-
 	void setBackgroundMap(int id) {
 		if (id == mBackgroundId)
 			return;
@@ -169,10 +177,14 @@ public class MapLayers {
 			mBackgroundLayer = new BitmapTileLayer(App.map, NaturalEarth.INSTANCE);
 			break;
 		default:
+			mBackgroundLayer = mBackroundPlaceholder;
 			id = -1;
 		}
-		if (mBackgroundLayer != null)
-			App.map.setBackgroundMap(mBackgroundLayer);
+
+		if (mBackgroundLayer instanceof BitmapTileLayer)
+			App.map.setBackgroundMap((BitmapTileLayer) mBackgroundLayer);
+		else
+			App.map.getLayerManager().add(0, mBackroundPlaceholder);
 
 		mBackgroundId = id;
 	}

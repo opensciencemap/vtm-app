@@ -45,7 +45,11 @@
     <string name="menu_position_last_known">Last known location</string>
     <string name="menu_position_map_file_center">Map file center</string>
     <string name="menu_position_my_location_enable">Show my location</string>
-    <string name="menu_position_my_location_disable">Remove my location</string>
+    <string name="menu_position_follow_location">Follow my location</string>
+    <string name="menu_compass">Compass</string>
+    <string name="menu_compass_2d">Compass 2D</string>
+    <string name="menu_compass_3d">Compass 3D</string>
+    <string name="menu_compass_off">Compass Off</string>
     <string name="menu_preferences">Preferences</string>
     <string name="menu_render_theme">Theme</string>
     <string name="no_location_provider_available">No location source available</string>

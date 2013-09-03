@@ -33,7 +33,14 @@ import android.widget.ImageView;
 
 @SuppressWarnings("deprecation")
 public class Compass extends Layer implements SensorEventListener {
+
 	//private static final String TAG = Compass.class.getName();
+
+	public enum Mode {
+		OFF,
+		C2D,
+		C3D,
+	}
 
 	private final SensorManager mSensorManager;
 	private final ImageView mArrowView;
@@ -50,6 +57,9 @@ public class Compass extends Layer implements SensorEventListener {
 	private float mCurTilt;
 
 	private boolean mControlOrientation;
+
+	private Mode mMode = Mode.OFF;
+	private int mListeners;
 
 	@Override
 	public void onUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
@@ -87,31 +97,76 @@ public class Compass extends Layer implements SensorEventListener {
 		return mControlOrientation;
 	}
 
+	public void setMode(Mode mode) {
+		if (mode == mMode)
+			return;
+
+		if (mode == Mode.OFF) {
+			setEnabled(false);
+
+			mMapView.getEventLayer().enableRotation(true);
+			mMapView.getEventLayer().enableTilt(true);
+		} else if (mMode == Mode.OFF) {
+			setEnabled(true);
+		}
+
+		if (mode == Mode.C3D) {
+			mMapView.getEventLayer().enableRotation(false);
+			mMapView.getEventLayer().enableTilt(false);
+		} else if (mode == Mode.C2D) {
+			mMapView.getEventLayer().enableRotation(false);
+			mMapView.getEventLayer().enableTilt(true);
+		}
+
+		mMode = mode;
+	}
+
+	public Mode getMode() {
+		return mMode;
+	}
 
 	@Override
 	public void setEnabled(boolean enabled) {
-		if (isEnabled() == enabled)
+		mListeners += enabled ? 1 : -1;
+
+		if (mListeners == 1) {
+			resume();
+		} else if (mListeners == 0) {
+			pause();
+
+		} else if (mListeners < 0) {
+			//then bad
+			mListeners = 0;
+		}
+	}
+
+	public void resume() {
+		if (mListeners <= 0)
 			return;
 
-		super.setEnabled(enabled);
+		super.setEnabled(true);
 
-		if (isEnabled()) {
-			Sensor sensor;
-			//Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-			//Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-			//sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
-			//mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
-			//sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-			//mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
+		Sensor sensor;
+		//Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+		//Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		//sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+		//mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
+		//sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+		//mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
 
-			sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
-			mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
+		sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+		mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
 
-			//mLastAccelerometerSet = false;
-			//mLastMagnetometerSet = false;
-		} else {
-			mSensorManager.unregisterListener(this);
-		}
+		//mLastAccelerometerSet = false;
+		//mLastMagnetometerSet = false;
+	}
+
+	public void pause() {
+		if (mListeners <= 0)
+			return;
+
+		super.setEnabled(false);
+		mSensorManager.unregisterListener(this);
 	}
 
 	public void adjustArrow(float prev, float cur) {
@@ -182,15 +237,20 @@ public class Compass extends Layer implements SensorEventListener {
 
 		mCurTilt = mCurTilt + 0.2f * (tilt - mCurTilt);
 
-		if (mControlOrientation) {
+		if (mMode != Mode.OFF) {
+			boolean redraw = false;
+
 			if (Math.abs(change) > 0.01) {
 				adjustArrow(mCurRotation, rotation);
 				mMapView.getMapViewPosition().setRotation(-rotation);
-				mMapView.getMapViewPosition().setTilt(-mCurTilt * 1.5f);
-				mMapView.updateMap(true);
-			} else if (mMapView.getMapViewPosition().setTilt(-mCurTilt * 1.5f)) {
-				mMapView.updateMap(true);
+				redraw = true;
 			}
+
+			if (mMode == Mode.C3D)
+				redraw |= mMapView.getMapViewPosition().setTilt(-mCurTilt * 1.5f);
+
+			if (redraw)
+				mMapView.redrawMap(true);
 		}
 		mCurRotation = rotation;
 	}
@@ -313,4 +373,5 @@ public class Compass extends Layer implements SensorEventListener {
 		//	break;
 		//}
 	}
+
 }
