@@ -82,7 +82,7 @@ public class LocationHandler implements LocationListener {
 
 		App.map.getOverlays().add(2, mLocationOverlay);
 
-		App.map.redrawMap(true);
+		App.map.updateMap(true);
 		return true;
 	}
 
@@ -101,7 +101,7 @@ public class LocationHandler implements LocationListener {
 		mLocationOverlay.setEnabled(false);
 
 		App.map.getOverlays().remove(mLocationOverlay);
-		App.map.redrawMap(true);
+		App.map.updateMap(true);
 
 		return true;
 	}
@@ -139,7 +139,7 @@ public class LocationHandler implements LocationListener {
 
 		mapPosition.setPosition(location.getLatitude(), location.getLongitude());
 		App.map.setMapPosition(mapPosition);
-		App.map.redrawMap(true);
+		App.map.updateMap(true);
 
 		return location;
 	}
@@ -193,7 +193,7 @@ public class LocationHandler implements LocationListener {
 
 			GeoPoint point = new GeoPoint(lat, lon);
 			App.map.setCenter(point);
-			App.map.redrawMap(true);
+			App.map.updateMap(true);
 		}
 
 		mLocationOverlay.setPosition(lat, lon, location.getAccuracy());

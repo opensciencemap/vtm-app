@@ -96,7 +96,7 @@ public class LocationOverlay extends Overlay {
 		private long mAnimStart;
 
 		public LocationIndicator(final MapView mapView) {
-			super(mapView);
+			super();
 		}
 
 		private void animate(boolean enable) {

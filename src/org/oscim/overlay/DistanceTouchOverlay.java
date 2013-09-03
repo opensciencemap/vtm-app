@@ -19,12 +19,12 @@ package org.oscim.overlay;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.oscim.backend.input.MotionEvent;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.InputLayer;
 import org.oscim.view.MapView;
 import org.osmdroid.overlays.MapEventsReceiver;
 
-import android.view.MotionEvent;
 
 public class DistanceTouchOverlay extends InputLayer {
 	//private final static String TAG = DistanceTouchOverlay.class.getName();
@@ -60,76 +60,76 @@ public class DistanceTouchOverlay extends InputLayer {
 		}
 	}
 
-	@Override
-	public boolean onTouchEvent(MotionEvent e) {
-
-		int action = e.getActionMasked(); //(e.getAction() & e.getActionMasked());
-		// lens overlay is not active, cancel timer
-		if ((action == MotionEvent.ACTION_CANCEL)) {
-			cancel();
-			return false;
-		}
-
-		if (mLongpressTimer != null) {
-			// any pointer up while long press detection
-			// cancels timer
-			if (action == MotionEvent.ACTION_POINTER_UP ||
-					action == MotionEvent.ACTION_UP) {
-
-				cancel();
-				return false;
-			}
-
-			// two fingers must still be down, tested
-			// one above.
-			if (action == MotionEvent.ACTION_MOVE) {
-				// update pointer positions
-				int idx1 = e.findPointerIndex(mPointer1);
-				int idx2 = e.findPointerIndex(mPointer2);
-
-				mCurX1 = e.getX(idx1);
-				mCurY1 = e.getY(idx1);
-				mCurX2 = e.getX(idx2);
-				mCurY2 = e.getY(idx2);
-
-				// cancel if moved one finger more than 50 pixel
-				float maxSq = 10 * 10;
-				float d = (mCurX1 - mPrevX1) * (mCurX1 - mPrevX1) +
-						(mCurY1 - mPrevY1) * (mCurY1 - mPrevY1);
-				if (d > maxSq) {
-					cancel();
-					return false;
-				}
-				d = (mCurX2 - mPrevX2) * (mCurX2 - mPrevX2) +
-						(mCurY2 - mPrevY2) * (mCurY2 - mPrevY2);
-				if (d > maxSq) {
-					cancel();
-					return false;
-				}
-			}
-		}
-
-		if ((action == MotionEvent.ACTION_POINTER_DOWN)
-				&& (e.getPointerCount() == 2)) {
-
-			// keep track of pointer ids, only
-			// use these for gesture, ignoring
-			// more than two pointer
-			mPointer1 = e.getPointerId(0);
-			mPointer2 = e.getPointerId(1);
-
-			if (mLongpressTimer == null) {
-				// start timer, keep initial down position
-				mCurX1 = mPrevX1 = e.getX(0);
-				mCurY1 = mPrevY1 = e.getY(0);
-				mCurX2 = mPrevX2 = e.getX(1);
-				mCurY2 = mPrevY2 = e.getY(1);
-				runLongpressTimer();
-			}
-		}
-
-		return false;
-	}
+//	@Override
+//	public boolean onTouchEvent(MotionEvent e) {
+//
+//		int action = e.getActionMasked(); //(e.getAction() & e.getActionMasked());
+//		// lens overlay is not active, cancel timer
+//		if ((action == MotionEvent.ACTION_CANCEL)) {
+//			cancel();
+//			return false;
+//		}
+//
+//		if (mLongpressTimer != null) {
+//			// any pointer up while long press detection
+//			// cancels timer
+//			if (action == MotionEvent.ACTION_POINTER_UP ||
+//					action == MotionEvent.ACTION_UP) {
+//
+//				cancel();
+//				return false;
+//			}
+//
+//			// two fingers must still be down, tested
+//			// one above.
+//			if (action == MotionEvent.ACTION_MOVE) {
+//				// update pointer positions
+//				int idx1 = e.findPointerIndex(mPointer1);
+//				int idx2 = e.findPointerIndex(mPointer2);
+//
+//				mCurX1 = e.getX(idx1);
+//				mCurY1 = e.getY(idx1);
+//				mCurX2 = e.getX(idx2);
+//				mCurY2 = e.getY(idx2);
+//
+//				// cancel if moved one finger more than 50 pixel
+//				float maxSq = 10 * 10;
+//				float d = (mCurX1 - mPrevX1) * (mCurX1 - mPrevX1) +
+//						(mCurY1 - mPrevY1) * (mCurY1 - mPrevY1);
+//				if (d > maxSq) {
+//					cancel();
+//					return false;
+//				}
+//				d = (mCurX2 - mPrevX2) * (mCurX2 - mPrevX2) +
+//						(mCurY2 - mPrevY2) * (mCurY2 - mPrevY2);
+//				if (d > maxSq) {
+//					cancel();
+//					return false;
+//				}
+//			}
+//		}
+//
+//		if ((action == MotionEvent.ACTION_POINTER_DOWN)
+//				&& (e.getPointerCount() == 2)) {
+//
+//			// keep track of pointer ids, only
+//			// use these for gesture, ignoring
+//			// more than two pointer
+//			mPointer1 = e.getPointerId(0);
+//			mPointer2 = e.getPointerId(1);
+//
+//			if (mLongpressTimer == null) {
+//				// start timer, keep initial down position
+//				mCurX1 = mPrevX1 = e.getX(0);
+//				mCurY1 = mPrevY1 = e.getY(0);
+//				mCurX2 = mPrevX2 = e.getX(1);
+//				mCurY2 = mPrevY2 = e.getY(1);
+//				runLongpressTimer();
+//			}
+//		}
+//
+//		return false;
+//	}
 
 	private MapEventsReceiver mReceiver;
 

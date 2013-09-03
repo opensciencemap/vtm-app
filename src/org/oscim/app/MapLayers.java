@@ -1,13 +1,18 @@
 package org.oscim.app;
 
 import org.oscim.cache.CacheFileManager;
+import org.oscim.layers.labeling.LabelLayer;
+import org.oscim.layers.overlay.BuildingOverlay;
 import org.oscim.layers.overlay.GenericOverlay;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.bitmap.MapQuestAerial;
 import org.oscim.layers.tile.bitmap.NaturalEarth;
 import org.oscim.layers.tile.vector.MapTileLayer;
+import org.oscim.renderer.GLRenderer;
 import org.oscim.renderer.layers.GridRenderLayer;
+import org.oscim.theme.IRenderTheme;
 import org.oscim.theme.InternalRenderTheme;
+import org.oscim.theme.ThemeLoader;
 import org.oscim.tilesource.ITileCache;
 import org.oscim.tilesource.TileSource;
 import org.oscim.tilesource.TileSources;
@@ -48,73 +53,74 @@ public class MapLayers {
 			tileSourceNew = TileSources.OPENSCIENCEMAP2;
 		}
 
-		if (tileSourceNew != mMapDatabase) {
-			Log.d(TAG, "set tile source " + tileSourceNew);
+		if (tileSourceNew == mMapDatabase)
+			return;
 
-			TileSource tileSource = null;
+		Log.d(TAG, "set tile source " + tileSourceNew);
+		TileSource tileSource = null;
 
-			switch (tileSourceNew) {
-			case OPENSCIENCEMAP1:
-				tileSource = new OSciMap1TileSource();
-				tileSource.setOption("url", "http://city.informatik.uni-bremen.de/osmstache/test");
-				break;
-			case OPENSCIENCEMAP2:
-				tileSource = new OSciMap2TileSource();
-				tileSource.setOption("url", "http://city.informatik.uni-bremen.de/osci/map-live");
-				break;
-			case OPENSCIENCEMAP4:
-				tileSource = new OSciMap4TileSource();
-				tileSource.setOption("url", "http://city.informatik.uni-bremen.de/tiles/vtm");
-				break;
-			case MAPSFORGE:
-				tileSource = new MapFileTileSource();
-				tileSource.setOption("file", "/storage/sdcard0/germany.map");
-				break;
-			case MAPNIK_VECTOR:
-				tileSource = new MapnikVectorTileSource();
-				tileSource.setOption("url", "http://d1s11ojcu7opje.cloudfront.net/dev/764e0b8d");
-				break;
+		switch (tileSourceNew) {
+		case OPENSCIENCEMAP1:
+			tileSource = new OSciMap1TileSource();
+			tileSource.setOption("url", "http://city.informatik.uni-bremen.de/osmstache/test");
+			break;
+		case OPENSCIENCEMAP2:
+			tileSource = new OSciMap2TileSource();
+			tileSource.setOption("url", "http://city.informatik.uni-bremen.de/osci/map-live");
+			break;
+		case OPENSCIENCEMAP4:
+			tileSource = new OSciMap4TileSource();
+			tileSource.setOption("url", "http://city.informatik.uni-bremen.de/tiles/vtm");
+			break;
+		case MAPSFORGE:
+			tileSource = new MapFileTileSource();
+			tileSource.setOption("file", "/storage/sdcard0/germany.map");
+			break;
+		case MAPNIK_VECTOR:
+			tileSource = new MapnikVectorTileSource();
+			tileSource.setOption("url", "http://d1s11ojcu7opje.cloudfront.net/dev/764e0b8d");
+			break;
 
-			default:
-				break;
-			}
-
-			if (tileSource instanceof UrlTileSource) {
-				mCache = new CacheFileManager(App.activity);
-				mCache.setStoragePath(CACHE_DIRECTORY + dbname);
-				mCache.setCacheSize(512 * (1 << 10));
-				tileSource.setCache(mCache);
-			} else {
-				mCache = null;
-			}
-
-			if (mBaseLayer == null) {
-				mBaseLayer = App.map.setBaseMap(tileSource);
-			} else
-				mBaseLayer.setTileSource(tileSource);
-
-			mMapDatabase = tileSourceNew;
+		default:
+			break;
 		}
+
+		if (tileSource instanceof UrlTileSource) {
+			mCache = new CacheFileManager(App.activity);
+			mCache.setStoragePath(CACHE_DIRECTORY + dbname);
+			mCache.setCacheSize(512 * (1 << 10));
+			//tileSource.setCache(mCache);
+		} else {
+			mCache = null;
+		}
+
+		if (mBaseLayer == null) {
+			mBaseLayer = App.map.setBaseMap(tileSource);
+			App.map.getLayerManager().add(2,
+					new BuildingOverlay(App.map, mBaseLayer.getTileLayer()));
+			App.map.getLayerManager().add(3, new LabelLayer(App.map, mBaseLayer.getTileLayer()));
+		} else
+			mBaseLayer.setTileSource(tileSource);
+
+		mMapDatabase = tileSourceNew;
 	}
 
 	void setPreferences(SharedPreferences preferences) {
-		if (preferences.contains("mapDatabase")) {
+		if (preferences.contains("mapDatabase"))
 			setBaseMap(preferences);
-		}
 
-		InternalRenderTheme theme = null;
-
+		InternalRenderTheme theme = InternalRenderTheme.DEFAULT;
 		if (preferences.contains("theme")) {
 			String name = preferences.getString("theme", "DEFAULT");
 			try {
 				theme = InternalRenderTheme.valueOf(name);
-				mBaseLayer.setRenderTheme(theme);
+				mBaseLayer.setRenderTheme(ThemeLoader.load(theme));
 			} catch (IllegalArgumentException e) {
-				theme = null;
+				theme = InternalRenderTheme.DEFAULT;
 			}
 		}
-		if (theme == null)
-			mBaseLayer.setRenderTheme(InternalRenderTheme.DEFAULT);
+
+		App.map.setTheme(theme);
 
 		// default cache size 20MB
 		int cacheSize = preferences.getInt("cacheSize", 20);
@@ -130,7 +136,7 @@ public class MapLayers {
 
 		if (enable) {
 			if (mGridOverlay == null)
-				mGridOverlay = new GenericOverlay(App.map, new GridRenderLayer(App.map));
+				mGridOverlay = new GenericOverlay(App.map, new GridRenderLayer());
 
 			App.map.getOverlays().add(mGridOverlay);
 		} else {
@@ -138,7 +144,7 @@ public class MapLayers {
 		}
 
 		mGridEnabled = enable;
-		App.map.redrawMap(true);
+		App.map.updateMap(true);
 	}
 
 	boolean isGridEnabled() {

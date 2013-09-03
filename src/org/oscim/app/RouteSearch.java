@@ -20,12 +20,11 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.oscim.android.AndroidGraphics;
+import org.oscim.android.canvas.AndroidGraphics;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.overlay.OverlayItem.HotspotPlace;
 import org.oscim.layers.overlay.OverlayMarker;
 import org.oscim.layers.overlay.PathOverlay;
-import org.oscim.view.MapView;
 import org.osmdroid.location.GeocoderNominatim;
 import org.osmdroid.overlays.DefaultInfoWindow;
 import org.osmdroid.overlays.ExtendedOverlayItem;
@@ -43,7 +42,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class RouteSearch {
 	private static int START_INDEX = -2, DEST_INDEX = -1;
@@ -69,7 +67,7 @@ public class RouteSearch {
 
 		mItineraryMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map,
 				App.activity, null, waypointsItems,
-				new ViaPointInfoWindow(R.layout.itinerary_bubble, App.map));
+				new ViaPointInfoWindow(R.layout.itinerary_bubble));
 
 		//updateIternaryMarkers();
 
@@ -176,7 +174,7 @@ public class RouteSearch {
 
 		mItineraryMarkers.addItem(overlayItem);
 
-		App.map.redrawMap(true);
+		App.map.updateMap(true);
 
 		//Start geocoding task to update the description of the marker with its address:
 		new GeocodingTask().execute(overlayItem);
@@ -230,9 +228,7 @@ public class RouteSearch {
 		mRouteOverlay.clearPath();
 
 		if (route == null || route.status == Route.STATUS_DEFAULT) {
-			Toast.makeText(App.map.getContext(),
-					App.res.getText(R.string.route_lookup_error),
-					Toast.LENGTH_SHORT).show();
+			App.activity.showToastOnUiThread(App.res.getString(R.string.route_lookup_error));
 			return;
 		}
 
@@ -254,7 +250,7 @@ public class RouteSearch {
 		//	mRouteMarkers.addItem(nodeMarker);
 		//}
 
-		App.map.redrawMap(true);
+		App.map.updateMap(true);
 	}
 
 	void clearOverlays() {
@@ -266,7 +262,7 @@ public class RouteSearch {
 		mDestinationPoint = null;
 		mViaPoints.clear();
 
-		App.map.redrawMap(true);
+		App.map.updateMap(true);
 	}
 
 	/**
@@ -372,8 +368,8 @@ public class RouteSearch {
 
 		int mSelectedPoint;
 
-		public ViaPointInfoWindow(int layoutResId, MapView mapView) {
-			super(layoutResId, mapView);
+		public ViaPointInfoWindow(int layoutResId) {
+			super(layoutResId, App.view);
 
 			Button btnDelete = (Button) (mView.findViewById(R.id.bubble_delete));
 			btnDelete.setOnClickListener(new View.OnClickListener() {

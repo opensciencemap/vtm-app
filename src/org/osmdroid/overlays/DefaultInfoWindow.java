@@ -1,6 +1,7 @@
 package org.osmdroid.overlays;
 
-import org.oscim.view.MapView;
+import org.oscim.android.AndroidMapView;
+import org.oscim.app.App;
 import org.osmdroid.utils.BonusPackHelper;
 
 import android.content.Context;
@@ -38,11 +39,11 @@ public class DefaultInfoWindow extends InfoWindow {
 		}
 	}
 
-	public DefaultInfoWindow(int layoutResId, MapView mapView) {
+	public DefaultInfoWindow(int layoutResId, AndroidMapView mapView) {
 		super(layoutResId, mapView);
 
 		if (mTitleId == 0)
-			setResIds(mapView.getContext());
+			setResIds(App.activity);
 
 		// default behaviour: close it when clicking on the bubble:
 		mView.setOnClickListener(new View.OnClickListener() {

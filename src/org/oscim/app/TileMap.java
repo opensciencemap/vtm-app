@@ -15,6 +15,7 @@
 
 package org.oscim.app;
 
+import org.oscim.android.AndroidMapView;
 import org.oscim.android.MapActivity;
 import org.oscim.app.location.Compass;
 import org.oscim.app.location.LocationDialog;
@@ -23,7 +24,6 @@ import org.oscim.app.preferences.EditPreferences;
 import org.oscim.core.GeoPoint;
 import org.oscim.overlay.DistanceTouchOverlay;
 import org.oscim.view.DebugSettings;
-import org.oscim.view.MapView;
 import org.osmdroid.location.POI;
 import org.osmdroid.overlays.MapEventsReceiver;
 
@@ -71,9 +71,9 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_tilemap);
-		mMapView = (MapView) findViewById(R.id.mapView);
-		mMapView.setClickable(true);
-		mMapView.setFocusable(true);
+		App.view = (AndroidMapView) findViewById(R.id.mapView);
+		App.view.setClickable(true);
+		App.view.setFocusable(true);
 
 		App.map = mMapView;
 		App.activity = this;
@@ -90,7 +90,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		App.poiSearch = new POISearch();
 		App.routeSearch = new RouteSearch();
 
-		registerForContextMenu(mMapView);
+		registerForContextMenu(App.view);
 
 		handleIntent(getIntent(), true);
 	}
@@ -101,8 +101,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		handleIntent(intent, false);
 	}
 
-
-	private void handleIntent(Intent intent, boolean start){
+	private void handleIntent(Intent intent, boolean start) {
 		if (intent == null)
 			return;
 
@@ -173,14 +172,14 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				bgId = -1;
 
 			mMapLayers.setBackgroundMap(bgId);
-			mMapView.redrawMap(true);
+			mMapView.updateMap(true);
 
 			toggleMenuCheck();
 			return true;
 
 		case R.id.menu_layer_grid:
 			mMapLayers.enableGridOverlay(!mMapLayers.isGridEnabled());
-			mMapView.redrawMap(true);
+			mMapView.updateMap(true);
 
 			toggleMenuCheck();
 			return true;
@@ -253,11 +252,11 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		return super.onPrepareOptionsMenu(menu);
 	}
 
-	@Override
-	public boolean onTrackballEvent(MotionEvent event) {
-		// forward the event to the MapView
-		return mMapView.onTrackballEvent(event);
-	}
+	//@Override
+	//public boolean onTrackballEvent(MotionEvent event) {
+	//	// forward the event to the MapView
+	//	return mMapView.onTrackballEvent(event);
+	//}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -379,11 +378,9 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		mMapLayers.setPreferences(preferences);
 
 		if (preferences.getBoolean("fullscreen", false)) {
-			Log.i("mapviewer", "FULLSCREEN");
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 		} else {
-			Log.i("mapviewer", "NO FULLSCREEN");
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 		}
@@ -427,7 +424,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			mMapView.setDebugSettings(debugSettings);
 		}
 
-		mMapView.redrawMap(false);
+		mMapView.updateMap(true);
 	}
 
 	@Override
@@ -521,7 +518,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			break;
 		}
 
-		App.map.redrawMap(true);
+		App.map.updateMap(true);
 	}
 
 	// ----------- Context Menu when clicking on the map
@@ -563,7 +560,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	@Override
 	public boolean longPressHelper(GeoPoint p) {
 		mLongPressGeoPoint = p;
-		openContextMenu(mMapView);
+		openContextMenu(App.view);
 		return true;
 	}
 

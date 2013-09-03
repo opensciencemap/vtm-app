@@ -11,8 +11,6 @@ import org.osmdroid.routing.provider.OSRMRouteProvider;
 import org.osmdroid.utils.BonusPackHelper;
 import org.osmdroid.utils.DouglasPeuckerReducer;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 
 /**
@@ -23,7 +21,7 @@ import android.util.Log;
  * @see OSRMRouteProvider
  * @author M.Kergall
  */
-public class Route implements Parcelable {
+public class Route {
 	/**
 	 * @see #STATUS_INVALID STATUS_INVALID
 	 * @see #STATUS_OK STATUS_OK
@@ -202,43 +200,43 @@ public class Route implements Parcelable {
 
 	// --- Parcelable implementation
 
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel out, int flags) {
-		out.writeInt(status);
-		out.writeDouble(length);
-		out.writeDouble(duration);
-		out.writeList(nodes);
-		out.writeList(legs);
-		out.writeList(routeHigh);
-		out.writeParcelable(boundingBox, 0);
-	}
-
-	public static final Parcelable.Creator<Route> CREATOR = new Parcelable.Creator<Route>() {
-		@Override
-		public Route createFromParcel(Parcel source) {
-			return new Route(source);
-		}
-
-		@Override
-		public Route[] newArray(int size) {
-			return new Route[size];
-		}
-	};
-
-	@SuppressWarnings("unchecked")
-	private Route(Parcel in) {
-		status = in.readInt();
-		length = in.readDouble();
-		duration = in.readDouble();
-
-		nodes = in.readArrayList(RouteNode.class.getClassLoader());
-		legs = in.readArrayList(RouteLeg.class.getClassLoader());
-		routeHigh = in.readArrayList(GeoPoint.class.getClassLoader());
-		boundingBox = in.readParcelable(BoundingBox.class.getClassLoader());
-	}
+//	@Override
+//	public int describeContents() {
+//		return 0;
+//	}
+//
+//	@Override
+//	public void writeToParcel(Parcel out, int flags) {
+//		out.writeInt(status);
+//		out.writeDouble(length);
+//		out.writeDouble(duration);
+//		out.writeList(nodes);
+//		out.writeList(legs);
+//		out.writeList(routeHigh);
+//		out.writeParcelable(boundingBox, 0);
+//	}
+//
+//	public static final Parcelable.Creator<Route> CREATOR = new Parcelable.Creator<Route>() {
+//		@Override
+//		public Route createFromParcel(Parcel source) {
+//			return new Route(source);
+//		}
+//
+//		@Override
+//		public Route[] newArray(int size) {
+//			return new Route[size];
+//		}
+//	};
+//
+//	@SuppressWarnings("unchecked")
+//	private Route(Parcel in) {
+//		status = in.readInt();
+//		length = in.readDouble();
+//		duration = in.readDouble();
+//
+//		nodes = in.readArrayList(RouteNode.class.getClassLoader());
+//		legs = in.readArrayList(RouteLeg.class.getClassLoader());
+//		routeHigh = in.readArrayList(GeoPoint.class.getClassLoader());
+//		boundingBox = in.readParcelable(BoundingBox.class.getClassLoader());
+//	}
 }

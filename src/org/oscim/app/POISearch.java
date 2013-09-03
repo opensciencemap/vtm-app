@@ -18,7 +18,7 @@ package org.oscim.app;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.oscim.android.AndroidGraphics;
+import org.oscim.android.canvas.AndroidGraphics;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.overlay.OverlayItem;
@@ -169,7 +169,7 @@ public class POISearch {
 		mPOIs.clear();
 		if (pois == null) {
 			showPOIActivity(true);
-			App.map.redrawMap(true);
+			App.map.updateMap(true);
 			return;
 		}
 
@@ -224,7 +224,7 @@ public class POISearch {
 		}
 
 		showPOIActivity(true);
-		App.map.redrawMap(true);
+		App.map.updateMap(true);
 	}
 
 	private void showPOIActivity(boolean setNew) {
@@ -247,7 +247,7 @@ public class POISearch {
 		private ImageView mImage;
 
 		public POIInfoWindow(MapView mapView) {
-			super(R.layout.bonuspack_bubble, mapView);
+			super(R.layout.bonuspack_bubble, App.view);
 
 			mButton = (Button) mView.findViewById(R.id.bubble_moreinfo);
 			mImage = (ImageView) mView.findViewById(R.id.bubble_image);
@@ -316,7 +316,7 @@ public class POISearch {
 		case R.id.menu_poi_clear:
 			poiMarkers.removeAllItems();
 			mPOIs.clear();
-			App.map.redrawMap(true);
+			App.map.updateMap(true);
 
 			return true;
 		default:

@@ -2,14 +2,11 @@ package org.osmdroid.routing;
 
 import org.oscim.core.GeoPoint;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * Route intersection, with instructions to continue.
  * @author M.Kergall
  */
-public class RouteNode implements Parcelable {
+public class RouteNode {
 	/**
 	 * @see <a
 	 *      href="http://open.mapquestapi.com/guidance/#maneuvertypes">Maneuver
@@ -35,37 +32,37 @@ public class RouteNode implements Parcelable {
 
 	// --- Parcelable implementation
 
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel out, int flags) {
-		out.writeInt(maneuverType);
-		out.writeString(instructions);
-		out.writeDouble(length);
-		out.writeDouble(duration);
-		out.writeParcelable(location, 0);
-	}
-
-	public static final Parcelable.Creator<RouteNode> CREATOR = new
-			Parcelable.Creator<RouteNode>() {
-				@Override
-				public RouteNode createFromParcel(Parcel in) {
-					RouteNode rn = new RouteNode();
-					rn.maneuverType = in.readInt();
-					rn.instructions = in.readString();
-					rn.length = in.readDouble();
-					rn.duration = in.readDouble();
-					rn.location = in.readParcelable(GeoPoint.class.getClassLoader());
-					return rn;
-				}
-
-				@Override
-				public RouteNode[] newArray(int size) {
-					return new RouteNode[size];
-				}
-			};
+//	@Override
+//	public int describeContents() {
+//		return 0;
+//	}
+//
+//	@Override
+//	public void writeToParcel(Parcel out, int flags) {
+//		out.writeInt(maneuverType);
+//		out.writeString(instructions);
+//		out.writeDouble(length);
+//		out.writeDouble(duration);
+//		out.writeParcelable(location, 0);
+//	}
+//
+//	public static final Parcelable.Creator<RouteNode> CREATOR = new
+//			Parcelable.Creator<RouteNode>() {
+//				@Override
+//				public RouteNode createFromParcel(Parcel in) {
+//					RouteNode rn = new RouteNode();
+//					rn.maneuverType = in.readInt();
+//					rn.instructions = in.readString();
+//					rn.length = in.readDouble();
+//					rn.duration = in.readDouble();
+//					rn.location = in.readParcelable(GeoPoint.class.getClassLoader());
+//					return rn;
+//				}
+//
+//				@Override
+//				public RouteNode[] newArray(int size) {
+//					return new RouteNode[size];
+//				}
+//			};
 
 }

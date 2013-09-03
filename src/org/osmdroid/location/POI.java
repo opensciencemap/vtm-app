@@ -7,8 +7,6 @@ import org.osmdroid.utils.BonusPackHelper;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,7 +17,7 @@ import android.widget.ImageView;
  * @see GeoNamesPOIProvider
  * @author M.Kergall
  */
-public class POI implements Parcelable {
+public class POI {
 	/** IDs of POI services */
 	public static int POI_SERVICE_NOMINATIM = 100;
 	public static int POI_SERVICE_GEONAMES_WIKIPEDIA = 200;
@@ -125,48 +123,48 @@ public class POI implements Parcelable {
 
 	// --- Parcelable implementation
 
-	@Override
-	public int describeContents() {
-		return 0;
-	}
+//	@Override
+//	public int describeContents() {
+//		return 0;
+//	}
 
-	@Override
-	public void writeToParcel(Parcel out, int flags) {
-		out.writeInt(serviceId);
-		out.writeString(id);
-		out.writeParcelable(location, 0);
-		out.writeString(category);
-		out.writeString(type);
-		out.writeString(description);
-		out.writeString(thumbnailPath);
-		out.writeParcelable(thumbnail, 0);
-		out.writeString(url);
-		out.writeInt(rank);
-		out.writeInt(mThumbnailLoadingFailures);
-	}
-
-	public static final Parcelable.Creator<POI> CREATOR = new Parcelable.Creator<POI>() {
-		@Override
-		public POI createFromParcel(Parcel in) {
-			POI poi = new POI(in.readInt());
-			poi.id = in.readString();
-			poi.location = in.readParcelable(GeoPoint.class.getClassLoader());
-			poi.category = in.readString();
-			poi.type = in.readString();
-			poi.description = in.readString();
-			poi.thumbnailPath = in.readString();
-			poi.thumbnail = in.readParcelable(Bitmap.class.getClassLoader());
-			poi.url = in.readString();
-			poi.rank = in.readInt();
-			poi.mThumbnailLoadingFailures = in.readInt();
-			return poi;
-		}
-
-		@Override
-		public POI[] newArray(int size) {
-			return new POI[size];
-		}
-	};
+//	@Override
+//	public void writeToParcel(Parcel out, int flags) {
+//		out.writeInt(serviceId);
+//		out.writeString(id);
+//		out.writeParcelable(location, 0);
+//		out.writeString(category);
+//		out.writeString(type);
+//		out.writeString(description);
+//		out.writeString(thumbnailPath);
+//		out.writeParcelable(thumbnail, 0);
+//		out.writeString(url);
+//		out.writeInt(rank);
+//		out.writeInt(mThumbnailLoadingFailures);
+//	}
+//
+//	public static final Parcelable.Creator<POI> CREATOR = new Parcelable.Creator<POI>() {
+//		@Override
+//		public POI createFromParcel(Parcel in) {
+//			POI poi = new POI(in.readInt());
+//			poi.id = in.readString();
+//			poi.location = in.readParcelable(GeoPoint.class.getClassLoader());
+//			poi.category = in.readString();
+//			poi.type = in.readString();
+//			poi.description = in.readString();
+//			poi.thumbnailPath = in.readString();
+//			poi.thumbnail = in.readParcelable(Bitmap.class.getClassLoader());
+//			poi.url = in.readString();
+//			poi.rank = in.readInt();
+//			poi.mThumbnailLoadingFailures = in.readInt();
+//			return poi;
+//		}
+//
+//		@Override
+//		public POI[] newArray(int size) {
+//			return new POI[size];
+//		}
+//	};
 
 	//	private POI(Parcel in) {
 	//		serviceId = in.readInt();

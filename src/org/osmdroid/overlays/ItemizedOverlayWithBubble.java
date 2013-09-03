@@ -2,6 +2,8 @@ package org.osmdroid.overlays;
 
 import java.util.List;
 
+import org.oscim.app.App;
+import org.oscim.backend.input.MotionEvent;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.PointD;
@@ -13,7 +15,6 @@ import org.osmdroid.utils.BonusPackHelper;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.MotionEvent;
 
 /**
  * An itemized overlay with an InfoWindow or "bubble" which opens when the user
@@ -87,7 +88,8 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 							"ItemizedOverlayWithBubble: layout/bonuspack_bubble not found in "
 									+ packageName);
 			}
-			mBubble = new DefaultInfoWindow(layoutResId, mapView);
+			// FIXME
+			mBubble = new DefaultInfoWindow(layoutResId, App.view);
 		}
 		mItemWithBubble = null;
 
@@ -121,7 +123,7 @@ public class ItemizedOverlayWithBubble<Item extends OverlayItem> extends Itemize
 
 			mMapView.getMapViewPosition().animateTo(eItem.mGeoPoint);
 
-			mMapView.redrawMap(true);
+			mMapView.updateMap(true);
 			setFocus((Item) eItem);
 		}
 	}

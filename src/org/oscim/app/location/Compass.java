@@ -187,9 +187,9 @@ public class Compass extends Layer implements SensorEventListener {
 				adjustArrow(mCurRotation, rotation);
 				mMapView.getMapViewPosition().setRotation(-rotation);
 				mMapView.getMapViewPosition().setTilt(-mCurTilt * 1.5f);
-				mMapView.redrawMap(true);
+				mMapView.updateMap(true);
 			} else if (mMapView.getMapViewPosition().setTilt(-mCurTilt * 1.5f)) {
-				mMapView.redrawMap(true);
+				mMapView.updateMap(true);
 			}
 		}
 		mCurRotation = rotation;

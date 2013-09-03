@@ -2,7 +2,7 @@ package org.osmdroid.overlays;
 
 // TODO composite view as texture overlay and only allow one bubble at a time.
 
-import org.oscim.view.MapView;
+import org.oscim.android.AndroidMapView;
 
 import android.content.Context;
 import android.view.Gravity;
@@ -39,7 +39,7 @@ public abstract class InfoWindow {
 	protected RelativeLayout mLayout;
 	private android.widget.RelativeLayout.LayoutParams mLayoutPos;
 
-	private MapView mMapView;
+	private AndroidMapView mMapView;
 
 	/**
 	 * @param layoutResId
@@ -47,7 +47,7 @@ public abstract class InfoWindow {
 	 * @param mapView
 	 *            the mapview on which is hooked the view
 	 */
-	public InfoWindow(int layoutResId, MapView mapView) {
+	public InfoWindow(int layoutResId, AndroidMapView mapView) {
 		ViewGroup parent = (ViewGroup) mapView.getParent();
 		Context context = mapView.getContext();
 		LayoutInflater inflater = (LayoutInflater) context
