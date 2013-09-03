@@ -66,6 +66,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	private MapLayers mMapLayers;
 
+	private DistanceTouchOverlay mDistanceTouch;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -79,9 +81,16 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		App.activity = this;
 
 		mMapLayers = new MapLayers();
-		mMapLayers.setBaseMap(PreferenceManager.getDefaultSharedPreferences(this));
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		mMapLayers.setBaseMap(prefs);
 
-		mMapView.getOverlays().add(new DistanceTouchOverlay(mMapView, this));
+		if (!prefs.contains("distanceTouch"))
+			prefs.edit().putBoolean("distanceTouch", true).apply();
+
+		if (prefs.getBoolean("distanceTouch", true)) {
+			mDistanceTouch = new DistanceTouchOverlay(mMapView, this);
+			mMapView.getOverlays().add(mDistanceTouch);
+		}
 
 		mCompass = new Compass(this, mMapView);
 		mMapView.getOverlays().add(mCompass);
@@ -409,6 +418,17 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			// getWindow().getWindowManager().getDefaultDisplay().getOrientation());
 		}
 
+		boolean distanceTouch = preferences.getBoolean("distanceTouch", true);
+		if (distanceTouch) {
+			if (mDistanceTouch == null){
+				mDistanceTouch = new DistanceTouchOverlay(mMapView, this);
+				mMapView.getOverlays().add(mDistanceTouch);
+			}
+		} else {
+			mMapView.getOverlays().remove(mDistanceTouch);
+			mDistanceTouch = null;
+		}
+
 		// try {
 		// String textScaleDefault =
 		// getString(R.string.preferences_text_scale_default);
@@ -574,6 +594,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 	@Override
 	public boolean longPressHelper(final GeoPoint p1, final GeoPoint p2) {
+		((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(50);
+		showToastOnUiThread("Distance Touch!");
 		App.routeSearch.showRoute(p1, p2);
 		return true;
 	}
