@@ -1,6 +1,7 @@
 package org.oscim.app;
 
 import org.oscim.cache.CacheFileManager;
+import org.oscim.layers.Layer;
 import org.oscim.layers.overlay.GenericOverlay;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.bitmap.MapQuestAerial;
@@ -34,67 +35,76 @@ public class MapLayers {
 	private GenericOverlay mGridOverlay;
 	private boolean mGridEnabled;
 
-	private int mBackgroundId = -1;
+	// FIXME -> implement LayerGroup
+	private int mBackgroundId = -2;
+	private Layer mBackroundPlaceholder;
+	private Layer mBackgroundLayer;
+
+	public MapLayers() {
+		mBackroundPlaceholder = new Layer(null) {
+		};
+		setBackgroundMap(-1);
+	}
 
 	void setBaseMap(SharedPreferences preferences) {
 		TileSources tileSourceNew;
 		String dbname = preferences.getString("mapDatabase",
-				TileSources.OPENSCIENCEMAP2.name());
+				TileSources.OPENSCIENCEMAP4.name());
 
 		try {
 			tileSourceNew = TileSources.valueOf(dbname);
 		} catch (IllegalArgumentException e) {
-			App.activity.showToastOnUiThread("invalid db: " + dbname);
-			tileSourceNew = TileSources.OPENSCIENCEMAP2;
+			tileSourceNew = TileSources.OPENSCIENCEMAP4;
 		}
 
-		if (tileSourceNew != mMapDatabase) {
-			Log.d(TAG, "set tile source " + tileSourceNew);
+		if (tileSourceNew == mMapDatabase)
+			return;
 
-			TileSource tileSource = null;
+		Log.d(TAG, "set tile source " + tileSourceNew);
 
-			switch (tileSourceNew) {
-			case OPENSCIENCEMAP1:
-				tileSource = new OSciMap1TileSource();
-				tileSource.setOption("url", "http://city.informatik.uni-bremen.de/osmstache/test");
-				break;
-			case OPENSCIENCEMAP2:
-				tileSource = new OSciMap2TileSource();
-				tileSource.setOption("url", "http://city.informatik.uni-bremen.de/osci/map-live");
-				break;
-			case OPENSCIENCEMAP4:
-				tileSource = new OSciMap4TileSource();
-				tileSource.setOption("url", "http://city.informatik.uni-bremen.de/tiles/vtm");
-				break;
-			case MAPSFORGE:
-				tileSource = new MapFileTileSource();
-				tileSource.setOption("file", "/storage/sdcard0/germany.map");
-				break;
-			case MAPNIK_VECTOR:
-				tileSource = new MapnikVectorTileSource();
-				tileSource.setOption("url", "http://d1s11ojcu7opje.cloudfront.net/dev/764e0b8d");
-				break;
+		TileSource tileSource = null;
 
-			default:
-				break;
-			}
+		switch (tileSourceNew) {
+		case OPENSCIENCEMAP1:
+			tileSource = new OSciMap1TileSource();
+			tileSource.setOption("url", "http://city.informatik.uni-bremen.de/osmstache/test");
+			break;
+		case OPENSCIENCEMAP2:
+			tileSource = new OSciMap2TileSource();
+			tileSource.setOption("url", "http://city.informatik.uni-bremen.de/osci/map-live");
+			break;
+		case OPENSCIENCEMAP4:
+			tileSource = new OSciMap4TileSource();
+			tileSource.setOption("url", "http://city.informatik.uni-bremen.de/tiles/vtm");
+			break;
+		case MAPSFORGE:
+			tileSource = new MapFileTileSource();
+			tileSource.setOption("file", "/storage/sdcard0/germany.map");
+			break;
+		case MAPNIK_VECTOR:
+			tileSource = new MapnikVectorTileSource();
+			tileSource.setOption("url", "http://d1s11ojcu7opje.cloudfront.net/dev/764e0b8d");
+			break;
 
-			if (tileSource instanceof UrlTileSource) {
-				mCache = new CacheFileManager(App.activity);
-				mCache.setStoragePath(CACHE_DIRECTORY + dbname);
-				mCache.setCacheSize(512 * (1 << 10));
-				tileSource.setCache(mCache);
-			} else {
-				mCache = null;
-			}
-
-			if (mBaseLayer == null) {
-				mBaseLayer = App.map.setBaseMap(tileSource);
-			} else
-				mBaseLayer.setTileSource(tileSource);
-
-			mMapDatabase = tileSourceNew;
+		default:
+			break;
 		}
+
+		if (tileSource instanceof UrlTileSource) {
+			mCache = new CacheFileManager(App.activity);
+			mCache.setStoragePath(CACHE_DIRECTORY + dbname);
+			mCache.setCacheSize(512 * (1 << 10));
+			tileSource.setCache(mCache);
+		} else {
+			mCache = null;
+		}
+
+		if (mBaseLayer == null) {
+			mBaseLayer = App.map.setBaseMap(tileSource);
+		} else
+			mBaseLayer.setTileSource(tileSource);
+
+		mMapDatabase = tileSourceNew;
 	}
 
 	void setPreferences(SharedPreferences preferences) {
@@ -145,8 +155,6 @@ public class MapLayers {
 		return mGridEnabled;
 	}
 
-	BitmapTileLayer mBackgroundLayer;
-
 	void setBackgroundMap(int id) {
 		if (id == mBackgroundId)
 			return;
@@ -163,10 +171,14 @@ public class MapLayers {
 			mBackgroundLayer = new BitmapTileLayer(App.map, NaturalEarth.INSTANCE);
 			break;
 		default:
+			mBackgroundLayer = mBackroundPlaceholder;
 			id = -1;
 		}
-		if (mBackgroundLayer != null)
-			App.map.setBackgroundMap(mBackgroundLayer);
+
+		if (mBackgroundLayer instanceof BitmapTileLayer)
+			App.map.setBackgroundMap((BitmapTileLayer) mBackgroundLayer);
+		else
+			App.map.getLayerManager().add(0, mBackroundPlaceholder);
 
 		mBackgroundId = id;
 	}

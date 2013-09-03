@@ -58,16 +58,19 @@ public class LocationOverlay extends Overlay {
 
 	@Override
 	public void setEnabled(boolean enabled) {
+		if (enabled == isEnabled())
+			return;
+
 		super.setEnabled(enabled);
 
 		if (!enabled)
 			((LocationIndicator) mLayer).animate(false);
-		mCompass.setEnabled(true);
+
+		mCompass.setEnabled(enabled);
 	}
 
 	@Override
 	public void onUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
-		mCompass.setEnabled(mapPosition.zoomLevel >= SHOW_ACCURACY_ZOOM);
 	}
 
 	public class LocationIndicator extends RenderLayer {

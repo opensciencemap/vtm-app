@@ -37,6 +37,17 @@
             android:title="@string/preferences_text_scale" />
         -->
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/preferences_theme_title" >
+        <ListPreference
+            android:defaultValue="@string/preferences_map_theme_default"
+            android:entries="@array/preferences_map_theme_values"
+            android:entryValues="@array/preferences_map_theme_keys"
+            android:key="theme"
+            android:summary="@string/preferences_theme_summary"
+            android:title="@string/preferences_theme" />
+    </PreferenceCategory>
+
+
     <PreferenceCategory android:title="Cache settings" >
         <org.oscim.app.preferences.CacheSizePreference
             android:defaultValue="30"
@@ -48,15 +59,7 @@
             oscim_app:unitsLeft=""
             oscim_app:unitsRight="MB" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/preferences_theme_title" >
-        <ListPreference
-            android:defaultValue="@string/preferences_map_theme_default"
-            android:entries="@array/preferences_map_theme_values"
-            android:entryValues="@array/preferences_map_theme_keys"
-            android:key="theme"
-            android:summary="@string/preferences_theme_summary"
-            android:title="@string/preferences_theme" />
-    </PreferenceCategory>
+
     <!--
     <PreferenceCategory android:title="@string/preferences_general" >
         <CheckBoxPreference

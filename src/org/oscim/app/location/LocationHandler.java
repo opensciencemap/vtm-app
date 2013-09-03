@@ -33,14 +33,19 @@ import android.util.Log;
 public class LocationHandler implements LocationListener {
 	private final static String TAG = LocationHandler.class.getName();
 
+	public enum Mode {
+		OFF,
+		SHOW,
+		SNAP,
+	}
+
 	private final static int DIALOG_LOCATION_PROVIDER_DISABLED = 2;
 	private final static int SHOW_LOCATION_ZOOM = 14;
 
 	private final LocationManager mLocationManager;
 	private final LocationOverlay mLocationOverlay;
 
-	private boolean mShowMyLocation;
-	private boolean mSnapToLocation;
+	private Mode mMode = Mode.OFF;
 
 	private boolean mSetCenter;
 
@@ -51,11 +56,47 @@ public class LocationHandler implements LocationListener {
 		mLocationOverlay = new LocationOverlay(App.map, compass);
 	}
 
-	@SuppressWarnings("deprecation")
-	public boolean enableShowMyLocation(boolean centerAtFirstFix) {
-
-		if (mShowMyLocation)
+	public boolean setMode(Mode mode) {
+		if (mode == mMode)
 			return true;
+
+		if (mode == Mode.OFF) {
+			disableShowMyLocation();
+
+			if (mMode == Mode.SNAP)
+				App.map.getEventLayer().enableMove(true);
+		}
+
+		if (mMode == Mode.OFF) {
+			if (!enableShowMyLocation())
+				return false;
+		}
+
+		if (mode == Mode.SNAP) {
+			App.map.getEventLayer().enableMove(false);
+			gotoLastKnownPosition();
+		} else {
+			App.map.getEventLayer().enableMove(true);
+		}
+
+		// FIXME?
+		mSetCenter = false;
+
+		mMode = mode;
+
+		return true;
+	}
+
+	public Mode getMode() {
+		return mMode;
+	}
+
+	public boolean isFirstCenter() {
+		return mSetCenter;
+	}
+
+	@SuppressWarnings("deprecation")
+	private boolean enableShowMyLocation() {
 
 		Criteria criteria = new Criteria();
 		criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -65,9 +106,6 @@ public class LocationHandler implements LocationListener {
 			App.activity.showDialog(DIALOG_LOCATION_PROVIDER_DISABLED);
 			return false;
 		}
-
-		mShowMyLocation = true;
-		mSetCenter = centerAtFirstFix;
 
 		mLocationManager.requestLocationUpdates(bestProvider, 10000, 10, this);
 
@@ -80,7 +118,8 @@ public class LocationHandler implements LocationListener {
 				location.getLongitude(),
 				location.getAccuracy());
 
-		App.map.getOverlays().add(2, mLocationOverlay);
+		// FIXME -> implement LayerGroup
+		App.map.getOverlays().add(4, mLocationOverlay);
 
 		App.map.redrawMap(true);
 		return true;
@@ -89,13 +128,7 @@ public class LocationHandler implements LocationListener {
 	/**
 	 * Disable "show my location" mode.
 	 */
-	public boolean disableShowMyLocation() {
-		if (!mShowMyLocation)
-			return false;
-
-		mShowMyLocation = false;
-
-		disableSnapToLocation();
+	private boolean disableShowMyLocation() {
 
 		mLocationManager.removeUpdates(this);
 		mLocationOverlay.setEnabled(false);
@@ -144,43 +177,11 @@ public class LocationHandler implements LocationListener {
 		return location;
 	}
 
-	public boolean isShowMyLocationEnabled() {
-		return mShowMyLocation;
-	}
-
-	public boolean isSnapToLocationEnabled() {
-		return mSnapToLocation;
-	}
-
-	public void disableSnapToLocation() {
-		if (mSnapToLocation) {
-			mSnapToLocation = false;
-
-			App.map.getEventLayer().enableMove(true);
-		}
-	}
-
-	public void enableSnapToLocation() {
-		if (!mSnapToLocation) {
-			mSnapToLocation = true;
-			App.map.getEventLayer().enableMove(false);
-			gotoLastKnownPosition();
-		}
-	}
-
-	boolean isFirstCenter() {
-		return mSetCenter;
-	}
-
-	void setFirstCenter(boolean center) {
-		mSetCenter = center;
-	}
-
 	/*** LocationListener ***/
 	@Override
 	public void onLocationChanged(Location location) {
 
-		if (!mShowMyLocation)
+		if (mMode == Mode.OFF)
 			return;
 
 		double lat = location.getLatitude();
@@ -188,7 +189,7 @@ public class LocationHandler implements LocationListener {
 
 		Log.d(TAG, "update location " + lat + ":" + lon);
 
-		if (mSetCenter || mSnapToLocation) {
+		if (mSetCenter || mMode == Mode.SNAP) {
 			mSetCenter = false;
 
 			GeoPoint point = new GeoPoint(lat, lon);
@@ -209,6 +210,10 @@ public class LocationHandler implements LocationListener {
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
+	}
+
+	public void setCenterOnFirstFix() {
+		mSetCenter = true;
 	}
 
 }
