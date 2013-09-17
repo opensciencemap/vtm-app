@@ -18,7 +18,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.oscim.core.Tile;
-import org.oscim.tilesource.ITileCache;
+import org.oscim.tiling.source.ITileCache;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

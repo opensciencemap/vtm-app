@@ -93,7 +93,7 @@ public abstract class InfoWindow {
 	 * @param offsetY
 	 *            ...
 	 */
-	public void open(ExtendedOverlayItem item, int offsetX, int offsetY) {
+	public void open(ExtendedMarkerItem item, int offsetX, int offsetY) {
 
 		onOpen(item);
 		close();
@@ -130,7 +130,7 @@ public abstract class InfoWindow {
 	}
 
 	// Abstract methods to implement:
-	public abstract void onOpen(ExtendedOverlayItem item);
+	public abstract void onOpen(ExtendedMarkerItem item);
 
 	public abstract void onClose();
 

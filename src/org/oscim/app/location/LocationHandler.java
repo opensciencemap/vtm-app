@@ -19,7 +19,6 @@ package org.oscim.app.location;
 import org.oscim.app.App;
 import org.oscim.app.R;
 import org.oscim.app.TileMap;
-import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 
 import android.content.Context;
@@ -192,8 +191,7 @@ public class LocationHandler implements LocationListener {
 		if (mSetCenter || mMode == Mode.SNAP) {
 			mSetCenter = false;
 
-			GeoPoint point = new GeoPoint(lat, lon);
-			App.map.setCenter(point);
+			App.map.setMapCenter(lat, lon);
 			App.map.updateMap(true);
 		}
 

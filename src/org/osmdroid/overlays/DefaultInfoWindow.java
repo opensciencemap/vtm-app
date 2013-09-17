@@ -55,7 +55,7 @@ public class DefaultInfoWindow extends InfoWindow {
 	}
 
 	@Override
-	public void onOpen(ExtendedOverlayItem item) {
+	public void onOpen(ExtendedMarkerItem item) {
 		String title = item.getTitle();
 		if (title == null)
 			title = "";

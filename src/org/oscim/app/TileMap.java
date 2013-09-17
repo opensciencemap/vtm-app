@@ -23,7 +23,6 @@ import org.oscim.app.location.LocationHandler;
 import org.oscim.app.preferences.EditPreferences;
 import org.oscim.core.GeoPoint;
 import org.oscim.overlay.DistanceTouchOverlay;
-import org.oscim.view.DebugSettings;
 import org.osmdroid.location.POI;
 import org.osmdroid.overlays.MapEventsReceiver;
 
@@ -160,7 +159,8 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 		case R.id.menu_compass_2d:
 			if (!item.isChecked()) {
-				mMapView.getMapViewPosition().setTilt(0);
+				// FIXME
+				//mMapView.getMapViewPosition().setTilt(0);
 				mCompass.setMode(Compass.Mode.C2D);
 			} else {
 				mCompass.setMode(Compass.Mode.OFF);
@@ -295,9 +295,9 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 				POI poi = App.poiSearch.getPOIs().get(id);
 
 				if (poi.bbox != null)
-					mMap.getViewport().animateTo(poi.bbox);
+					mMap.getAnimator().animateTo(poi.bbox);
 				else
-					mMap.getViewport().animateTo(poi.location);
+					mMap.getAnimator().animateTo(poi.location);
 			}
 			break;
 		//case SELECT_RENDER_THEME_FILE:
@@ -422,7 +422,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 		boolean distanceTouch = preferences.getBoolean("distanceTouch", true);
 		if (distanceTouch) {
-			if (mDistanceTouch == null){
+			if (mDistanceTouch == null) {
 				mDistanceTouch = new DistanceTouchOverlay(mMap, this);
 				mMap.getLayers().add(mDistanceTouch);
 			}
@@ -444,24 +444,24 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		// mWakeLock.acquire();
 		// }
 
-		boolean drawTileFrames = preferences.getBoolean("drawTileFrames", false);
-		boolean drawTileCoordinates = preferences.getBoolean("drawTileCoordinates", false);
-		boolean disablePolygons = preferences.getBoolean("disablePolygons", false);
-		boolean drawUnmatchedWays = preferences.getBoolean("drawUnmatchedWays", false);
-		boolean debugLabels = preferences.getBoolean("debugLabels", false);
-
-		DebugSettings cur = mMap.getDebugSettings();
-		if (cur.disablePolygons != disablePolygons
-				|| cur.drawTileCoordinates != drawTileCoordinates
-				|| cur.drawTileFrames != drawTileFrames
-				|| cur.debugTheme != drawUnmatchedWays
-				|| cur.debugLabels != debugLabels) {
-
-			DebugSettings debugSettings = new DebugSettings(drawTileCoordinates,
-					drawTileFrames, disablePolygons, drawUnmatchedWays, debugLabels);
-
-			mMap.setDebugSettings(debugSettings);
-		}
+		//boolean drawTileFrames = preferences.getBoolean("drawTileFrames", false);
+		//boolean drawTileCoordinates = preferences.getBoolean("drawTileCoordinates", false);
+		//boolean disablePolygons = preferences.getBoolean("disablePolygons", false);
+		//boolean drawUnmatchedWays = preferences.getBoolean("drawUnmatchedWays", false);
+		//boolean debugLabels = preferences.getBoolean("debugLabels", false);
+		//
+		//DebugSettings cur = mMap.getDebugSettings();
+		//if (cur.disablePolygons != disablePolygons
+		//		|| cur.drawTileCoordinates != drawTileCoordinates
+		//		|| cur.drawTileFrames != drawTileFrames
+		//		|| cur.debugTheme != drawUnmatchedWays
+		//		|| cur.debugLabels != debugLabels) {
+		//
+		//	DebugSettings debugSettings = new DebugSettings(drawTileCoordinates,
+		//			drawTileFrames, disablePolygons, drawUnmatchedWays, debugLabels);
+		//
+		//	mMap.setDebugSettings(debugSettings);
+		//}
 
 		mMap.updateMap(true);
 	}
@@ -523,7 +523,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			mLocation.setMode(LocationHandler.Mode.SHOW);
 			mCompass.setMode(Compass.Mode.OFF);
 			App.activity.showToastOnUiThread(App.activity
-			.getString(R.string.menu_position_my_location_enable));
+					.getString(R.string.menu_position_my_location_enable));
 			break;
 
 		case SNAP_LOCATION:
@@ -534,7 +534,9 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			break;
 
 		case COMPASS_2D:
-			mMapView.getMapViewPosition().setTilt(0);
+			// FIXME
+			//mMapView.getMapViewPosition().setTilt(0);
+			
 			mLocation.setMode(LocationHandler.Mode.SHOW);
 			mCompass.setMode(Compass.Mode.C2D);
 			App.activity.showToastOnUiThread("Compass 2D");

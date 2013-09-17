@@ -19,33 +19,33 @@ package org.oscim.app.location;
 import org.oscim.core.Box;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
-import org.oscim.core.PointD;
+import org.oscim.core.Point;
 import org.oscim.core.Tile;
-import org.oscim.layers.overlay.Overlay;
-import org.oscim.renderer.GLRenderer;
-import org.oscim.renderer.GLRenderer.Matrices;
+import org.oscim.layers.Layer;
+import org.oscim.map.Map;
+import org.oscim.map.Viewport;
 import org.oscim.renderer.GLState;
-import org.oscim.renderer.RenderLayer;
+import org.oscim.renderer.LayerRenderer;
+import org.oscim.renderer.MapRenderer;
+import org.oscim.renderer.MapRenderer.Matrices;
 import org.oscim.utils.FastMath;
 import org.oscim.utils.GlUtils;
 import org.oscim.utils.Interpolation;
-import org.oscim.view.Map;
-import org.oscim.view.Viewport;
 
 import android.opengl.GLES20;
 import android.os.SystemClock;
 
-public class LocationOverlay extends Overlay {
+public class LocationOverlay extends Layer {
 	private final int SHOW_ACCURACY_ZOOM = 16;
 
-	private final PointD mLocation = new PointD();
+	private final Point mLocation = new Point();
 	private double mRadius;
 
 	private final Compass mCompass;
 
 	public LocationOverlay(Map map, Compass compass) {
 		super(map);
-		mLayer = new LocationIndicator(map);
+		mRenderer= new LocationIndicator(map);
 		mCompass = compass;
 	}
 
@@ -53,7 +53,7 @@ public class LocationOverlay extends Overlay {
 		mLocation.x = MercatorProjection.longitudeToX(longitude);
 		mLocation.y = MercatorProjection.latitudeToY(latitude);
 		mRadius = accuracy / MercatorProjection.calculateGroundResolution(latitude, 1);
-		((LocationIndicator) mLayer).animate(true);
+		((LocationIndicator) mRenderer).animate(true);
 	}
 
 	@Override
@@ -64,16 +64,12 @@ public class LocationOverlay extends Overlay {
 		super.setEnabled(enabled);
 
 		if (!enabled)
-			((LocationIndicator) mLayer).animate(false);
+			((LocationIndicator) mRenderer).animate(false);
 
 		mCompass.setEnabled(enabled);
 	}
 
-	@Override
-	public void onUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
-	}
-
-	public class LocationIndicator extends RenderLayer {
+	public class LocationIndicator extends LayerRenderer{
 		private int mShaderProgram;
 		private int hVertexPosition;
 		private int hMatrixPosition;
@@ -86,9 +82,9 @@ public class LocationOverlay extends Overlay {
 		private final static long ANIM_RATE = 50;
 		private final static long INTERVAL = 2000;
 
-		private final PointD mIndicatorPosition = new PointD();
+		private final Point mIndicatorPosition = new Point();
 
-		private final PointD mScreenPoint = new PointD();
+		private final Point mScreenPoint = new Point();
 		private final Box mBBox = new Box();
 
 		private boolean mInitialized;
@@ -129,7 +125,7 @@ public class LocationOverlay extends Overlay {
 		}
 
 		private float animPhase() {
-			return (float) ((GLRenderer.frametime - mAnimStart) % INTERVAL) / INTERVAL;
+			return (float) ((MapRenderer.frametime - mAnimStart) % INTERVAL) / INTERVAL;
 		}
 
 		@Override
@@ -141,14 +137,14 @@ public class LocationOverlay extends Overlay {
 			}
 
 			if (!isEnabled()) {
-				isReady = false;
+				setReady(false);
 				return;
 			}
 
-			if (!changed && isReady)
+			if (!changed && isReady())
 				return;
 
-			isReady = true;
+			setReady(true);
 
 			int width = mMap.getWidth();
 			int height = mMap.getHeight();
@@ -169,7 +165,7 @@ public class LocationOverlay extends Overlay {
 
 			// get position of Location in pixel relative to
 			// screen center
-			mapPosition.project(x, y, mScreenPoint);
+			mapPosition.toScreenPoint(x, y, mScreenPoint);
 
 			x = mScreenPoint.x + width / 2;
 			y = mScreenPoint.y + height / 2;
@@ -194,7 +190,7 @@ public class LocationOverlay extends Overlay {
 			mLocationIsVisible = (visible == 2);
 
 			// set location indicator position
-			mapPosition.fromScreenPixels(x, y, mIndicatorPosition);
+			mapPosition.fromScreenPoint(x, y, mIndicatorPosition);
 		}
 
 		@Override
@@ -210,7 +206,7 @@ public class LocationOverlay extends Overlay {
 
 			GLState.enableVertexArrays(hVertexPosition, -1);
 			GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,
-					GLRenderer.getQuadVertexVBO());
+					MapRenderer.getQuadVertexVBO());
 			GLES20.glVertexAttribPointer(hVertexPosition, 2,
 					GLES20.GL_FLOAT, false, 0, 0);
 

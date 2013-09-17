@@ -1,26 +1,25 @@
 package org.oscim.app;
 
 import org.oscim.cache.TileCache;
+import org.oscim.layers.GenericLayer;
 import org.oscim.layers.Layer;
-import org.oscim.layers.labeling.LabelLayer;
-import org.oscim.layers.overlay.BuildingOverlay;
-import org.oscim.layers.overlay.GenericOverlay;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.bitmap.MapQuestAerial;
 import org.oscim.layers.tile.bitmap.NaturalEarth;
-import org.oscim.layers.tile.vector.MapTileLayer;
-import org.oscim.renderer.layers.GridRenderLayer;
+import org.oscim.layers.tile.vector.BuildingLayer;
+import org.oscim.layers.tile.vector.VectorTileLayer;
+import org.oscim.layers.tile.vector.labeling.LabelLayer;
+import org.oscim.renderer.GridRenderer;
 import org.oscim.theme.InternalRenderTheme;
 import org.oscim.theme.ThemeLoader;
-import org.oscim.tilesource.ITileCache;
-import org.oscim.tilesource.TileSource;
-import org.oscim.tilesource.TileSources;
-import org.oscim.tilesource.common.UrlTileSource;
-import org.oscim.tilesource.mapfile.MapFileTileSource;
-import org.oscim.tilesource.mapnik.MapnikVectorTileSource;
-import org.oscim.tilesource.oscimap.OSciMap1TileSource;
-import org.oscim.tilesource.oscimap2.OSciMap2TileSource;
-import org.oscim.tilesource.oscimap4.OSciMap4TileSource;
+import org.oscim.tiling.source.ITileCache;
+import org.oscim.tiling.source.TileSource;
+import org.oscim.tiling.source.common.UrlTileSource;
+import org.oscim.tiling.source.mapfile.MapFileTileSource;
+import org.oscim.tiling.source.mapnik.MapnikVectorTileSource;
+import org.oscim.tiling.source.oscimap.OSciMap1TileSource;
+import org.oscim.tiling.source.oscimap2.OSciMap2TileSource;
+import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -31,11 +30,11 @@ public class MapLayers {
 
 	private static final String CACHE_DIRECTORY = "/Android/data/org.oscim.app/cache/";
 
-	private MapTileLayer mBaseLayer;
-	private TileSources mMapDatabase;
+	private VectorTileLayer mBaseLayer;
+	private String mMapDatabase;
 	private ITileCache mCache;
 
-	private GenericOverlay mGridOverlay;
+	private GenericLayer mGridOverlay;
 	private boolean mGridEnabled;
 
 	// FIXME -> implement LayerGroup
@@ -50,47 +49,31 @@ public class MapLayers {
 	}
 
 	void setBaseMap(SharedPreferences preferences) {
-		TileSources tileSourceNew;
-		String dbname = preferences.getString("mapDatabase",
-				TileSources.OPENSCIENCEMAP4.name());
+		String dbname = preferences.getString("mapDatabase", "OPENSCIENCEMAP4");
 
-		try {
-			tileSourceNew = TileSources.valueOf(dbname);
-		} catch (IllegalArgumentException e) {
-			tileSourceNew = TileSources.OPENSCIENCEMAP4;
-		}
-
-		if (tileSourceNew == mMapDatabase)
+		if (dbname == mMapDatabase)
 			return;
-
-		Log.d(TAG, "set tile source " + tileSourceNew);
-
+		
 		TileSource tileSource = null;
-
-		switch (tileSourceNew) {
-		case OPENSCIENCEMAP1:
+		
+		if ("OPENSCIENCEMAP1".equals(dbname)){
 			tileSource = new OSciMap1TileSource();
-			tileSource.setOption("url", "http://city.informatik.uni-bremen.de/osmstache/test");
-			break;
-		case OPENSCIENCEMAP2:
+			tileSource.setOption("url", "http://opensciencemap.org/osmstache/test");
+		} else if ("OPENSCIENCEMAP2".equals(dbname)) {
 			tileSource = new OSciMap2TileSource();
-			tileSource.setOption("url", "http://city.informatik.uni-bremen.de/osci/map-live");
-			break;
-		case OPENSCIENCEMAP4:
+			tileSource.setOption("url", "http://opensciencemap.org/osci/map-live");
+		} else if ("OPENSCIENCEMAP4".equals(dbname)) {
 			tileSource = new OSciMap4TileSource();
-			tileSource.setOption("url", "http://city.informatik.uni-bremen.de/tiles/vtm");
-			break;
-		case MAPSFORGE:
+			tileSource.setOption("url", "http://opensciencemap.org/tiles/vtm");
+		} else if ("MAPSFORGE".equals(dbname)) {
 			tileSource = new MapFileTileSource();
 			tileSource.setOption("file", "/storage/sdcard0/germany.map");
-			break;
-		case MAPNIK_VECTOR:
+		} else if ("MAPNIK_VECTOR".equals(dbname)) {
 			tileSource = new MapnikVectorTileSource();
 			tileSource.setOption("url", "http://d1s11ojcu7opje.cloudfront.net/dev/764e0b8d");
-			break;
-
-		default:
-			break;
+		} else {
+			Log.d(TAG, "no matching tilesource for: " + dbname);
+			return;
 		}
 
 		if (tileSource instanceof UrlTileSource) {
@@ -104,12 +87,12 @@ public class MapLayers {
 		if (mBaseLayer == null) {
 			mBaseLayer = App.map.setBaseMap(tileSource);
 			App.map.getLayers().add(2,
-					new BuildingOverlay(App.map, mBaseLayer.getTileLayer()));
+					new BuildingLayer(App.map, mBaseLayer.getTileLayer()));
 			App.map.getLayers().add(3, new LabelLayer(App.map, mBaseLayer.getTileLayer()));
 		} else
 			mBaseLayer.setTileSource(tileSource);
 
-		mMapDatabase = tileSourceNew;
+		mMapDatabase = dbname;
 	}
 
 	void setPreferences(SharedPreferences preferences) {
@@ -143,7 +126,7 @@ public class MapLayers {
 
 		if (enable) {
 			if (mGridOverlay == null)
-				mGridOverlay = new GenericOverlay(App.map, new GridRenderLayer());
+				mGridOverlay = new GenericLayer(App.map, new GridRenderer());
 
 			App.map.getLayers().add(mGridOverlay);
 		} else {

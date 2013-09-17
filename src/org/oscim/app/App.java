@@ -15,7 +15,7 @@
 package org.oscim.app;
 
 import org.oscim.android.MapView;
-import org.oscim.view.Map;
+import org.oscim.map.Map;
 
 import android.app.Application;
 import android.content.res.Resources;
@@ -31,15 +31,6 @@ public class App extends Application {
 
 	public static POISearch poiSearch;
 	public static RouteSearch routeSearch;
-
-
-	// TODO
-//	public final static int LAYER_EVENT = 0;
-//	public final static int LAYER_BACKGROUND = 1;
-//	public final static int LAYER_BASE = 2;
-//	public final static int LAYER_BUILDING = 3;
-//	public final static int LAYER_LABELS = 5;
-//	public final static int LAYER_LOCATION = 4;
 
 	@Override
 	public void onCreate() {

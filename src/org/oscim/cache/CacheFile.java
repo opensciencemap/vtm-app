@@ -22,14 +22,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.oscim.core.Tile;
-import org.oscim.tilesource.ITileCache;
 import org.oscim.utils.IOUtils;
+import org.oscim.tiling.source.ITileCache;
 
 /*
  * The class CacheFile implements the concrete cache unit for the cache operation.
  * It contains the FileOutputStream, and can write the binary tile data via the buffer
  * to the file.
- */
+ */ 
 public class CacheFile implements ITileCache.TileReader, ITileCache.TileWriter{
 	//private final static String TAG = CacheFile.class.getName();
 

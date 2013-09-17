@@ -1,8 +1,8 @@
 package org.osmdroid.overlays;
 
 import org.oscim.core.GeoPoint;
-import org.oscim.layers.overlay.OverlayItem;
-import org.oscim.view.Map;
+import org.oscim.layers.marker.MarkerItem;
+import org.oscim.map.Map;
 
 import android.graphics.drawable.Drawable;
 
@@ -19,7 +19,7 @@ import android.graphics.drawable.Drawable;
  * @see ItemizedOverlayWithBubble
  * @author M.Kergall
  */
-public class ExtendedOverlayItem extends OverlayItem {
+public class ExtendedMarkerItem extends MarkerItem {
 
 	// now, they are modifiable
 	private String mTitle, mDescription;
@@ -33,7 +33,7 @@ public class ExtendedOverlayItem extends OverlayItem {
 	private Object mRelatedObject; // reference to an object (of any kind)
 									// linked to this item.
 
-	public ExtendedOverlayItem(String aTitle, String aDescription, GeoPoint aGeoPoint) {
+	public ExtendedMarkerItem(String aTitle, String aDescription, GeoPoint aGeoPoint) {
 		super(aTitle, aDescription, aGeoPoint);
 		mTitle = aTitle;
 		mDescription = aDescription;

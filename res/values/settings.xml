@@ -21,13 +21,15 @@
     <string name="preferences_map_database_default">OSCIMAP_READER</string>
 
     <string-array name="preferences_map_theme_keys">
-        <item>OSMARENDER</item>
+        <item>DEFAULT</item>
         <item>TRONRENDER</item>
-       <!--  <item>MAPNIK</item> -->
+        <item>OSMARENDER</item>
+        <!--  <item>MAPNIK</item> -->
         </string-array>
     <string-array name="preferences_map_theme_values">
         <item>Default</item>
         <item>Tubes</item>
+        <item>Osmarender</item>
         <!-- <item>Mapnik</item> -->
         </string-array>
 

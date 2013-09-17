@@ -20,7 +20,7 @@ import org.oscim.app.App;
 import org.oscim.app.R;
 import org.oscim.core.MapPosition;
 import org.oscim.layers.Layer;
-import org.oscim.view.Map;
+import org.oscim.map.Map;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -32,7 +32,7 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 
 @SuppressWarnings("deprecation")
-public class Compass extends Layer implements SensorEventListener {
+public class Compass extends Layer implements SensorEventListener, Map.UpdateListener {
 
 	//private static final String TAG = Compass.class.getName();
 
@@ -62,12 +62,11 @@ public class Compass extends Layer implements SensorEventListener {
 	private int mListeners;
 
 	@Override
-	public void onUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
+	public void onMapUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
 		if (!mControlOrientation) {
 			float rotation = -mapPosition.angle;
 			adjustArrow(rotation, rotation);
 		}
-		super.onUpdate(mapPosition, changed, clear);
 	}
 
 	public Compass(Context context, Map map) {

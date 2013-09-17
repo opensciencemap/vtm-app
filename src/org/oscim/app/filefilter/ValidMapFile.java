@@ -16,8 +16,8 @@ package org.oscim.app.filefilter;
 
 import java.io.File;
 
-import org.oscim.tilesource.TileSource.OpenResult;
-import org.oscim.tilesource.mapfile.MapFileTileSource;
+import org.oscim.tiling.source.TileSource.OpenResult;
+import org.oscim.tiling.source.mapfile.MapFileTileSource;
 
 /**
  * Accepts all valid map files.

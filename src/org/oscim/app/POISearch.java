@@ -21,10 +21,10 @@ import java.util.List;
 import org.oscim.android.canvas.AndroidGraphics;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
-import org.oscim.layers.overlay.OverlayItem;
-import org.oscim.layers.overlay.OverlayItem.HotspotPlace;
-import org.oscim.layers.overlay.OverlayMarker;
-import org.oscim.view.Map;
+import org.oscim.layers.marker.MarkerItem;
+import org.oscim.layers.marker.MarkerItem.HotspotPlace;
+import org.oscim.layers.marker.MarkerSymbol;
+import org.oscim.map.Map;
 import org.osmdroid.location.FlickrPOIProvider;
 import org.osmdroid.location.FourSquareProvider;
 import org.osmdroid.location.GeoNamesPOIProvider;
@@ -32,7 +32,7 @@ import org.osmdroid.location.NominatimPOIProvider;
 import org.osmdroid.location.POI;
 import org.osmdroid.location.PicasaPOIProvider;
 import org.osmdroid.overlays.DefaultInfoWindow;
-import org.osmdroid.overlays.ExtendedOverlayItem;
+import org.osmdroid.overlays.ExtendedMarkerItem;
 import org.osmdroid.overlays.ItemizedOverlayWithBubble;
 
 import android.content.Intent;
@@ -46,8 +46,8 @@ import android.widget.Toast;
 
 public class POISearch {
 	private final ArrayList<POI> mPOIs;
-	ItemizedOverlayWithBubble<ExtendedOverlayItem> poiMarkers;
-	OverlayMarker[] mMarkers;
+	ItemizedOverlayWithBubble<ExtendedMarkerItem> poiMarkers;
+	MarkerSymbol[] mMarkers;
 
 	private final static int MDEFAULT = 0;
 	private final static int MFLICKR = 1;
@@ -58,14 +58,14 @@ public class POISearch {
 	POISearch() {
 		mPOIs = new ArrayList<POI>();
 		//POI markers:
-		final ArrayList<ExtendedOverlayItem> poiItems = new ArrayList<ExtendedOverlayItem>();
+		final ArrayList<ExtendedMarkerItem> poiItems = new ArrayList<ExtendedMarkerItem>();
 
-		poiMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map, App.activity, null,
+		poiMarkers = new ItemizedOverlayWithBubble<ExtendedMarkerItem>(App.map, App.activity, null,
 				poiItems, new POIInfoWindow(App.map));
 
 		App.map.getLayers().add(poiMarkers);
 
-		mMarkers = new OverlayMarker[5];
+		mMarkers = new MarkerSymbol[5];
 
 		mMarkers[MDEFAULT] = AndroidGraphics.makeMarker(
 				App.res, R.drawable.pin,
@@ -194,9 +194,9 @@ public class POISearch {
 				desc = poi.description;
 			}
 
-			ExtendedOverlayItem poiMarker = new ExtendedOverlayItem(
+			ExtendedMarkerItem poiMarker = new ExtendedMarkerItem(
 					poi.type + (name == null ? "" : ": " + name), desc, poi.location);
-			OverlayMarker marker = null;
+			MarkerSymbol marker = null;
 
 			if (poi.serviceId == POI.POI_SERVICE_NOMINATIM) {
 
@@ -217,7 +217,7 @@ public class POISearch {
 			}
 
 			poiMarker.setMarker(marker);
-			poiMarker.setMarkerHotspot(OverlayItem.HotspotPlace.CENTER);
+			poiMarker.setMarkerHotspot(MarkerItem.HotspotPlace.CENTER);
 			//thumbnail loading moved in POIInfoWindow.onOpen for better performances.
 			poiMarker.setRelatedObject(poi);
 			poiMarkers.addItem(poiMarker);
@@ -283,7 +283,7 @@ public class POISearch {
 		}
 
 		@Override
-		public void onOpen(ExtendedOverlayItem item) {
+		public void onOpen(ExtendedMarkerItem item) {
 			POI poi = (POI) item.getRelatedObject();
 
 			super.onOpen(item);

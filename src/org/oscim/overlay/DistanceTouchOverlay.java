@@ -19,14 +19,14 @@ package org.oscim.overlay;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.oscim.backend.input.MotionEvent;
 import org.oscim.core.GeoPoint;
-import org.oscim.layers.InputLayer;
-import org.oscim.view.Map;
+import org.oscim.event.MotionEvent;
+import org.oscim.layers.Layer;
+import org.oscim.map.Map;
 import org.osmdroid.overlays.MapEventsReceiver;
 
 
-public class DistanceTouchOverlay extends InputLayer {
+public class DistanceTouchOverlay extends Layer {
 	//private final static String TAG = DistanceTouchOverlay.class.getName();
 
 	private static final int LONGPRESS_THRESHOLD = 800;
@@ -39,6 +39,8 @@ public class DistanceTouchOverlay extends InputLayer {
 	private final static int POINTER_UP = -1;
 	private int mPointer1 = POINTER_UP;
 	private int mPointer2 = POINTER_UP;
+
+	private final MapEventsReceiver mReceiver;
 
 	/**
 	 * @param map
@@ -130,36 +132,34 @@ public class DistanceTouchOverlay extends InputLayer {
 //
 //		return false;
 //	}
-
-	private MapEventsReceiver mReceiver;
-
-	@Override
-	public boolean onLongPress(MotionEvent e) {
-		// dont forward long press when two fingers are down.
-		// maybe should be only done if our timer is still running.
-		// ... not sure if this is even needed
-		GeoPoint p = mMap.getViewport().fromScreenPixels(e.getX(), e.getY());
-		return mReceiver.longPressHelper(p);
-
-	}
-
-	public void runLongpressTimer() {
-		mLongpressTimer = new Timer();
-		mLongpressTimer.schedule(new TimerTask() {
-
-			@Override
-			public void run() {
-				final GeoPoint p1 = mMap.getViewport().fromScreenPixels(mCurX1, mCurY1);
-				final GeoPoint p2 = mMap.getViewport().fromScreenPixels(mCurX2, mCurY2);
-
-				mMap.post(new Runnable() {
-					@Override
-					public void run() {
-						mReceiver.longPressHelper(p1, p2);
-					}
-				});
-			}
-		}, LONGPRESS_THRESHOLD);
-	}
+//
+//	@Override
+//	public boolean onLongPress(MotionEvent e) {
+//		// dont forward long press when two fingers are down.
+//		// maybe should be only done if our timer is still running.
+//		// ... not sure if this is even needed
+//		GeoPoint p = mMap.getViewport().fromScreenPixels(e.getX(), e.getY());
+//		return mReceiver.longPressHelper(p);
+//
+//	}
+//
+//	public void runLongpressTimer() {
+//		mLongpressTimer = new Timer();
+//		mLongpressTimer.schedule(new TimerTask() {
+//
+//			@Override
+//			public void run() {
+//				final GeoPoint p1 = mMap.getViewport().fromScreenPixels(mCurX1, mCurY1);
+//				final GeoPoint p2 = mMap.getViewport().fromScreenPixels(mCurX2, mCurY2);
+//
+//				mMap.post(new Runnable() {
+//					@Override
+//					public void run() {
+//						mReceiver.longPressHelper(p1, p2);
+//					}
+//				});
+//			}
+//		}, LONGPRESS_THRESHOLD);
+//	}
 
 }

@@ -20,8 +20,8 @@ import org.oscim.app.R;
 import org.oscim.app.TileMap;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
-import org.oscim.view.Map;
-import org.oscim.view.Viewport;
+import org.oscim.map.Map;
+import org.oscim.map.Viewport;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -36,7 +36,8 @@ public class LocationDialog {
 
 	public void prepareDialog(Map map, final Dialog dialog) {
 		EditText editText = (EditText) dialog.findViewById(R.id.latitude);
-		GeoPoint mapCenter = map.getViewport().getMapCenter();
+		
+		GeoPoint mapCenter = map.getMapCenter();
 		editText.setText(Double.toString(mapCenter.getLatitude()));
 
 		editText = (EditText) dialog.findViewById(R.id.longitude);

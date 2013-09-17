@@ -22,12 +22,12 @@ import java.util.List;
 
 import org.oscim.android.canvas.AndroidGraphics;
 import org.oscim.core.GeoPoint;
-import org.oscim.layers.overlay.OverlayItem.HotspotPlace;
-import org.oscim.layers.overlay.OverlayMarker;
-import org.oscim.layers.overlay.PathOverlay;
+import org.oscim.layers.PathLayer;
+import org.oscim.layers.marker.MarkerItem.HotspotPlace;
+import org.oscim.layers.marker.MarkerSymbol;
 import org.osmdroid.location.GeocoderNominatim;
 import org.osmdroid.overlays.DefaultInfoWindow;
-import org.osmdroid.overlays.ExtendedOverlayItem;
+import org.osmdroid.overlays.ExtendedMarkerItem;
 import org.osmdroid.overlays.ItemizedOverlayWithBubble;
 import org.osmdroid.routing.Route;
 import org.osmdroid.routing.RouteProvider;
@@ -46,16 +46,16 @@ import android.widget.TextView;
 public class RouteSearch {
 	private static int START_INDEX = -2, DEST_INDEX = -1;
 
-	private final PathOverlay mRouteOverlay;
+	private final PathLayer mRouteOverlay;
 	//private final ItemizedOverlayWithBubble<ExtendedOverlayItem> mRouteMarkers;
-	private final ItemizedOverlayWithBubble<ExtendedOverlayItem> mItineraryMarkers;
+	private final ItemizedOverlayWithBubble<ExtendedMarkerItem> mItineraryMarkers;
 
 	private final RouteBar mRouteBar;
 
 	private GeoPoint mStartPoint, mDestinationPoint;
 	private final ArrayList<GeoPoint> mViaPoints;
 
-	private ExtendedOverlayItem markerStart, markerDestination;
+	private ExtendedMarkerItem markerStart, markerDestination;
 
 	private UpdateRouteTask mRouteTask;
 
@@ -63,9 +63,9 @@ public class RouteSearch {
 		mViaPoints = new ArrayList<GeoPoint>();
 
 		// Itinerary markers:
-		ArrayList<ExtendedOverlayItem> waypointsItems = new ArrayList<ExtendedOverlayItem>();
+		ArrayList<ExtendedMarkerItem> waypointsItems = new ArrayList<ExtendedMarkerItem>();
 
-		mItineraryMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map,
+		mItineraryMarkers = new ItemizedOverlayWithBubble<ExtendedMarkerItem>(App.map,
 				App.activity, null, waypointsItems,
 				new ViaPointInfoWindow(R.layout.itinerary_bubble));
 
@@ -76,7 +76,7 @@ public class RouteSearch {
 		//mRouteMarkers = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(App.map, App.activity,
 		//		null, routeItems);
 
-		mRouteOverlay = new PathOverlay(App.map, 0xAA0000FF, 3);
+		mRouteOverlay = new PathLayer(App.map, 0xAA0000FF, 3);
 
 		// TODO use LayerGroup
 		App.map.getLayers().add(mRouteOverlay);
@@ -138,11 +138,11 @@ public class RouteSearch {
 
 	// Async task to reverse-geocode the marker position in a separate thread:
 	class GeocodingTask extends AsyncTask<Object, Void, String> {
-		ExtendedOverlayItem marker;
+		ExtendedMarkerItem marker;
 
 		@Override
 		protected String doInBackground(Object... params) {
-			marker = (ExtendedOverlayItem) params[0];
+			marker = (ExtendedMarkerItem) params[0];
 			return getAddress(marker.getPoint());
 		}
 
@@ -153,17 +153,17 @@ public class RouteSearch {
 	}
 
 	/* add (or replace) an item in markerOverlays. p position. */
-	public ExtendedOverlayItem putMarkerItem(ExtendedOverlayItem item, GeoPoint p, int index,
+	public ExtendedMarkerItem putMarkerItem(ExtendedMarkerItem item, GeoPoint p, int index,
 			int titleResId, int markerResId, int iconResId) {
 
 		if (item != null)
 			mItineraryMarkers.removeItem(item);
 
-		OverlayMarker marker = AndroidGraphics.makeMarker(App.res, markerResId,
+		MarkerSymbol marker = AndroidGraphics.makeMarker(App.res, markerResId,
 				HotspotPlace.BOTTOM_CENTER);
 
-		ExtendedOverlayItem overlayItem =
-				new ExtendedOverlayItem(App.res.getString(titleResId), "", p);
+		ExtendedMarkerItem overlayItem =
+				new ExtendedMarkerItem(App.res.getString(titleResId), "", p);
 
 		overlayItem.setMarker(marker);
 
@@ -382,7 +382,7 @@ public class RouteSearch {
 		}
 
 		@Override
-		public void onOpen(ExtendedOverlayItem item) {
+		public void onOpen(ExtendedMarkerItem item) {
 			mSelectedPoint = ((Integer) item.getRelatedObject()).intValue();
 			super.onOpen(item);
 		}
