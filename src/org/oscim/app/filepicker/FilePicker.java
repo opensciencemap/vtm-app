@@ -72,6 +72,7 @@ public class FilePicker extends Activity implements AdapterView.OnItemClickListe
 	 * Sets the file comparator which is used to order the contents of all
 	 * directories before displaying them. If set to
 	 * null, subfolders and files will not be ordered.
+	 * 
 	 * @param fileComparator
 	 *            the file comparator (may be null).
 	 */
@@ -83,6 +84,7 @@ public class FilePicker extends Activity implements AdapterView.OnItemClickListe
 	 * Sets the file display filter. This filter is used to determine which
 	 * files and subfolders of directories will be
 	 * displayed. If set to null, all files and subfolders are shown.
+	 * 
 	 * @param fileDisplayFilter
 	 *            the file display filter (may be null).
 	 */
@@ -94,6 +96,7 @@ public class FilePicker extends Activity implements AdapterView.OnItemClickListe
 	 * Sets the file select filter. This filter is used when the user selects a
 	 * file to determine if it is valid. If set
 	 * to null, all files are considered as valid.
+	 * 
 	 * @param fileSelectFilter
 	 *            the file selection filter (may be null).
 	 */
@@ -103,6 +106,7 @@ public class FilePicker extends Activity implements AdapterView.OnItemClickListe
 
 	/**
 	 * Creates the default file comparator.
+	 * 
 	 * @return the default file comparator.
 	 */
 	private static Comparator<File> getDefaultFileComparator() {
@@ -135,7 +139,7 @@ public class FilePicker extends Activity implements AdapterView.OnItemClickListe
 			browseToCurrentDirectory();
 		} else if (fileSelectFilter == null || fileSelectFilter.accept(selectedFile)) {
 			setResult(RESULT_OK,
-					new Intent().putExtra(SELECTED_FILE, selectedFile.getAbsolutePath()));
+			          new Intent().putExtra(SELECTED_FILE, selectedFile.getAbsolutePath()));
 			finish();
 		} else {
 			showDialog(DIALOG_FILE_INVALID);
@@ -167,7 +171,7 @@ public class FilePicker extends Activity implements AdapterView.OnItemClickListe
 			this.filesWithParentFolder = new File[this.files.length + 1];
 			this.filesWithParentFolder[0] = this.currentDirectory.getParentFile();
 			System.arraycopy(this.files, 0, this.filesWithParentFolder, 1,
-					this.files.length);
+			                 this.files.length);
 			this.files = this.filesWithParentFolder;
 			this.filePickerIconAdapter.setFiles(this.files, true);
 		} else {
@@ -196,26 +200,26 @@ public class FilePicker extends Activity implements AdapterView.OnItemClickListe
 	protected Dialog onCreateDialog(int id) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		switch (id) {
-		case DIALOG_FILE_INVALID:
-			builder.setIcon(android.R.drawable.ic_menu_info_details);
-			builder.setTitle(R.string.error);
+			case DIALOG_FILE_INVALID:
+				builder.setIcon(android.R.drawable.ic_menu_info_details);
+				builder.setTitle(R.string.error);
 
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.append(getString(R.string.file_invalid));
-			stringBuilder.append("\n\n");
-			stringBuilder.append(FilePicker.fileSelectFilter.getFileOpenResult()
-					.getErrorMessage());
+				StringBuilder stringBuilder = new StringBuilder();
+				stringBuilder.append(getString(R.string.file_invalid));
+				stringBuilder.append("\n\n");
+				stringBuilder.append(FilePicker.fileSelectFilter.getFileOpenResult()
+				    .getErrorMessage());
 
-			builder.setMessage(stringBuilder.toString());
-			builder.setPositiveButton(R.string.ok, null);
-			return builder.create();
-			// case DIALOG_FILE_SELECT:
-			// builder.setMessage(R.string.file_select);
-			// builder.setPositiveButton(R.string.ok, null);
-			// return builder.create();
-		default:
-			// do dialog will be created
-			return null;
+				builder.setMessage(stringBuilder.toString());
+				builder.setPositiveButton(R.string.ok, null);
+				return builder.create();
+				// case DIALOG_FILE_SELECT:
+				// builder.setMessage(R.string.file_select);
+				// builder.setPositiveButton(R.string.ok, null);
+				// return builder.create();
+			default:
+				// do dialog will be created
+				return null;
 		}
 	}
 
@@ -250,9 +254,9 @@ public class FilePicker extends Activity implements AdapterView.OnItemClickListe
 
 		// restore the current directory
 		SharedPreferences preferences = getSharedPreferences(PREFERENCES_FILE,
-				MODE_PRIVATE);
+		                                                     MODE_PRIVATE);
 		this.currentDirectory = new File(preferences.getString(CURRENT_DIRECTORY,
-				DEFAULT_DIRECTORY));
+		                                                       DEFAULT_DIRECTORY));
 		if (!this.currentDirectory.exists() || !this.currentDirectory.canRead()) {
 			this.currentDirectory = new File(DEFAULT_DIRECTORY);
 		}

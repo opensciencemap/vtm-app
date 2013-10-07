@@ -10,6 +10,7 @@ import org.oscim.core.GeoPoint;
  * From:
  * http://www.phpriot.com/articles/reducing-map-path-douglas-peucker-algorithm/4<br>
  * Ported from PHP to Java. "marked" array added to optimize.
+ * 
  * @author M.Kergall
  */
 public class DouglasPeuckerReducer {
@@ -17,6 +18,7 @@ public class DouglasPeuckerReducer {
 	/**
 	 * Reduce the number of points in a shape using the Douglas-Peucker
 	 * algorithm
+	 * 
 	 * @param shape
 	 *            The shape to reduce
 	 * @param tolerance
@@ -25,7 +27,7 @@ public class DouglasPeuckerReducer {
 	 * @return the reduced shape
 	 */
 	public static List<GeoPoint> reduceWithTolerance(List<GeoPoint> shape,
-			double tolerance)
+	        double tolerance)
 	{
 		int n = shape.size();
 		// if a shape has 2 or less points it cannot be reduced
@@ -42,11 +44,11 @@ public class DouglasPeuckerReducer {
 		// the first and last points in the original shape are
 		// used as the entry point to the algorithm.
 		douglasPeuckerReduction(
-				shape, // original shape
-				marked, // reduced shape
-				tolerance, // tolerance
-				0, // index of first point
-				n - 1 // index of last point
+		                        shape, // original shape
+		                        marked, // reduced shape
+		                        tolerance, // tolerance
+		                        0, // index of first point
+		                        n - 1 // index of last point
 		);
 
 		// all done, return the reduced shape
@@ -61,6 +63,7 @@ public class DouglasPeuckerReducer {
 	/**
 	 * Reduce the points in shape between the specified first and last index.
 	 * Mark the points to keep in marked[]
+	 * 
 	 * @param shape
 	 *            The original shape
 	 * @param marked
@@ -75,7 +78,7 @@ public class DouglasPeuckerReducer {
 	 *            this line segment
 	 */
 	private static void douglasPeuckerReduction(List<GeoPoint> shape, boolean[] marked,
-			double tolerance, int firstIdx, int lastIdx)
+	        double tolerance, int firstIdx, int lastIdx)
 	{
 		if (lastIdx <= firstIdx + 1) {
 			// overlapping indexes, just return
@@ -119,6 +122,7 @@ public class DouglasPeuckerReducer {
 	/**
 	 * Calculate the orthogonal distance from the line joining the lineStart and
 	 * lineEnd points to point
+	 * 
 	 * @param point
 	 *            The point the distance is being calculated for
 	 * @param lineStart
@@ -130,20 +134,20 @@ public class DouglasPeuckerReducer {
 	public static double orthogonalDistance(GeoPoint point, GeoPoint lineStart, GeoPoint lineEnd)
 	{
 		double area = Math.abs(
-				(
-				1.0 * lineStart.latitudeE6 * lineEnd.longitudeE6
-						+ 1.0 * lineEnd.latitudeE6 * point.longitudeE6
-						+ 1.0 * point.latitudeE6 * lineStart.longitudeE6
-						- 1.0 * lineEnd.latitudeE6 * lineStart.longitudeE6
-						- 1.0 * point.latitudeE6 * lineEnd.longitudeE6
-						- 1.0 * lineStart.latitudeE6 * point.longitudeE6
-				) / 2.0
-				);
+		    (
+		    1.0 * lineStart.latitudeE6 * lineEnd.longitudeE6
+		            + 1.0 * lineEnd.latitudeE6 * point.longitudeE6
+		            + 1.0 * point.latitudeE6 * lineStart.longitudeE6
+		            - 1.0 * lineEnd.latitudeE6 * lineStart.longitudeE6
+		            - 1.0 * point.latitudeE6 * lineEnd.longitudeE6
+		            - 1.0 * lineStart.latitudeE6 * point.longitudeE6
+		    ) / 2.0
+		    );
 
 		double bottom = Math.hypot(
-				lineStart.latitudeE6 - lineEnd.latitudeE6,
-				lineStart.longitudeE6 - lineEnd.longitudeE6
-				);
+		                           lineStart.latitudeE6 - lineEnd.latitudeE6,
+		                           lineStart.longitudeE6 - lineEnd.longitudeE6
+		    );
 
 		return (area / bottom * 2.0);
 	}

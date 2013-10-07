@@ -29,15 +29,15 @@ import org.oscim.tiling.source.ITileCache;
  * The class CacheFile implements the concrete cache unit for the cache operation.
  * It contains the FileOutputStream, and can write the binary tile data via the buffer
  * to the file.
- */ 
-public class CacheFile implements ITileCache.TileReader, ITileCache.TileWriter{
+ */
+public class CacheFile implements ITileCache.TileReader, ITileCache.TileWriter {
 	//private final static String TAG = CacheFile.class.getName();
 
 	final File mFile;
 	final TileCache mCacheManager;
 	final Tile mTile;
 
-	CacheFile(TileCache cm, Tile t, File f){
+	CacheFile(TileCache cm, Tile t, File f) {
 		mCacheManager = cm;
 		mFile = f;
 		mTile = t;
@@ -47,12 +47,12 @@ public class CacheFile implements ITileCache.TileReader, ITileCache.TileWriter{
 
 	@Override
 	public OutputStream getOutputStream() {
-		if (mOutputStream == null){
-		try {
-			mOutputStream = new FileOutputStream(mFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		if (mOutputStream == null) {
+			try {
+				mOutputStream = new FileOutputStream(mFile);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 		return mOutputStream;
 	}
@@ -69,7 +69,7 @@ public class CacheFile implements ITileCache.TileReader, ITileCache.TileWriter{
 
 	@Override
 	public int getBytes() {
-		return (int)mFile.length();
+		return (int) mFile.length();
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class CacheFile implements ITileCache.TileReader, ITileCache.TileWriter{
 	public void complete(boolean success) {
 		IOUtils.closeQuietly(mOutputStream);
 
-		if (!success){
+		if (!success) {
 			mFile.delete();
 		}
 

@@ -18,7 +18,6 @@ package org.oscim.app.location;
 import org.oscim.app.App;
 import org.oscim.app.R;
 import org.oscim.app.TileMap;
-import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.map.Map;
 import org.oscim.map.Viewport;
@@ -36,8 +35,9 @@ public class LocationDialog {
 
 	public void prepareDialog(Map map, final Dialog dialog) {
 		EditText editText = (EditText) dialog.findViewById(R.id.latitude);
-		
-		GeoPoint mapCenter = map.getMapCenter();
+
+		MapPosition mapCenter = map.getMapPostion();
+
 		editText.setText(Double.toString(mapCenter.getLatitude()));
 
 		editText = (EditText) dialog.findViewById(R.id.longitude);
@@ -61,35 +61,36 @@ public class LocationDialog {
 		builder.setView(view);
 
 		builder.setPositiveButton(R.string.go_to_position,
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// disable GPS follow mode if it is enabled
-						//map.mLocation.disableSnapToLocation();
-						if (map.getLocationHandler().getMode() == LocationHandler.Mode.SNAP)
-							map.getLocationHandler().setMode(LocationHandler.Mode.SHOW);
+		                          new DialogInterface.OnClickListener() {
+			                          @Override
+			                          public void onClick(DialogInterface dialog, int which) {
+				                          // disable GPS follow mode if it is enabled
+				                          //map.mLocation.disableSnapToLocation();
+				                          if (map.getLocationHandler().getMode() == LocationHandler.Mode.SNAP)
+					                          map.getLocationHandler()
+					                              .setMode(LocationHandler.Mode.SHOW);
 
-						// set the map center and zoom level
-						EditText latitudeView = (EditText) view
-								.findViewById(R.id.latitude);
-						EditText longitudeView = (EditText) view
-								.findViewById(R.id.longitude);
-						double latitude = Double.parseDouble(latitudeView.getText()
-								.toString());
-						double longitude = Double.parseDouble(longitudeView.getText()
-								.toString());
+				                          // set the map center and zoom level
+				                          EditText latitudeView = (EditText) view
+				                              .findViewById(R.id.latitude);
+				                          EditText longitudeView = (EditText) view
+				                              .findViewById(R.id.longitude);
+				                          double latitude = Double.parseDouble(latitudeView.getText()
+				                              .toString());
+				                          double longitude = Double.parseDouble(longitudeView.getText()
+				                              .toString());
 
-						SeekBar zoomLevelView = (SeekBar) view
-								.findViewById(R.id.zoomLevel);
+				                          SeekBar zoomLevelView = (SeekBar) view
+				                              .findViewById(R.id.zoomLevel);
 
-						int zoom = zoomLevelView.getProgress();
+				                          int zoom = zoomLevelView.getProgress();
 
-						MapPosition mapPosition = new MapPosition();
-						mapPosition.setPosition(latitude, longitude);
-						mapPosition.setZoomLevel(zoom);
-						App.map.setMapPosition(mapPosition);
-					}
-				});
+				                          MapPosition mapPosition = new MapPosition();
+				                          mapPosition.setPosition(latitude, longitude);
+				                          mapPosition.setZoomLevel(zoom);
+				                          App.map.setMapPosition(mapPosition);
+			                          }
+		                          });
 		builder.setNegativeButton(R.string.cancel, null);
 		return builder.create();
 	}

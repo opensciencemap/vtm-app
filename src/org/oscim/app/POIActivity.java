@@ -48,6 +48,7 @@ import android.widget.TextView;
 
 /**
  * Activity showing POIs as a list.
+ * 
  * @author M.Kergall
  */
 
@@ -92,7 +93,8 @@ public class POIActivity extends Activity {
 		String[] poiTags = getResources().getStringArray(R.array.poi_tags);
 		poiTagText = (AutoCompleteTextView) findViewById(R.id.poiTag);
 		ArrayAdapter<String> textadapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_dropdown_item_1line, poiTags);
+		                                                            android.R.layout.simple_dropdown_item_1line,
+		                                                            poiTags);
 		poiTagText.setAdapter(textadapter);
 
 		//		Button setPOITagButton = (Button) findViewById(R.id.buttonSetPOITag);
@@ -143,7 +145,7 @@ public class POIActivity extends Activity {
 			public void onClick(View v) {
 				hideKeyboard();
 				App.poiSearch.getPOIAsync(POISearch.TAG_FOURSQUARE
-						+ poiTagText.getText().toString());
+				        + poiTagText.getText().toString());
 			}
 		});
 
@@ -155,7 +157,7 @@ public class POIActivity extends Activity {
 				@Override
 				public void run() {
 					InputMethodManager keyboard = (InputMethodManager)
-							getSystemService(Context.INPUT_METHOD_SERVICE);
+					        getSystemService(Context.INPUT_METHOD_SERVICE);
 					keyboard.showSoftInput(poiTagText, 0);
 				}
 			}, 200);
@@ -164,7 +166,7 @@ public class POIActivity extends Activity {
 
 	private void hideKeyboard() {
 		InputMethodManager imm = (InputMethodManager)
-				getSystemService(Context.INPUT_METHOD_SERVICE);
+		        getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(poiTagText.getWindowToken(), 0);
 	}
 
@@ -186,7 +188,7 @@ public class POIActivity extends Activity {
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
+	        ContextMenuInfo menuInfo) {
 		if (v.getId() == R.id.items) {
 			//AdapterView.AdapterContextMenuInfo info =
 			// (AdapterView.AdapterContextMenuInfo) menuInfo;
@@ -208,7 +210,7 @@ public class POIActivity extends Activity {
 		if (item.getItemId() == R.id.menu_link) {
 
 			AdapterView.AdapterContextMenuInfo info =
-					(AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+			        (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
 			POI poi = (POI) mAdapter.getItem(info.position);
 			if (poi == null || poi.url == null)
@@ -274,7 +276,7 @@ class POIAdapter extends BaseAdapter implements OnClickListener {
 		POI entry = (POI) getItem(position);
 		if (view == null) {
 			LayoutInflater inflater = (LayoutInflater) mContext
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			view = inflater.inflate(R.layout.item_layout, null);
 
 			ViewHolder holder = new ViewHolder();

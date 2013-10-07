@@ -53,10 +53,10 @@ public class MapLayers {
 
 		if (dbname == mMapDatabase)
 			return;
-		
+
 		TileSource tileSource = null;
-		
-		if ("OPENSCIENCEMAP1".equals(dbname)){
+
+		if ("OPENSCIENCEMAP1".equals(dbname)) {
 			tileSource = new OSciMap1TileSource();
 			tileSource.setOption("url", "http://opensciencemap.org/osmstache/test");
 		} else if ("OPENSCIENCEMAP2".equals(dbname)) {
@@ -87,7 +87,7 @@ public class MapLayers {
 		if (mBaseLayer == null) {
 			mBaseLayer = App.map.setBaseMap(tileSource);
 			App.map.getLayers().add(2,
-					new BuildingLayer(App.map, mBaseLayer.getTileLayer()));
+			                        new BuildingLayer(App.map, mBaseLayer.getTileLayer()));
 			App.map.getLayers().add(3, new LabelLayer(App.map, mBaseLayer.getTileLayer()));
 		} else
 			mBaseLayer.setTileSource(tileSource);
@@ -149,16 +149,16 @@ public class MapLayers {
 		mBackgroundLayer = null;
 
 		switch (id) {
-		case R.id.menu_layer_mapquest:
-			mBackgroundLayer = new BitmapTileLayer(App.map, MapQuestAerial.INSTANCE);
-			break;
+			case R.id.menu_layer_mapquest:
+				mBackgroundLayer = new BitmapTileLayer(App.map, MapQuestAerial.INSTANCE);
+				break;
 
-		case R.id.menu_layer_naturalearth:
-			mBackgroundLayer = new BitmapTileLayer(App.map, NaturalEarth.INSTANCE);
-			break;
-		default:
-			mBackgroundLayer = mBackroundPlaceholder;
-			id = -1;
+			case R.id.menu_layer_naturalearth:
+				mBackgroundLayer = new BitmapTileLayer(App.map, NaturalEarth.INSTANCE);
+				break;
+			default:
+				mBackgroundLayer = mBackroundPlaceholder;
+				id = -1;
 		}
 
 		if (mBackgroundLayer instanceof BitmapTileLayer)
@@ -173,7 +173,7 @@ public class MapLayers {
 		return mBackgroundId;
 	}
 
-	public void deleteCache(){
+	public void deleteCache() {
 		if (mCache != null)
 			mCache.setCacheSize(0);
 	}

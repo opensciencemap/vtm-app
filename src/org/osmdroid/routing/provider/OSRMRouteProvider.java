@@ -25,6 +25,7 @@ import android.util.Log;
  * It requests by default the OSRM demo site. Use setService() to request an
  * other (for instance your own) OSRM service. <br>
  * TODO: improve internationalization of instructions
+ * 
  * @author M.Kergall
  */
 public class OSRMRouteProvider extends RouteProvider {
@@ -158,6 +159,7 @@ public class OSRMRouteProvider extends RouteProvider {
 
 	/**
 	 * allows to request on an other site than OSRM demo site
+	 * 
 	 * @param serviceUrl
 	 *            ...
 	 */
@@ -168,6 +170,7 @@ public class OSRMRouteProvider extends RouteProvider {
 	/**
 	 * allows to send to OSRM service a user agent specific to the app, instead
 	 * of the default user agent of OSMBonusPack lib.
+	 * 
 	 * @param userAgent
 	 *            ...
 	 */
@@ -266,7 +269,7 @@ public class OSRMRouteProvider extends RouteProvider {
 	}
 
 	protected String buildInstructions(String direction, String routeName,
-			HashMap<String, String> directions) {
+	        HashMap<String, String> directions) {
 		if (directions == null)
 			return null;
 		direction = directions.get(direction);

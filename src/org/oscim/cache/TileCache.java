@@ -80,9 +80,9 @@ public class TileCache implements ITileCache {
 	@Override
 	public synchronized CacheFile writeTile(Tile tile) {
 		File f = new File(mCacheDir, String.format(CACHE_FILE,
-				Integer.valueOf(tile.zoomLevel),
-				Integer.valueOf(tile.tileX),
-				Integer.valueOf(tile.tileY)));
+		                                           Integer.valueOf(tile.zoomLevel),
+		                                           Integer.valueOf(tile.tileX),
+		                                           Integer.valueOf(tile.tileY)));
 
 		addTileHit(tile);
 		cacheCheck(tile);
@@ -106,9 +106,9 @@ public class TileCache implements ITileCache {
 	public synchronized ITileCache.TileReader getTile(Tile tile) {
 
 		File f = new File(mCacheDir, String.format(CACHE_FILE,
-				Integer.valueOf(tile.zoomLevel),
-				Integer.valueOf(tile.tileX),
-				Integer.valueOf(tile.tileY)));
+		                                           Integer.valueOf(tile.zoomLevel),
+		                                           Integer.valueOf(tile.tileX),
+		                                           Integer.valueOf(tile.tileY)));
 		if (f.exists() && f.length() > 0) {
 			return new CacheFile(this, tile, f);
 		}
@@ -176,7 +176,7 @@ public class TileCache implements ITileCache {
 		String state = Environment.getExternalStorageState();
 
 		String externalStorageDirectory = Environment.getExternalStorageDirectory()
-				.getAbsolutePath();
+		    .getAbsolutePath();
 
 		String cacheDirectoryPath = externalStorageDirectory + path;
 
@@ -238,9 +238,11 @@ public class TileCache implements ITileCache {
 		 *            3. exsited age.
 		 */
 		private void limitCache(Tile tile) {
-			/* 1.distance
+			/*
+			 * 1.distance
 			 * 2.haeufigkeit
-			 * 3.time */
+			 * 3.time
+			 */
 			ArrayList<String> safeTile = new ArrayList<String>();
 			int z = tile.zoomLevel;
 			int x = tile.tileX;
@@ -254,8 +256,10 @@ public class TileCache implements ITileCache {
 							xx = (int) (Math.pow(2, zz) - 1 + xx);
 						}
 						if (yy > 0) {
-							String safeTileFile = String.format(CACHE_FILE, Integer.valueOf(zz),
-									Integer.valueOf(xx), Integer.valueOf(yy));
+							String safeTileFile = String.format(CACHE_FILE,
+							                                    Integer.valueOf(zz),
+							                                    Integer.valueOf(xx),
+							                                    Integer.valueOf(yy));
 							safeTile.add(safeTileFile);
 						}
 					}
@@ -266,7 +270,7 @@ public class TileCache implements ITileCache {
 			/* get the middle haeufigkeit */
 			//Log.d("Cache", "middle is: " + datasource.getMiddleHits());
 			ArrayList<String> always = (ArrayList<String>) mTileStats
-					.getAllTileFileAboveHits(mTileStats.getMiddleHits());
+			    .getAllTileFileAboveHits(mTileStats.getMiddleHits());
 
 			//long limit = MAX_SIZE - 1024 * 1024;
 
@@ -326,7 +330,7 @@ public class TileCache implements ITileCache {
 			mCacheSize += size;
 			if (DEBUG)
 				Log.d(TAG, cacheFile.getTile() + " written: " + size + " / usage: "
-						+ (mCacheSize / 1024) + "kb");
+				        + (mCacheSize / 1024) + "kb");
 		} else {
 			Log.d(TAG, cacheFile.getTile() + " cache failed");
 

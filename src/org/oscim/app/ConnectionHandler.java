@@ -13,14 +13,14 @@ public class ConnectionHandler extends BroadcastReceiver
 	public void onReceive(Context context, Intent intent)
 	{
 		ConnectivityManager connectivityManager = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		    .getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
 		//	    NetworkInfo mobNetInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE );
 		if (activeNetInfo != null)
 		{
 			if (activeNetInfo.isConnected()) {
 				Toast.makeText(context, "Active Network Type : " + activeNetInfo.getTypeName(),
-						Toast.LENGTH_SHORT).show();
+				               Toast.LENGTH_SHORT).show();
 				//if (App.map != null)
 				//	App.map.redrawMap();
 			}

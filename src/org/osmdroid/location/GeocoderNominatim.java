@@ -20,6 +20,7 @@ import android.util.Log;
  * data and Nominatim API. <br>
  * See http://wiki.openstreetmap.org/wiki/Nominatim or
  * http://open.mapquestapi.com/nominatim/
+ * 
  * @author M.Kergall
  */
 public class GeocoderNominatim {
@@ -56,6 +57,7 @@ public class GeocoderNominatim {
 	 * Specify the url of the Nominatim service provider to use. Can be one of
 	 * the predefined (NOMINATIM_SERVICE_URL or MAPQUEST_SERVICE_URL), or
 	 * another one, your local instance of Nominatim for instance.
+	 * 
 	 * @param serviceUrl
 	 *            ...
 	 */
@@ -67,6 +69,7 @@ public class GeocoderNominatim {
 	 * Build an Android Address object from the Nominatim address in JSON
 	 * format. Current implementation is mainly targeting french addresses, and
 	 * will be quite basic on other countries.
+	 * 
 	 * @param jResult
 	 *            ...
 	 * @return ...
@@ -119,11 +122,13 @@ public class GeocoderNominatim {
 		if (jAddress.has("country_code"))
 			gAddress.setCountryCode(jAddress.getString("country_code"));
 
-		/* Other possible OSM tags in Nominatim results not handled yet: subway,
+		/*
+		 * Other possible OSM tags in Nominatim results not handled yet: subway,
 		 * golf_course, bus_stop, parking,... house, house_number, building
 		 * city_district (13e Arrondissement) road => or highway, ... sub-city
 		 * (like suburb) => locality, isolated_dwelling, hamlet ...
-		 * state_district */
+		 * state_district
+		 */
 
 		return gAddress;
 	}
@@ -140,14 +145,14 @@ public class GeocoderNominatim {
 	 *             ...
 	 */
 	public List<Address> getFromLocation(double latitude, double longitude, int maxResults)
-			throws IOException {
+	        throws IOException {
 		String url = mServiceUrl
-				+ "reverse?"
-				+ "format=json"
-				+ "&accept-language=" + mLocale.getLanguage()
-				//+ "&addressdetails=1"
-				+ "&lat=" + latitude
-				+ "&lon=" + longitude;
+		        + "reverse?"
+		        + "format=json"
+		        + "&accept-language=" + mLocale.getLanguage()
+		        //+ "&addressdetails=1"
+		        + "&lat=" + latitude
+		        + "&lon=" + longitude;
 		Log.d(BonusPackHelper.LOG_TAG, "GeocoderNominatim::getFromLocation:" + url);
 		String result = BonusPackHelper.requestStringFromUrl(url);
 		//Log.d("NOMINATIM", result);
@@ -165,23 +170,23 @@ public class GeocoderNominatim {
 	}
 
 	public List<Address> getFromLocationName(String locationName, int maxResults,
-			double lowerLeftLatitude, double lowerLeftLongitude,
-			double upperRightLatitude, double upperRightLongitude)
-			throws IOException {
+	        double lowerLeftLatitude, double lowerLeftLongitude,
+	        double upperRightLatitude, double upperRightLongitude)
+	        throws IOException {
 		String url = mServiceUrl
-				+ "search?"
-				+ "format=json"
-				+ "&accept-language=" + mLocale.getLanguage()
-				+ "&addressdetails=1"
-				+ "&limit=" + maxResults
-				+ "&q=" + URLEncoder.encode(locationName, "UTF-8");
+		        + "search?"
+		        + "format=json"
+		        + "&accept-language=" + mLocale.getLanguage()
+		        + "&addressdetails=1"
+		        + "&limit=" + maxResults
+		        + "&q=" + URLEncoder.encode(locationName, "UTF-8");
 		if (lowerLeftLatitude != 0.0 && lowerLeftLongitude != 0.0) {
 			//viewbox = left, top, right, bottom:
 			url += "&viewbox=" + lowerLeftLongitude
-					+ "," + upperRightLatitude
-					+ "," + upperRightLongitude
-					+ "," + lowerLeftLatitude
-					+ "&bounded=1";
+			        + "," + upperRightLatitude
+			        + "," + upperRightLongitude
+			        + "," + lowerLeftLatitude
+			        + "&bounded=1";
 		}
 		Log.d(BonusPackHelper.LOG_TAG, "GeocoderNominatim::getFromLocationName:" + url);
 		String result = BonusPackHelper.requestStringFromUrl(url);
@@ -203,7 +208,7 @@ public class GeocoderNominatim {
 	}
 
 	public List<Address> getFromLocationName(String locationName, int maxResults)
-			throws IOException {
+	        throws IOException {
 		return getFromLocationName(locationName, maxResults, 0.0, 0.0, 0.0, 0.0);
 	}
 

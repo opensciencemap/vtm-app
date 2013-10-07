@@ -25,6 +25,7 @@ import android.util.Log;
 /**
  * POI Provider using GeoNames services. Currently, "find Nearby Wikipedia" and
  * "Wikipedia Articles in Bounding Box" services.
+ * 
  * @see "http://www.geonames.org"
  * @author M.Kergall
  */
@@ -85,15 +86,17 @@ public class GeoNamesPOIProvider {
 				JSONObject jPlace = jPlaceIds.getJSONObject(i);
 				POI poi = new POI(POI.POI_SERVICE_GEONAMES_WIKIPEDIA);
 				poi.location = new GeoPoint(jPlace.getDouble("lat"),
-						jPlace.getDouble("lng"));
+				                            jPlace.getDouble("lng"));
 				poi.category = jPlace.optString("feature");
 				poi.type = jPlace.getString("title");
 				poi.description = jPlace.optString("summary");
 				poi.thumbnailPath = jPlace.optString("thumbnailImg", null);
-				/* This makes loading too long. Thumbnail loading will be done
+				/*
+				 * This makes loading too long. Thumbnail loading will be done
 				 * only when needed, with POI.getThumbnail() if
 				 * (poi.mThumbnailPath != null){ poi.mThumbnail =
-				 * BonusPackHelper.loadBitmap(poi.mThumbnailPath); } */
+				 * BonusPackHelper.loadBitmap(poi.mThumbnailPath); }
+				 */
 				poi.url = jPlace.optString("wikipediaUrl", null);
 				if (poi.url != null)
 					poi.url = "http://" + poi.url;
@@ -145,7 +148,7 @@ public class GeoNamesPOIProvider {
 	 *         technical issue.
 	 */
 	public ArrayList<POI> getPOICloseTo(GeoPoint position,
-			int maxResults, double maxDistance) {
+	        int maxResults, double maxDistance) {
 		String url = getUrlCloseTo(position, maxResults, maxDistance);
 		return getThem(url);
 	}
@@ -177,7 +180,7 @@ class GeoNamesXMLHandler extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String name,
-			Attributes attributes) {
+	        Attributes attributes) {
 		if (localName.equals("entry")) {
 			mPOI = new POI(POI.POI_SERVICE_GEONAMES_WIKIPEDIA);
 		}

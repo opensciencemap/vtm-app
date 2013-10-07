@@ -16,6 +16,7 @@ import android.graphics.drawable.Drawable;
  * issue on marker drawing<br>
  * - Bubble offset is at 0 when using the default marker => set the marker on
  * each item!<br>
+ * 
  * @see ItemizedOverlayWithBubble
  * @author M.Kergall
  */
@@ -31,7 +32,7 @@ public class ExtendedMarkerItem extends MarkerItem {
 	private String mSubDescription;
 	private Drawable mImage;
 	private Object mRelatedObject; // reference to an object (of any kind)
-									// linked to this item.
+	                               // linked to this item.
 
 	public ExtendedMarkerItem(String aTitle, String aDescription, GeoPoint aGeoPoint) {
 		super(aTitle, aDescription, aGeoPoint);
@@ -92,6 +93,7 @@ public class ExtendedMarkerItem extends MarkerItem {
 	 * image and sub-description if any.
 	 * </ul>
 	 * and centers the map on the item. <br>
+	 * 
 	 * @param bubble
 	 *            ...
 	 * @param map

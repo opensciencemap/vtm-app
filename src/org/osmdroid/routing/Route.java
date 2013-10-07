@@ -16,6 +16,7 @@ import android.util.Log;
 /**
  * describes the way to go from a position to an other. Normally returned by a
  * call to a Directions API (from MapQuest, GoogleMaps or other)
+ * 
  * @see MapQuestRouteProvider
  * @see GoogleRouteProvider
  * @see OSRMRouteProvider
@@ -73,6 +74,7 @@ public class Route {
 	 * default constructor when normal loading failed: the route shape only
 	 * contains the waypoints; All distances and times are at 0; there is no
 	 * node; status equals DEFAULT.
+	 * 
 	 * @param waypoints
 	 *            ...
 	 */
@@ -101,7 +103,7 @@ public class Route {
 			int n = routeHigh.size();
 			routeLow = DouglasPeuckerReducer.reduceWithTolerance(routeHigh, 1500.0);
 			Log.d(BonusPackHelper.LOG_TAG, "route reduced from " + n + " to " + routeLow.size()
-					+ " points");
+			        + " points");
 		}
 		return routeLow;
 	}
@@ -166,6 +168,7 @@ public class Route {
 	 * Note that MapQuest legs fit well with waypoints, as there is a
 	 * "dedicated" node for each waypoint. But OSRM legs are not precise, as
 	 * there is no node "dedicated" to waypoints.
+	 * 
 	 * @param waypoints
 	 *            ...
 	 */
@@ -200,43 +203,43 @@ public class Route {
 
 	// --- Parcelable implementation
 
-//	@Override
-//	public int describeContents() {
-//		return 0;
-//	}
-//
-//	@Override
-//	public void writeToParcel(Parcel out, int flags) {
-//		out.writeInt(status);
-//		out.writeDouble(length);
-//		out.writeDouble(duration);
-//		out.writeList(nodes);
-//		out.writeList(legs);
-//		out.writeList(routeHigh);
-//		out.writeParcelable(boundingBox, 0);
-//	}
-//
-//	public static final Parcelable.Creator<Route> CREATOR = new Parcelable.Creator<Route>() {
-//		@Override
-//		public Route createFromParcel(Parcel source) {
-//			return new Route(source);
-//		}
-//
-//		@Override
-//		public Route[] newArray(int size) {
-//			return new Route[size];
-//		}
-//	};
-//
-//	@SuppressWarnings("unchecked")
-//	private Route(Parcel in) {
-//		status = in.readInt();
-//		length = in.readDouble();
-//		duration = in.readDouble();
-//
-//		nodes = in.readArrayList(RouteNode.class.getClassLoader());
-//		legs = in.readArrayList(RouteLeg.class.getClassLoader());
-//		routeHigh = in.readArrayList(GeoPoint.class.getClassLoader());
-//		boundingBox = in.readParcelable(BoundingBox.class.getClassLoader());
-//	}
+	//	@Override
+	//	public int describeContents() {
+	//		return 0;
+	//	}
+	//
+	//	@Override
+	//	public void writeToParcel(Parcel out, int flags) {
+	//		out.writeInt(status);
+	//		out.writeDouble(length);
+	//		out.writeDouble(duration);
+	//		out.writeList(nodes);
+	//		out.writeList(legs);
+	//		out.writeList(routeHigh);
+	//		out.writeParcelable(boundingBox, 0);
+	//	}
+	//
+	//	public static final Parcelable.Creator<Route> CREATOR = new Parcelable.Creator<Route>() {
+	//		@Override
+	//		public Route createFromParcel(Parcel source) {
+	//			return new Route(source);
+	//		}
+	//
+	//		@Override
+	//		public Route[] newArray(int size) {
+	//			return new Route[size];
+	//		}
+	//	};
+	//
+	//	@SuppressWarnings("unchecked")
+	//	private Route(Parcel in) {
+	//		status = in.readInt();
+	//		length = in.readDouble();
+	//		duration = in.readDouble();
+	//
+	//		nodes = in.readArrayList(RouteNode.class.getClassLoader());
+	//		legs = in.readArrayList(RouteLeg.class.getClassLoader());
+	//		routeHigh = in.readArrayList(GeoPoint.class.getClassLoader());
+	//		boundingBox = in.readParcelable(BoundingBox.class.getClassLoader());
+	//	}
 }

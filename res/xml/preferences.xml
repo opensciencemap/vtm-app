@@ -20,7 +20,6 @@
   -->
 
 
-  <!--
              <ListPreference
             android:defaultValue="@string/preferences_map_database_default"
             android:entries="@array/preferences_map_generator_values"
@@ -28,7 +27,6 @@
             android:key="mapDatabase"
             android:summary="@string/preferences_map_view_mode_desc"
             android:title="@string/preferences_map_view_mode" />
-  -->
 
 
   <!--

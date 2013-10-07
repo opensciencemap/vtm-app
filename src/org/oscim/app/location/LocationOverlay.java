@@ -25,11 +25,11 @@ import org.oscim.layers.Layer;
 import org.oscim.map.Map;
 import org.oscim.map.Viewport;
 import org.oscim.renderer.GLState;
+import org.oscim.renderer.GLUtils;
 import org.oscim.renderer.LayerRenderer;
 import org.oscim.renderer.MapRenderer;
 import org.oscim.renderer.MapRenderer.Matrices;
 import org.oscim.utils.FastMath;
-import org.oscim.utils.GlUtils;
 import org.oscim.utils.Interpolation;
 
 import android.opengl.GLES20;
@@ -45,7 +45,7 @@ public class LocationOverlay extends Layer {
 
 	public LocationOverlay(Map map, Compass compass) {
 		super(map);
-		mRenderer= new LocationIndicator(map);
+		mRenderer = new LocationIndicator(map);
 		mCompass = compass;
 	}
 
@@ -69,7 +69,7 @@ public class LocationOverlay extends Layer {
 		mCompass.setEnabled(enabled);
 	}
 
-	public class LocationIndicator extends LayerRenderer{
+	public class LocationIndicator extends LayerRenderer {
 		private int mShaderProgram;
 		private int hVertexPosition;
 		private int hMatrixPosition;
@@ -194,10 +194,6 @@ public class LocationOverlay extends Layer {
 		}
 
 		@Override
-		public void compile() {
-		}
-
-		@Override
 		public void render(MapPosition pos, Matrices m) {
 
 			GLState.useProgram(mShaderProgram);
@@ -206,9 +202,9 @@ public class LocationOverlay extends Layer {
 
 			GLState.enableVertexArrays(hVertexPosition, -1);
 			GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,
-					MapRenderer.getQuadVertexVBO());
+			                    MapRenderer.getQuadVertexVBO());
 			GLES20.glVertexAttribPointer(hVertexPosition, 2,
-					GLES20.GL_FLOAT, false, 0, 0);
+			                             GLES20.GL_FLOAT, false, 0, 0);
 
 			float radius = CIRCLE_SIZE;
 
@@ -246,9 +242,9 @@ public class LocationOverlay extends Layer {
 			if (viewShed && mLocationIsVisible) {
 				float rotation = mCompass.getRotation() - 90;
 				GLES20.glUniform2f(hDirection,
-						(float) Math.cos(Math.toRadians(rotation)),
-						(float) Math.sin(Math.toRadians(rotation)));
-			} else{
+				                   (float) Math.cos(Math.toRadians(rotation)),
+				                   (float) Math.sin(Math.toRadians(rotation)));
+			} else {
 				GLES20.glUniform2f(hDirection, 0, 0);
 			}
 
@@ -256,7 +252,7 @@ public class LocationOverlay extends Layer {
 		}
 
 		private boolean init() {
-			int shader = GlUtils.createProgram(vShaderStr, fShaderStr);
+			int shader = GLUtils.createProgram(vShaderStr, fShaderStr);
 			if (shader == 0)
 				return false;
 
@@ -271,45 +267,45 @@ public class LocationOverlay extends Layer {
 		}
 
 		private final static String vShaderStr = ""
-				+ "precision mediump float;"
-				+ "uniform mat4 u_mvp;"
-				+ "uniform float u_phase;"
-				+ "uniform float u_scale;"
-				+ "attribute vec2 a_pos;"
-				+ "varying vec2 v_tex;"
-				+ "void main() {"
-				+ "  gl_Position = u_mvp * vec4(a_pos * u_scale * u_phase, 0.0, 1.0);"
-				+ "  v_tex = a_pos;"
-				+ "}";
+		        + "precision mediump float;"
+		        + "uniform mat4 u_mvp;"
+		        + "uniform float u_phase;"
+		        + "uniform float u_scale;"
+		        + "attribute vec2 a_pos;"
+		        + "varying vec2 v_tex;"
+		        + "void main() {"
+		        + "  gl_Position = u_mvp * vec4(a_pos * u_scale * u_phase, 0.0, 1.0);"
+		        + "  v_tex = a_pos;"
+		        + "}";
 
 		private final static String fShaderStr = ""
-				+ "precision mediump float;"
-				+ "varying vec2 v_tex;"
-				+ "uniform float u_scale;"
-				+ "uniform float u_phase;"
-				+ "uniform vec2 u_dir;"
+		        + "precision mediump float;"
+		        + "varying vec2 v_tex;"
+		        + "uniform float u_scale;"
+		        + "uniform float u_phase;"
+		        + "uniform vec2 u_dir;"
 
-				+ "void main() {"
-				+ "  float len = 1.0 - length(v_tex);"
-				+ "  if (u_dir.x == 0.0 && u_dir.y == 0.0){"
-				+ "  gl_FragColor = vec4(0.2, 0.2, 0.8, 1.0) * len;"
-				+ "  } else {"
-				///  outer ring
-				+ "  float a = smoothstep(0.0, 2.0 / u_scale, len);"
-				///  inner ring
-				+ "  float b = 0.5 * smoothstep(4.0 / u_scale, 5.0 / u_scale, len);"
-				///  center point
-				+ "  float c = 0.5 * (1.0 - smoothstep(14.0 / u_scale, 16.0 / u_scale, 1.0 - len));"
-				+ "  vec2 dir = normalize(v_tex);"
-				+ "  float d = 1.0 - dot(dir, u_dir); "
-				///  0.5 width of viewshed
-				+ "  d = clamp(step(0.5, d), 0.4, 0.7);"
-				///  - subtract inner from outer to create the outline
-				///  - multiply by viewshed
-				///  - add center point
-				+ "  a = d * (a - (b + c)) + c;"
-				+ "  gl_FragColor = vec4(0.2, 0.2, 0.8, 1.0) * a;"
-				+ "}}";
+		        + "void main() {"
+		        + "  float len = 1.0 - length(v_tex);"
+		        + "  if (u_dir.x == 0.0 && u_dir.y == 0.0){"
+		        + "  gl_FragColor = vec4(0.2, 0.2, 0.8, 1.0) * len;"
+		        + "  } else {"
+		        ///  outer ring
+		        + "  float a = smoothstep(0.0, 2.0 / u_scale, len);"
+		        ///  inner ring
+		        + "  float b = 0.5 * smoothstep(4.0 / u_scale, 5.0 / u_scale, len);"
+		        ///  center point
+		        + "  float c = 0.5 * (1.0 - smoothstep(14.0 / u_scale, 16.0 / u_scale, 1.0 - len));"
+		        + "  vec2 dir = normalize(v_tex);"
+		        + "  float d = 1.0 - dot(dir, u_dir); "
+		        ///  0.5 width of viewshed
+		        + "  d = clamp(step(0.5, d), 0.4, 0.7);"
+		        ///  - subtract inner from outer to create the outline
+		        ///  - multiply by viewshed
+		        ///  - add center point
+		        + "  a = d * (a - (b + c)) + c;"
+		        + "  gl_FragColor = vec4(0.2, 0.2, 0.8, 1.0) * a;"
+		        + "}}";
 
 		//private final static String fShaderStr = ""
 		//		+ "precision mediump float;"

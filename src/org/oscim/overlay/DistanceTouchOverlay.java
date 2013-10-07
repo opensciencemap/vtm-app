@@ -20,14 +20,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.oscim.core.GeoPoint;
+import org.oscim.event.EventListener;
+import org.oscim.event.MapEvent;
 import org.oscim.event.MotionEvent;
 import org.oscim.layers.Layer;
 import org.oscim.map.Map;
 import org.osmdroid.overlays.MapEventsReceiver;
 
+import android.util.Log;
 
-public class DistanceTouchOverlay extends Layer {
-	//private final static String TAG = DistanceTouchOverlay.class.getName();
+public class DistanceTouchOverlay extends Layer implements EventListener {
+	private final static String TAG = DistanceTouchOverlay.class.getName();
 
 	private static final int LONGPRESS_THRESHOLD = 800;
 
@@ -52,6 +55,13 @@ public class DistanceTouchOverlay extends Layer {
 	public DistanceTouchOverlay(Map map, MapEventsReceiver receiver) {
 		super(map);
 		mReceiver = receiver;
+		map.addListener(MotionEvent.TYPE, this);
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		mMap.removeListener(MotionEvent.TYPE, this);
 	}
 
 	private void cancel() {
@@ -62,104 +72,109 @@ public class DistanceTouchOverlay extends Layer {
 		}
 	}
 
-//	@Override
-//	public boolean onTouchEvent(MotionEvent e) {
-//
-//		int action = e.getActionMasked(); //(e.getAction() & e.getActionMasked());
-//		// lens overlay is not active, cancel timer
-//		if ((action == MotionEvent.ACTION_CANCEL)) {
-//			cancel();
-//			return false;
-//		}
-//
-//		if (mLongpressTimer != null) {
-//			// any pointer up while long press detection
-//			// cancels timer
-//			if (action == MotionEvent.ACTION_POINTER_UP ||
-//					action == MotionEvent.ACTION_UP) {
-//
-//				cancel();
-//				return false;
-//			}
-//
-//			// two fingers must still be down, tested
-//			// one above.
-//			if (action == MotionEvent.ACTION_MOVE) {
-//				// update pointer positions
-//				int idx1 = e.findPointerIndex(mPointer1);
-//				int idx2 = e.findPointerIndex(mPointer2);
-//
-//				mCurX1 = e.getX(idx1);
-//				mCurY1 = e.getY(idx1);
-//				mCurX2 = e.getX(idx2);
-//				mCurY2 = e.getY(idx2);
-//
-//				// cancel if moved one finger more than 50 pixel
-//				float maxSq = 10 * 10;
-//				float d = (mCurX1 - mPrevX1) * (mCurX1 - mPrevX1) +
-//						(mCurY1 - mPrevY1) * (mCurY1 - mPrevY1);
-//				if (d > maxSq) {
-//					cancel();
-//					return false;
-//				}
-//				d = (mCurX2 - mPrevX2) * (mCurX2 - mPrevX2) +
-//						(mCurY2 - mPrevY2) * (mCurY2 - mPrevY2);
-//				if (d > maxSq) {
-//					cancel();
-//					return false;
-//				}
-//			}
-//		}
-//
-//		if ((action == MotionEvent.ACTION_POINTER_DOWN)
-//				&& (e.getPointerCount() == 2)) {
-//
-//			// keep track of pointer ids, only
-//			// use these for gesture, ignoring
-//			// more than two pointer
-//			mPointer1 = e.getPointerId(0);
-//			mPointer2 = e.getPointerId(1);
-//
-//			if (mLongpressTimer == null) {
-//				// start timer, keep initial down position
-//				mCurX1 = mPrevX1 = e.getX(0);
-//				mCurY1 = mPrevY1 = e.getY(0);
-//				mCurX2 = mPrevX2 = e.getX(1);
-//				mCurY2 = mPrevY2 = e.getY(1);
-//				runLongpressTimer();
-//			}
-//		}
-//
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean onLongPress(MotionEvent e) {
-//		// dont forward long press when two fingers are down.
-//		// maybe should be only done if our timer is still running.
-//		// ... not sure if this is even needed
-//		GeoPoint p = mMap.getViewport().fromScreenPixels(e.getX(), e.getY());
-//		return mReceiver.longPressHelper(p);
-//
-//	}
-//
-//	public void runLongpressTimer() {
-//		mLongpressTimer = new Timer();
-//		mLongpressTimer.schedule(new TimerTask() {
-//
-//			@Override
-//			public void run() {
-//				final GeoPoint p1 = mMap.getViewport().fromScreenPixels(mCurX1, mCurY1);
-//				final GeoPoint p2 = mMap.getViewport().fromScreenPixels(mCurX2, mCurY2);
-//
-//				mMap.post(new Runnable() {
-//					@Override
-//					public void run() {
-//						mReceiver.longPressHelper(p1, p2);
-//					}
-//				});
-//			}
-//		}, LONGPRESS_THRESHOLD);
-//	}
+	@Override
+	public void handleEvent(MapEvent event) {
+		if (!(event instanceof MotionEvent))
+			return;
+
+		MotionEvent e = (MotionEvent) event;
+
+		int action = e.getAction() & MotionEvent.ACTION_MASK;
+
+		if ((action == MotionEvent.ACTION_CANCEL)) {
+			cancel();
+			return;
+		}
+
+		if (mLongpressTimer != null) {
+			// any pointer up while long press detection
+			// cancels timer
+			if (action == MotionEvent.ACTION_POINTER_UP ||
+			        action == MotionEvent.ACTION_UP) {
+
+				cancel();
+				return;
+			}
+
+			// two fingers must still be down, tested
+			// one above.
+			if (action == MotionEvent.ACTION_MOVE) {
+				// update pointer positions
+				//int idx1 = e.findPointerIndex(mPointer1);
+				//int idx2 = e.findPointerIndex(mPointer2);
+
+				mCurX1 = e.getX(0);
+				mCurY1 = e.getY(0);
+				mCurX2 = e.getX(1);
+				mCurY2 = e.getY(1);
+
+				// cancel if moved one finger more than 50 pixel
+				float maxSq = 10 * 10;
+				float d = (mCurX1 - mPrevX1) * (mCurX1 - mPrevX1) +
+				        (mCurY1 - mPrevY1) * (mCurY1 - mPrevY1);
+				if (d > maxSq) {
+					cancel();
+					return;
+				}
+				d = (mCurX2 - mPrevX2) * (mCurX2 - mPrevX2) +
+				        (mCurY2 - mPrevY2) * (mCurY2 - mPrevY2);
+				if (d > maxSq) {
+					cancel();
+					return;
+				}
+			}
+		}
+
+		if ((action == MotionEvent.ACTION_POINTER_DOWN)
+		        && (e.getPointerCount() == 2)) {
+			Log.d(TAG, "down");
+
+			// keep track of pointer ids, only
+			// use these for gesture, ignoring
+			// more than two pointer
+
+			//mPointer1 = e.getPointerId(0);
+			//mPointer2 = e.getPointerId(1);
+
+			if (mLongpressTimer == null) {
+				// start timer, keep initial down position
+				mCurX1 = mPrevX1 = e.getX(0);
+				mCurY1 = mPrevY1 = e.getY(0);
+				mCurX2 = mPrevX2 = e.getX(1);
+				mCurY2 = mPrevY2 = e.getY(1);
+				runLongpressTimer();
+			}
+		}
+	}
+
+	//	@Override
+	//	public boolean onLongPress(MotionEvent e) {
+	//		// dont forward long press when two fingers are down.
+	//		// maybe should be only done if our timer is still running.
+	//		// ... not sure if this is even needed
+	//		GeoPoint p = mMap.getViewport().fromScreenPoint(e.getX(), e.getY());
+	//		return mReceiver.longPressHelper(p);
+	//	}
+
+	public void runLongpressTimer() {
+		//mMap.postDelayed(action, delay);
+
+		mLongpressTimer = new Timer();
+		mLongpressTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				final GeoPoint p1 = mMap.getViewport().fromScreenPoint(mCurX1, mCurY1);
+				final GeoPoint p2 = mMap.getViewport().fromScreenPoint(mCurX2, mCurY2);
+
+				mMap.post(new Runnable() {
+					@Override
+					public void run() {
+						mReceiver.longPressHelper(p1, p2);
+					}
+				});
+			}
+		}, LONGPRESS_THRESHOLD);
+	}
 
 }

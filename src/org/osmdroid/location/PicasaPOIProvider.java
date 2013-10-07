@@ -22,6 +22,7 @@ import android.util.Log;
 
 /**
  * POI Provider using Picasa service.
+ * 
  * @see "https://developers.google.com/picasa-web/docs/2.0/reference"
  * @author M.Kergall
  */
@@ -70,7 +71,7 @@ public class PicasaPOIProvider implements POIProvider {
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 			parser.getXMLReader().setFeature("http://xml.org/sax/features/namespaces", false);
 			parser.getXMLReader()
-					.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
+			    .setFeature("http://xml.org/sax/features/namespace-prefixes", true);
 			parser.parse(stream, handler);
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
@@ -82,7 +83,7 @@ public class PicasaPOIProvider implements POIProvider {
 		connection.close();
 		if (handler.mPOIs != null)
 			Log.d(BonusPackHelper.LOG_TAG, "done:" + handler.mPOIs.size() + " got, on a total of:"
-					+ handler.mTotalResults);
+			        + handler.mTotalResults);
 		return handler.mPOIs;
 	}
 
@@ -117,7 +118,7 @@ class PicasaXMLHandler extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String qName,
-			Attributes attributes) {
+	        Attributes attributes) {
 		if (qName.equals("entry")) {
 			mPOI = new POI(POI.POI_SERVICE_PICASA);
 		} else if (qName.equals("media:thumbnail")) {

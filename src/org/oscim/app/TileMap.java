@@ -145,86 +145,86 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		switch (item.getItemId()) {
-		case R.id.menu_info_about:
-			startActivity(new Intent(this, InfoView.class));
-			break;
+			case R.id.menu_info_about:
+				startActivity(new Intent(this, InfoView.class));
+				break;
 
-		case R.id.menu_position:
-			break;
+			case R.id.menu_position:
+				break;
 
-		case R.id.menu_poi_nearby:
-			Intent intent = new Intent(this, POIActivity.class);
-			startActivityForResult(intent, TileMap.POIS_REQUEST);
-			break;
+			case R.id.menu_poi_nearby:
+				Intent intent = new Intent(this, POIActivity.class);
+				startActivityForResult(intent, TileMap.POIS_REQUEST);
+				break;
 
-		case R.id.menu_compass_2d:
-			if (!item.isChecked()) {
-				// FIXME
-				//mMapView.getMapViewPosition().setTilt(0);
-				mCompass.setMode(Compass.Mode.C2D);
-			} else {
-				mCompass.setMode(Compass.Mode.OFF);
-			}
-			break;
+			case R.id.menu_compass_2d:
+				if (!item.isChecked()) {
+					// FIXME
+					//mMapView.getMapViewPosition().setTilt(0);
+					mCompass.setMode(Compass.Mode.C2D);
+				} else {
+					mCompass.setMode(Compass.Mode.OFF);
+				}
+				break;
 
-		case R.id.menu_compass_3d:
-			if (!item.isChecked()) {
-				mCompass.setMode(Compass.Mode.C3D);
-			} else {
-				mCompass.setMode(Compass.Mode.OFF);
-			}
-			break;
+			case R.id.menu_compass_3d:
+				if (!item.isChecked()) {
+					mCompass.setMode(Compass.Mode.C3D);
+				} else {
+					mCompass.setMode(Compass.Mode.OFF);
+				}
+				break;
 
-		case R.id.menu_position_my_location_enable:
-			if (!item.isChecked()) {
-				mLocation.setMode(LocationHandler.Mode.SHOW);
-				mLocation.setCenterOnFirstFix();
-			} else {
-				mLocation.setMode(LocationHandler.Mode.OFF);
-			}
-			break;
+			case R.id.menu_position_my_location_enable:
+				if (!item.isChecked()) {
+					mLocation.setMode(LocationHandler.Mode.SHOW);
+					mLocation.setCenterOnFirstFix();
+				} else {
+					mLocation.setMode(LocationHandler.Mode.OFF);
+				}
+				break;
 
-		case R.id.menu_position_follow_location:
-			if (!item.isChecked()) {
-				mLocation.setMode(LocationHandler.Mode.SNAP);
-			} else {
-				mLocation.setMode(LocationHandler.Mode.OFF);
-			}
-			break;
+			case R.id.menu_position_follow_location:
+				if (!item.isChecked()) {
+					mLocation.setMode(LocationHandler.Mode.SNAP);
+				} else {
+					mLocation.setMode(LocationHandler.Mode.OFF);
+				}
+				break;
 
-		case R.id.menu_layer_mapquest:
-		case R.id.menu_layer_naturalearth:
-			int bgId = item.getItemId();
-			// toggle if already enabled
-			if (bgId == mMapLayers.getBackgroundId())
-				bgId = -1;
+			case R.id.menu_layer_mapquest:
+			case R.id.menu_layer_naturalearth:
+				int bgId = item.getItemId();
+				// toggle if already enabled
+				if (bgId == mMapLayers.getBackgroundId())
+					bgId = -1;
 
-			mMapLayers.setBackgroundMap(bgId);
-			mMap.updateMap(true);
-			break;
+				mMapLayers.setBackgroundMap(bgId);
+				mMap.updateMap(true);
+				break;
 
-		case R.id.menu_layer_grid:
-			mMapLayers.enableGridOverlay(!mMapLayers.isGridEnabled());
-			mMap.updateMap(true);
-			break;
+			case R.id.menu_layer_grid:
+				mMapLayers.enableGridOverlay(!mMapLayers.isGridEnabled());
+				mMap.updateMap(true);
+				break;
 
-		case R.id.menu_position_enter_coordinates:
-			showDialog(DIALOG_ENTER_COORDINATES);
-			break;
+			case R.id.menu_position_enter_coordinates:
+				showDialog(DIALOG_ENTER_COORDINATES);
+				break;
 
-		//case R.id.menu_position_map_center:
-		//	MapPosition mapCenter = mBaseLayer.getMapFileCenter();
-		//	if (mapCenter != null)
-		//		mMap.setCenter(mapCenter.getGeoPoint());
-		//	break;
+			//case R.id.menu_position_map_center:
+			//	MapPosition mapCenter = mBaseLayer.getMapFileCenter();
+			//	if (mapCenter != null)
+			//		mMap.setCenter(mapCenter.getGeoPoint());
+			//	break;
 
-		case R.id.menu_preferences:
-			startActivity(new Intent(this, EditPreferences.class));
-			overridePendingTransition(R.anim.slide_right, R.anim.slide_left2);
-			break;
+			case R.id.menu_preferences:
+				startActivity(new Intent(this, EditPreferences.class));
+				overridePendingTransition(R.anim.slide_right, R.anim.slide_left2);
+				break;
 
-		default:
-			return false;
+			default:
+				return false;
 		}
 
 		toggleMenuCheck();
@@ -235,24 +235,24 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	private void toggleMenuCheck() {
 
 		mMenu.findItem(R.id.menu_compass_2d)
-				.setChecked(mCompass.getMode() == Compass.Mode.C2D);
+		    .setChecked(mCompass.getMode() == Compass.Mode.C2D);
 		mMenu.findItem(R.id.menu_compass_3d)
-				.setChecked(mCompass.getMode() == Compass.Mode.C3D);
+		    .setChecked(mCompass.getMode() == Compass.Mode.C3D);
 
 		mMenu.findItem(R.id.menu_position_my_location_enable)
-				.setChecked(mLocation.getMode() == LocationHandler.Mode.SHOW);
+		    .setChecked(mLocation.getMode() == LocationHandler.Mode.SHOW);
 		mMenu.findItem(R.id.menu_position_follow_location)
-				.setChecked(mLocation.getMode() == LocationHandler.Mode.SNAP);
+		    .setChecked(mLocation.getMode() == LocationHandler.Mode.SNAP);
 
 		int bgId = mMapLayers.getBackgroundId();
 		mMenu.findItem(R.id.menu_layer_naturalearth)
-				.setChecked(bgId == R.id.menu_layer_naturalearth);
+		    .setChecked(bgId == R.id.menu_layer_naturalearth);
 
 		mMenu.findItem(R.id.menu_layer_mapquest)
-				.setChecked(bgId == R.id.menu_layer_mapquest);
+		    .setChecked(bgId == R.id.menu_layer_mapquest);
 
 		mMenu.findItem(R.id.menu_layer_grid)
-				.setChecked(mMapLayers.isGridEnabled());
+		    .setChecked(mMapLayers.isGridEnabled());
 	}
 
 	@Override
@@ -285,34 +285,34 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		switch (requestCode) {
-		case POIS_REQUEST:
-			Log.d(TAG, "result: POIS_REQUEST");
-			if (resultCode == RESULT_OK) {
-				int id = intent.getIntExtra("ID", 0);
-				Log.d(TAG, "result: POIS_REQUEST: " + id);
+			case POIS_REQUEST:
+				Log.d(TAG, "result: POIS_REQUEST");
+				if (resultCode == RESULT_OK) {
+					int id = intent.getIntExtra("ID", 0);
+					Log.d(TAG, "result: POIS_REQUEST: " + id);
 
-				App.poiSearch.poiMarkers.showBubbleOnItem(id);
-				POI poi = App.poiSearch.getPOIs().get(id);
+					App.poiSearch.poiMarkers.showBubbleOnItem(id);
+					POI poi = App.poiSearch.getPOIs().get(id);
 
-				if (poi.bbox != null)
-					mMap.getAnimator().animateTo(poi.bbox);
-				else
-					mMap.getAnimator().animateTo(poi.location);
-			}
-			break;
-		//case SELECT_RENDER_THEME_FILE:
-		//	if (resultCode == RESULT_OK && intent != null
-		//			&& intent.getStringExtra(FilePicker.SELECTED_FILE) != null) {
-		//		try {
-		//			mMap.setRenderTheme(intent
-		//					.getStringExtra(FilePicker.SELECTED_FILE));
-		//		} catch (FileNotFoundException e) {
-		//			showToastOnUiThread(e.getLocalizedMessage());
-		//		}
-		//	}
-		//	break;
-		default:
-			break;
+					if (poi.bbox != null)
+						mMap.getAnimator().animateTo(poi.bbox);
+					else
+						mMap.getAnimator().animateTo(poi.location);
+				}
+				break;
+			//case SELECT_RENDER_THEME_FILE:
+			//	if (resultCode == RESULT_OK && intent != null
+			//			&& intent.getStringExtra(FilePicker.SELECTED_FILE) != null) {
+			//		try {
+			//			mMap.setRenderTheme(intent
+			//					.getStringExtra(FilePicker.SELECTED_FILE));
+			//		} catch (FileNotFoundException e) {
+			//			showToastOnUiThread(e.getLocalizedMessage());
+			//		}
+			//	}
+			//	break;
+			default:
+				break;
 		}
 
 		//if (requestCode == SELECT_MAP_FILE) {
@@ -474,6 +474,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	/**
 	 * Uses the UI thread to display the given text message as toast
 	 * notification.
+	 * 
 	 * @param text
 	 *            the text message to display
 	 */
@@ -511,45 +512,45 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		Mode m = Mode.values()[mapMode];
 
 		switch (m) {
-		case DEFAULT:
+			case DEFAULT:
 
-			mLocation.setMode(LocationHandler.Mode.OFF);
-			mCompass.setMode(Compass.Mode.OFF);
+				mLocation.setMode(LocationHandler.Mode.OFF);
+				mCompass.setMode(Compass.Mode.OFF);
 
-			App.activity.showToastOnUiThread("Manual");
+				App.activity.showToastOnUiThread("Manual");
 
-			break;
-		case SHOW_LOCATION:
-			mLocation.setMode(LocationHandler.Mode.SHOW);
-			mCompass.setMode(Compass.Mode.OFF);
-			App.activity.showToastOnUiThread(App.activity
-					.getString(R.string.menu_position_my_location_enable));
-			break;
+				break;
+			case SHOW_LOCATION:
+				mLocation.setMode(LocationHandler.Mode.SHOW);
+				mCompass.setMode(Compass.Mode.OFF);
+				App.activity.showToastOnUiThread(App.activity
+				    .getString(R.string.menu_position_my_location_enable));
+				break;
 
-		case SNAP_LOCATION:
-			mLocation.setMode(LocationHandler.Mode.SNAP);
-			mCompass.setMode(Compass.Mode.OFF);
-			App.activity.showToastOnUiThread(App.activity
-					.getString(R.string.menu_position_follow_location));
-			break;
+			case SNAP_LOCATION:
+				mLocation.setMode(LocationHandler.Mode.SNAP);
+				mCompass.setMode(Compass.Mode.OFF);
+				App.activity.showToastOnUiThread(App.activity
+				    .getString(R.string.menu_position_follow_location));
+				break;
 
-		case COMPASS_2D:
-			// FIXME
-			//mMapView.getMapViewPosition().setTilt(0);
-			
-			mLocation.setMode(LocationHandler.Mode.SHOW);
-			mCompass.setMode(Compass.Mode.C2D);
-			App.activity.showToastOnUiThread("Compass 2D");
-			break;
+			case COMPASS_2D:
+				// FIXME
+				//mMapView.getMapViewPosition().setTilt(0);
 
-		case COMPASS_3D:
-			mLocation.setMode(LocationHandler.Mode.SHOW);
-			mCompass.setMode(Compass.Mode.C3D);
-			App.activity.showToastOnUiThread("Compass 3D");
-			break;
+				mLocation.setMode(LocationHandler.Mode.SHOW);
+				mCompass.setMode(Compass.Mode.C2D);
+				App.activity.showToastOnUiThread("Compass 2D");
+				break;
 
-		default:
-			break;
+			case COMPASS_3D:
+				mLocation.setMode(LocationHandler.Mode.SHOW);
+				mCompass.setMode(Compass.Mode.C3D);
+				App.activity.showToastOnUiThread("Compass 3D");
+				break;
+
+			default:
+				break;
 		}
 
 		App.map.updateMap(true);

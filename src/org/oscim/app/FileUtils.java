@@ -27,6 +27,7 @@ final class FileUtils {
 	/**
 	 * Formats the given file size as a human readable string, using SI
 	 * prefixes.
+	 * 
 	 * @param fileSize
 	 *            the file size to be formatted.
 	 * @param resources
@@ -49,13 +50,13 @@ final class FileUtils {
 		} else {
 			if (fileSize < ONE_MEGABYTE) {
 				return DECIMAL_FORMAT.format(fileSize / ONE_KILOBYTE)
-						+ resources.getString(R.string.file_size_kb);
+				        + resources.getString(R.string.file_size_kb);
 			} else if (fileSize < ONE_GIGABYTE) {
 				return DECIMAL_FORMAT.format(fileSize / ONE_MEGABYTE)
-						+ resources.getString(R.string.file_size_mb);
+				        + resources.getString(R.string.file_size_mb);
 			}
 			return DECIMAL_FORMAT.format(fileSize / ONE_GIGABYTE)
-					+ resources.getString(R.string.file_size_gb);
+			        + resources.getString(R.string.file_size_gb);
 		}
 	}
 

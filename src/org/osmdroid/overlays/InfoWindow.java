@@ -29,6 +29,7 @@ import android.widget.RelativeLayout;
  * can hide the marker.</li>
  * </ul>
  * This is an abstract class.
+ * 
  * @see DefaultInfoWindow
  * @author M.Kergall
  */
@@ -51,13 +52,13 @@ public abstract class InfoWindow {
 		ViewGroup parent = (ViewGroup) mapView.getParent();
 		Context context = mapView.getContext();
 		LayoutInflater inflater = (LayoutInflater) context
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mView = inflater.inflate(layoutResId, parent, false);
 
 		RelativeLayout.LayoutParams rlp =
-				new RelativeLayout.LayoutParams(
-						android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-						android.view.ViewGroup.LayoutParams.MATCH_PARENT);
+		        new RelativeLayout.LayoutParams(
+		                                        android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+		                                        android.view.ViewGroup.LayoutParams.MATCH_PARENT);
 		mLayout = new RelativeLayout(context);
 		mLayout.setWillNotDraw(true);
 		mLayout.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
@@ -75,6 +76,7 @@ public abstract class InfoWindow {
 
 	/**
 	 * Returns the Android view. This allows to set its content.
+	 * 
 	 * @return the Android view
 	 */
 	public View getView() {
@@ -85,6 +87,7 @@ public abstract class InfoWindow {
 
 	/**
 	 * open the window at the specified position.
+	 * 
 	 * @param item
 	 *            the item on which is hooked the view
 	 * @param offsetX

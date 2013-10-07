@@ -31,6 +31,7 @@ import android.util.Log;
  * https://developers.google.com/maps/documentation/directions/<br>
  * Note that displaying a route provided by Google on a non-Google map (like
  * OSM) is not allowed by Google T&C.
+ * 
  * @author M.Kergall
  */
 public class GoogleRouteProvider extends RouteProvider {
@@ -40,6 +41,7 @@ public class GoogleRouteProvider extends RouteProvider {
 	/**
 	 * Build the URL to Google Directions service returning a route in XML
 	 * format
+	 * 
 	 * @param waypoints
 	 *            ...
 	 * @return ...
@@ -135,7 +137,7 @@ class GoogleDirectionsHandler extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String name,
-			Attributes attributes) {
+	        Attributes attributes) {
 		if (localName.equals("polyline")) {
 			isPolyline = true;
 		} else if (localName.equals("overview_polyline")) {

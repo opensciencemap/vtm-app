@@ -28,6 +28,7 @@ import android.util.Log;
  * list of waypoints. It uses MapQuest open, public and free API, based on
  * OpenStreetMap data. <br>
  * See http://open.mapquestapi.com/guidance
+ * 
  * @author M.Kergall
  */
 public class MapQuestRouteProvider extends RouteProvider {
@@ -36,6 +37,7 @@ public class MapQuestRouteProvider extends RouteProvider {
 
 	/**
 	 * Build the URL to MapQuest service returning a route in XML format
+	 * 
 	 * @param waypoints
 	 *            : array of waypoints, as [lat, lng], from start point to end
 	 *            point.
@@ -100,6 +102,7 @@ public class MapQuestRouteProvider extends RouteProvider {
 
 	/**
 	 * XML implementation
+	 * 
 	 * @param is
 	 *            : input stream to parse
 	 * @param waypoints
@@ -128,14 +131,14 @@ public class MapQuestRouteProvider extends RouteProvider {
 	}
 
 	protected List<RouteNode> finalizeNodes(List<RouteNode> mNodes,
-			List<RouteLink> mLinks, List<GeoPoint> polyline) {
+	        List<RouteLink> mLinks, List<GeoPoint> polyline) {
 		int n = mNodes.size();
 		if (n == 0)
 			return mNodes;
 		ArrayList<RouteNode> newNodes = new ArrayList<RouteNode>(n);
 		RouteNode lastNode = null;
 		for (int i = 1; i < n - 1; i++) { // 1, n-1 => first and last MapQuest
-											// nodes are irrelevant.
+			                              // nodes are irrelevant.
 			RouteNode node = mNodes.get(i);
 			RouteLink link = mLinks.get(node.nextRouteLink);
 			if (lastNode != null && (node.instructions == null || node.maneuverType == 0)) {
@@ -192,7 +195,7 @@ class XMLHandler extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String name,
-			Attributes attributes) {
+	        Attributes attributes) {
 		if (localName.equals("boundingBox"))
 			isBB = true;
 		else if (localName.equals("link"))

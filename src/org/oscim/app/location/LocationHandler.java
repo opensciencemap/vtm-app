@@ -47,12 +47,15 @@ public class LocationHandler implements LocationListener {
 	private Mode mMode = Mode.OFF;
 
 	private boolean mSetCenter;
+	private MapPosition mMapPosition;
 
 	public LocationHandler(TileMap tileMap, Compass compass) {
 		mLocationManager = (LocationManager) tileMap
-				.getSystemService(Context.LOCATION_SERVICE);
+		    .getSystemService(Context.LOCATION_SERVICE);
 
 		mLocationOverlay = new LocationOverlay(App.map, compass);
+
+		mMapPosition = new MapPosition();
 	}
 
 	public boolean setMode(Mode mode) {
@@ -114,8 +117,8 @@ public class LocationHandler implements LocationListener {
 
 		mLocationOverlay.setEnabled(true);
 		mLocationOverlay.setPosition(location.getLatitude(),
-				location.getLongitude(),
-				location.getAccuracy());
+		                             location.getLongitude(),
+		                             location.getAccuracy());
 
 		// FIXME -> implement LayerGroup
 		App.map.getLayers().add(4, mLocationOverlay);
@@ -159,19 +162,17 @@ public class LocationHandler implements LocationListener {
 
 		if (location == null) {
 			App.activity.showToastOnUiThread(App.activity
-					.getString(R.string.error_last_location_unknown));
+			    .getString(R.string.error_last_location_unknown));
 			return null;
 		}
 
-		MapPosition mapPosition = new MapPosition();
-		App.map.getMapPosition(mapPosition);
+		App.map.getMapPosition(mMapPosition);
 
-		if (mapPosition.zoomLevel < SHOW_LOCATION_ZOOM)
-			mapPosition.setZoomLevel(SHOW_LOCATION_ZOOM);
+		if (mMapPosition.zoomLevel < SHOW_LOCATION_ZOOM)
+			mMapPosition.setZoomLevel(SHOW_LOCATION_ZOOM);
 
-		mapPosition.setPosition(location.getLatitude(), location.getLongitude());
-		App.map.setMapPosition(mapPosition);
-		App.map.updateMap(true);
+		mMapPosition.setPosition(location.getLatitude(), location.getLongitude());
+		App.map.setMapPosition(mMapPosition);
 
 		return location;
 	}
@@ -191,8 +192,9 @@ public class LocationHandler implements LocationListener {
 		if (mSetCenter || mMode == Mode.SNAP) {
 			mSetCenter = false;
 
-			App.map.setMapCenter(lat, lon);
-			App.map.updateMap(true);
+			App.map.getMapPosition(mMapPosition);
+			mMapPosition.setPosition(lat, lon);
+			App.map.setMapPosition(mMapPosition);
 		}
 
 		mLocationOverlay.setPosition(lat, lon, location.getAccuracy());

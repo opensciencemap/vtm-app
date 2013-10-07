@@ -11,6 +11,7 @@ import android.util.Log;
 /**
  * Road Leg is the portion of the route between 2 waypoints (intermediate points
  * requested)
+ * 
  * @author M.Kergall
  */
 public class RouteLeg implements Parcelable {
@@ -29,7 +30,7 @@ public class RouteLeg implements Parcelable {
 	}
 
 	public RouteLeg(int startNodeIndex, int endNodeIndex,
-			List<RouteNode> nodes) {
+	        List<RouteNode> nodes) {
 		this.startNodeIndex = startNodeIndex;
 		this.endNodeIndex = endNodeIndex;
 		length = duration = 0.0;
@@ -40,7 +41,7 @@ public class RouteLeg implements Parcelable {
 			duration += node.duration;
 		}
 		Log.d(BonusPackHelper.LOG_TAG, "Leg: " + startNodeIndex + "-" + endNodeIndex
-				+ ", length=" + length + "km, duration=" + duration + "s");
+		        + ", length=" + length + "km, duration=" + duration + "s");
 	}
 
 	//--- Parcelable implementation

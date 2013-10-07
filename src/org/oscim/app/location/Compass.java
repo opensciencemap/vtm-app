@@ -73,7 +73,7 @@ public class Compass extends Layer implements SensorEventListener, Map.UpdateLis
 		super(map);
 
 		mSensorManager = (SensorManager) context
-				.getSystemService(Context.SENSOR_SERVICE);
+		    .getSystemService(Context.SENSOR_SERVICE);
 
 		//List<Sensor> s = mSensorManager.getSensorList(Sensor.TYPE_ALL);
 		//for (Sensor sensor : s)
@@ -170,8 +170,8 @@ public class Compass extends Layer implements SensorEventListener, Map.UpdateLis
 
 	public void adjustArrow(float prev, float cur) {
 		Animation an = new RotateAnimation(-prev, -cur,
-				Animation.RELATIVE_TO_SELF, 0.5f,
-				Animation.RELATIVE_TO_SELF, 0.5f);
+		                                   Animation.RELATIVE_TO_SELF, 0.5f,
+		                                   Animation.RELATIVE_TO_SELF, 0.5f);
 
 		an.setDuration(100);
 		an.setRepeatCount(0);

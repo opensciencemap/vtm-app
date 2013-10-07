@@ -58,10 +58,10 @@ public class FourSquareProvider {
 	@SuppressWarnings("deprecation")
 	private String getUrlInside(BoundingBox boundingBox, String query, int maxResults) {
 		StringBuffer url = new StringBuffer(
-				"https://api.foursquare.com/v2/venues/search?v=20120321"
-						+ "&intent=browse"
-						+ "&client_id=ZUN4ZMNZUFT3Z5QQZNMQ3ACPL4OJMBFGO15TYX51D5MHCIL3"
-						+ "&client_secret=X1RXCVF4VVSG1Y2FUDQJLKQUC1WF4XXKIMK2STXKACLPDGLY");
+		                                    "https://api.foursquare.com/v2/venues/search?v=20120321"
+		                                            + "&intent=browse"
+		                                            + "&client_id=ZUN4ZMNZUFT3Z5QQZNMQ3ACPL4OJMBFGO15TYX51D5MHCIL3"
+		                                            + "&client_secret=X1RXCVF4VVSG1Y2FUDQJLKQUC1WF4XXKIMK2STXKACLPDGLY");
 		url.append("&sw=");
 		url.append(boundingBox.getMinLatitude());
 		url.append(',');
@@ -108,8 +108,8 @@ public class FourSquareProvider {
 
 				JSONObject jLocation = jVenue.getJSONObject("location");
 				poi.location = new GeoPoint(
-						jLocation.getDouble("lat"),
-						jLocation.getDouble("lng"));
+				                            jLocation.getDouble("lat"),
+				                            jLocation.getDouble("lng"));
 				poi.description = jLocation.optString("address", null);
 
 				JSONArray jCategories = jVenue.getJSONArray("categories");
@@ -177,7 +177,7 @@ public class FourSquareProvider {
 					return;
 
 				Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://foursquare.com"
-						+ result));
+				        + result));
 				context.startActivity(myIntent);
 
 			}

@@ -66,8 +66,10 @@ public class RouteSearch {
 		ArrayList<ExtendedMarkerItem> waypointsItems = new ArrayList<ExtendedMarkerItem>();
 
 		mItineraryMarkers = new ItemizedOverlayWithBubble<ExtendedMarkerItem>(App.map,
-				App.activity, null, waypointsItems,
-				new ViaPointInfoWindow(R.layout.itinerary_bubble));
+		                                                                      App.activity,
+		                                                                      null,
+		                                                                      waypointsItems,
+		                                                                      new ViaPointInfoWindow(R.layout.itinerary_bubble));
 
 		//updateIternaryMarkers();
 
@@ -94,12 +96,12 @@ public class RouteSearch {
 
 		mStartPoint = p1;
 		markerStart = putMarkerItem(markerStart, mStartPoint, START_INDEX,
-				R.string.departure, R.drawable.marker_departure, -1);
+		                            R.string.departure, R.drawable.marker_departure, -1);
 
 		mDestinationPoint = p2;
 		markerDestination = putMarkerItem(markerDestination, mDestinationPoint, DEST_INDEX,
-				R.string.destination,
-				R.drawable.marker_destination, -1);
+		                                  R.string.destination,
+		                                  R.drawable.marker_destination, -1);
 
 		getRouteAsync();
 	}
@@ -154,16 +156,16 @@ public class RouteSearch {
 
 	/* add (or replace) an item in markerOverlays. p position. */
 	public ExtendedMarkerItem putMarkerItem(ExtendedMarkerItem item, GeoPoint p, int index,
-			int titleResId, int markerResId, int iconResId) {
+	        int titleResId, int markerResId, int iconResId) {
 
 		if (item != null)
 			mItineraryMarkers.removeItem(item);
 
 		MarkerSymbol marker = AndroidGraphics.makeMarker(App.res, markerResId,
-				HotspotPlace.BOTTOM_CENTER);
+		                                                 HotspotPlace.BOTTOM_CENTER);
 
 		ExtendedMarkerItem overlayItem =
-				new ExtendedMarkerItem(App.res.getString(titleResId), "", p);
+		        new ExtendedMarkerItem(App.res.getString(titleResId), "", p);
 
 		overlayItem.setMarker(marker);
 
@@ -185,7 +187,7 @@ public class RouteSearch {
 	public void addViaPoint(GeoPoint p) {
 		mViaPoints.add(p);
 		putMarkerItem(null, p, mViaPoints.size() - 1,
-				R.string.viapoint, R.drawable.marker_via, -1);
+		              R.string.viapoint, R.drawable.marker_via, -1);
 	}
 
 	public void removePoint(int index) {
@@ -206,18 +208,18 @@ public class RouteSearch {
 		//Start marker:
 		if (mStartPoint != null) {
 			markerStart = putMarkerItem(null, mStartPoint, START_INDEX,
-					R.string.departure, R.drawable.marker_departure, -1);
+			                            R.string.departure, R.drawable.marker_departure, -1);
 		}
 		//Via-points markers if any:
 		for (int index = 0; index < mViaPoints.size(); index++) {
 			putMarkerItem(null, mViaPoints.get(index), index,
-					R.string.viapoint, R.drawable.marker_via, -1);
+			              R.string.viapoint, R.drawable.marker_via, -1);
 		}
 		//Destination marker if any:
 		if (mDestinationPoint != null) {
 			markerDestination = putMarkerItem(null, mDestinationPoint, DEST_INDEX,
-					R.string.destination,
-					R.drawable.marker_destination, -1);
+			                                  R.string.destination,
+			                                  R.drawable.marker_destination, -1);
 		}
 	}
 
@@ -325,37 +327,37 @@ public class RouteSearch {
 
 	boolean onContextItemSelected(MenuItem item, GeoPoint geoPoint) {
 		switch (item.getItemId()) {
-		case R.id.menu_route_departure:
-			mStartPoint = geoPoint;
+			case R.id.menu_route_departure:
+				mStartPoint = geoPoint;
 
-			markerStart = putMarkerItem(markerStart, mStartPoint, START_INDEX,
-					R.string.departure, R.drawable.marker_departure, -1);
+				markerStart = putMarkerItem(markerStart, mStartPoint, START_INDEX,
+				                            R.string.departure, R.drawable.marker_departure, -1);
 
-			getRouteAsync();
-			return true;
+				getRouteAsync();
+				return true;
 
-		case R.id.menu_route_destination:
-			mDestinationPoint = geoPoint;
+			case R.id.menu_route_destination:
+				mDestinationPoint = geoPoint;
 
-			markerDestination = putMarkerItem(markerDestination, mDestinationPoint, DEST_INDEX,
-					R.string.destination,
-					R.drawable.marker_destination, -1);
+				markerDestination = putMarkerItem(markerDestination, mDestinationPoint, DEST_INDEX,
+				                                  R.string.destination,
+				                                  R.drawable.marker_destination, -1);
 
-			getRouteAsync();
-			return true;
+				getRouteAsync();
+				return true;
 
-		case R.id.menu_route_viapoint:
-			GeoPoint viaPoint = geoPoint;
-			addViaPoint(viaPoint);
+			case R.id.menu_route_viapoint:
+				GeoPoint viaPoint = geoPoint;
+				addViaPoint(viaPoint);
 
-			getRouteAsync();
-			return true;
+				getRouteAsync();
+				return true;
 
-		case R.id.menu_route_clear:
-			clearOverlays();
-			return true;
+			case R.id.menu_route_clear:
+				clearOverlays();
+				return true;
 
-		default:
+			default:
 		}
 		return false;
 	}

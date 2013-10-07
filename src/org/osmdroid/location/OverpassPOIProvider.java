@@ -24,7 +24,8 @@ public class OverpassPOIProvider implements POIProvider {
 		HttpConnection connection = new HttpConnection();
 		boundingBox.toString();
 
-		String q = "node[\"amenity\"~\"^restaurant$|^pub$\"]("+boundingBox.format()+");out 100;";
+		String q = "node[\"amenity\"~\"^restaurant$|^pub$\"](" + boundingBox.format()
+		        + ");out 100;";
 		String url = "http://city.informatik.uni-bremen.de/oapi/pbf?data=";
 		String encoded;
 		try {
@@ -35,23 +36,23 @@ public class OverpassPOIProvider implements POIProvider {
 		}
 		Log.d("...", "request " + url + encoded);
 		connection.doGet(url + encoded);
-		OSMData osmData= OsmPbfReader.process(connection.getStream());
+		OSMData osmData = OsmPbfReader.process(connection.getStream());
 		ArrayList<POI> pois = new ArrayList<POI>(osmData.getNodes().size());
 
-		for (OSMNode n : osmData.getNodes()){
+		for (OSMNode n : osmData.getNodes()) {
 			POI p = new POI(POI.POI_SERVICE_4SQUARE);
 			p.id = Long.toString(n.id);
 
 			p.location = new GeoPoint(n.lat, n.lon);
 			Tag t;
 
-			if ((t = n.tags.get(Tag.TAG_KEY_NAME)) != null)
+			if ((t = n.tags.get(Tag.KEY_NAME)) != null)
 				p.description = t.value;
 
-			if ((t = n.tags.get(Tag.TAG_KEY_AMENITY)) != null)
+			if ((t = n.tags.get(Tag.KEY_AMENITY)) != null)
 				p.type = t.value;
 
-			if ((t = n.tags.get(TAG_KEY_WEBSITE)) != null){
+			if ((t = n.tags.get(TAG_KEY_WEBSITE)) != null) {
 				Log.d("...", p.description + " " + t.value);
 				p.url = t.value;
 			}

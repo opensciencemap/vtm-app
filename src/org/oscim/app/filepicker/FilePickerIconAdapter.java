@@ -37,6 +37,7 @@ class FilePickerIconAdapter extends BaseAdapter {
 
 	/**
 	 * Creates a new FilePickerIconAdapter with the given context.
+	 * 
 	 * @param context
 	 *            the context of this adapter, through which new Views are
 	 *            created.
@@ -80,16 +81,20 @@ class FilePickerIconAdapter extends BaseAdapter {
 		if (index == 0 && this.hasParentFolder) {
 			// the parent directory of the current folder
 			this.textView.setCompoundDrawablesWithIntrinsicBounds(0,
-					R.drawable.file_picker_back, 0, 0);
+			                                                      R.drawable.file_picker_back, 0, 0);
 			this.textView.setText("..");
 		} else {
 			this.currentFile = this.files[index];
 			if (this.currentFile.isDirectory()) {
 				this.textView.setCompoundDrawablesWithIntrinsicBounds(0,
-						R.drawable.file_picker_folder, 0, 0);
+				                                                      R.drawable.file_picker_folder,
+				                                                      0,
+				                                                      0);
 			} else {
 				this.textView.setCompoundDrawablesWithIntrinsicBounds(0,
-						R.drawable.file_picker_file, 0, 0);
+				                                                      R.drawable.file_picker_file,
+				                                                      0,
+				                                                      0);
 			}
 			this.textView.setText(this.currentFile.getName());
 		}
@@ -98,6 +103,7 @@ class FilePickerIconAdapter extends BaseAdapter {
 
 	/**
 	 * Sets the data of this adapter.
+	 * 
 	 * @param files
 	 *            the new files for this adapter.
 	 * @param newHasParentFolder

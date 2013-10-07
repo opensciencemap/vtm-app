@@ -19,6 +19,7 @@ import android.util.Log;
  * An itemized overlay with an InfoWindow or "bubble" which opens when the user
  * taps on an overlay item, and displays item attributes. <br>
  * Items must be ExtendedMarkerItem. <br>
+ * 
  * @see ExtendedMarkerItem
  * @see InfoWindow
  * @author M.Kergall
@@ -26,7 +27,7 @@ import android.util.Log;
  *            ...
  */
 public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends ItemizedIconLayer<Item>
-		implements ItemizedIconLayer.OnItemGestureListener<Item>, Map.UpdateListener
+        implements ItemizedIconLayer.OnItemGestureListener<Item>, Map.UpdateListener
 {
 
 	protected List<Item> mItemsList;
@@ -69,7 +70,7 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 	}
 
 	public ItemizedOverlayWithBubble(Map map, Context context, MarkerSymbol marker,
-			List<Item> aList, InfoWindow bubble) {
+	        List<Item> aList, InfoWindow bubble) {
 		super(map, aList, marker, null);
 
 		mItemsList = aList;
@@ -80,12 +81,12 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 			String packageName = context.getPackageName();
 			if (layoutResId == 0) {
 				layoutResId = context.getResources().getIdentifier(
-						"layout/bonuspack_bubble", null,
-						packageName);
+				                                                   "layout/bonuspack_bubble", null,
+				                                                   packageName);
 				if (layoutResId == 0)
 					Log.e(BonusPackHelper.LOG_TAG,
-							"ItemizedOverlayWithBubble: layout/bonuspack_bubble not found in "
-									+ packageName);
+					      "ItemizedOverlayWithBubble: layout/bonuspack_bubble not found in "
+					              + packageName);
 			}
 			// FIXME
 			mBubble = new DefaultInfoWindow(layoutResId, App.view);
@@ -96,7 +97,7 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 	}
 
 	public ItemizedOverlayWithBubble(Map map, Context context, MarkerSymbol marker,
-			List<Item> aList) {
+	        List<Item> aList) {
 		this(map, context, marker, aList, null);
 	}
 
@@ -108,6 +109,7 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 	 * Opens the bubble on the item. For each ItemizedOverlay, only one bubble
 	 * is opened at a time. If you want more bubbles opened simultaneously, use
 	 * many ItemizedOverlays.
+	 * 
 	 * @param index
 	 *            of the overlay item to show
 	 * @param map
@@ -133,19 +135,19 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 		mItemWithBubble = null;
 	}
 
-//	@Override
-//	public boolean onSingleTapUp(final MotionEvent event) {
-//		boolean handled = super.onSingleTapUp(event);
-//		if (!handled)
-//			hideBubble();
-//		return handled;
-//	}
-//
-//	@Override
-//	protected boolean onSingleTapUpHelper(final int index, final Item item) {
-//		showBubbleOnItem(index);
-//		return true;
-//	}
+	//	@Override
+	//	public boolean onSingleTapUp(final MotionEvent event) {
+	//		boolean handled = super.onSingleTapUp(event);
+	//		if (!handled)
+	//			hideBubble();
+	//		return handled;
+	//	}
+	//
+	//	@Override
+	//	protected boolean onSingleTapUpHelper(final int index, final Item item) {
+	//		showBubbleOnItem(index);
+	//		return true;
+	//	}
 
 	/** @return the item currenty showing the bubble, or null if none. */
 	public MarkerItem getBubbledItem() {

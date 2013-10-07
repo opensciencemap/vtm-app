@@ -67,6 +67,7 @@ abstract class SeekBarPreference extends DialogPreference implements OnSeekBarCh
 
 	/**
 	 * Create a new seek bar preference.
+	 * 
 	 * @param context
 	 *            the context of the seek bar preferences activity.
 	 * @param attrs
@@ -81,7 +82,7 @@ abstract class SeekBarPreference extends DialogPreference implements OnSeekBarCh
 	public void onClick(DialogInterface dialog, int which) {
 		// check if the "OK" button was pressed and the seek bar value has changed
 		if (which == DialogInterface.BUTTON_POSITIVE
-				&& seekBarCurrentValue != mPreferenceSeekBar.getProgress()) {
+		        && seekBarCurrentValue != mPreferenceSeekBar.getProgress()) {
 			// get the value of the seek bar and save it in the preferences
 			seekBarCurrentValue = mPreferenceSeekBar.getProgress();
 			mEditor = preferencesDefault.edit();
@@ -146,6 +147,7 @@ abstract class SeekBarPreference extends DialogPreference implements OnSeekBarCh
 
 	/**
 	 * Get the current value text.
+	 * 
 	 * @param progress
 	 *            the current progress level of the seek bar.
 	 * @return the new current value text

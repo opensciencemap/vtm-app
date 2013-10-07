@@ -75,7 +75,7 @@ public class CacheSizePreference extends Preference implements OnSeekBarChangeLi
 	}
 
 	private String getAttributeStringValue(AttributeSet attrs, String namespace, String name,
-			String defaultValue) {
+	        String defaultValue) {
 		String value = attrs.getAttributeValue(namespace, name);
 		if (value == null)
 			value = defaultValue;
@@ -90,10 +90,10 @@ public class CacheSizePreference extends Preference implements OnSeekBarChangeLi
 
 		try {
 			LayoutInflater mInflater = (LayoutInflater) getContext().getSystemService(
-					Context.LAYOUT_INFLATER_SERVICE);
+			                                                                          Context.LAYOUT_INFLATER_SERVICE);
 
 			layout = (RelativeLayout) mInflater
-					.inflate(R.layout.seek_bar_preference, parent, false);
+			    .inflate(R.layout.seek_bar_preference, parent, false);
 		} catch (Exception e) {
 			Log.e(TAG, "Error creating seek bar preference", e);
 		}
@@ -120,7 +120,7 @@ public class CacheSizePreference extends Preference implements OnSeekBarChangeLi
 				// remove the existing seekbar (there may not be one) and add ours
 				newContainer.removeAllViews();
 				newContainer.addView(mSeekBar, ViewGroup.LayoutParams.FILL_PARENT,
-						ViewGroup.LayoutParams.WRAP_CONTENT);
+				                     ViewGroup.LayoutParams.WRAP_CONTENT);
 			}
 		} catch (Exception ex) {
 			Log.e(TAG, "Error binding view: " + ex.toString());
@@ -131,6 +131,7 @@ public class CacheSizePreference extends Preference implements OnSeekBarChangeLi
 
 	/**
 	 * Update a SeekBarPreference view with our current state
+	 * 
 	 * @param view
 	 */
 	protected void updateView(View view) {

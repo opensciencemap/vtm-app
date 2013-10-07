@@ -17,16 +17,19 @@ import android.util.Log;
  * POI Provider using Nominatim service. <br>
  * See https://wiki.openstreetmap.org/wiki/Nominatim<br>
  * and http://open.mapquestapi.com/nominatim/<br>
+ * 
  * @author M.Kergall
  */
 public class NominatimPOIProvider implements POIProvider {
-	/* As the doc lacks a lot of features, source code may help:
+	/*
+	 * As the doc lacks a lot of features, source code may help:
 	 * https://trac.openstreetmap
 	 * .org/browser/applications/utils/nominatim/website/search.php featuretype=
 	 * to select on feature type (country, city, state, settlement)<br>
 	 * format=jsonv2 to get a place_rank<br> offset= to offset the result ?...
 	 * <br> polygon=1 to get the border of the poi as a polygon<br> nearlat &
-	 * nearlon = ???<br> routewidth/69 and routewidth/30 ???<br> */
+	 * nearlon = ???<br> routewidth/69 and routewidth/30 ???<br>
+	 */
 	public static final String MAPQUEST_POI_SERVICE = "http://open.mapquestapi.com/nominatim/v1/";
 	public static final String NOMINATIM_POI_SERVICE = "http://nominatim.openstreetmap.org/";
 	protected String mService;
@@ -54,19 +57,19 @@ public class NominatimPOIProvider implements POIProvider {
 	private String getUrlInside(BoundingBox bb, String type, int maxResults) {
 		StringBuffer urlString = getCommonUrl(type, maxResults);
 		urlString.append("&viewbox=" + bb.getMaxLongitude() + ","
-				+ bb.getMaxLatitude() + ","
-				+ bb.getMinLongitude() + ","
-				+ bb.getMinLatitude());
+		        + bb.getMaxLatitude() + ","
+		        + bb.getMinLongitude() + ","
+		        + bb.getMinLatitude());
 		return urlString.toString();
 	}
 
 	private String getUrlCloseTo(GeoPoint p, String type,
-			int maxResults, double maxDistance) {
+	        int maxResults, double maxDistance) {
 		int maxD = (int) (maxDistance * 1E6);
 		BoundingBox bb = new BoundingBox(p.latitudeE6 + maxD,
-				p.longitudeE6 + maxD,
-				p.latitudeE6 - maxD,
-				p.longitudeE6 - maxD);
+		                                 p.longitudeE6 + maxD,
+		                                 p.latitudeE6 - maxD,
+		                                 p.longitudeE6 - maxD);
 		return getUrlInside(bb, type, maxResults);
 	}
 
@@ -97,7 +100,7 @@ public class NominatimPOIProvider implements POIProvider {
 				if (bbox != null) {
 					try {
 						poi.bbox = new BoundingBox(bbox.getDouble(0), bbox.getDouble(2),
-								bbox.getDouble(1), bbox.getDouble(3));
+						                           bbox.getDouble(1), bbox.getDouble(3));
 					} catch (Exception e) {
 						Log.d("NominatimPOIProvider", "could not parse " + bbox);
 					}
@@ -139,7 +142,7 @@ public class NominatimPOIProvider implements POIProvider {
 	 * @return the list of POI, null if technical issue.
 	 */
 	public ArrayList<POI> getPOICloseTo(GeoPoint position, String type,
-			int maxResults, double maxDistance) {
+	        int maxResults, double maxDistance) {
 		String url = getUrlCloseTo(position, type, maxResults, maxDistance);
 		return getThem(url);
 	}
@@ -177,7 +180,7 @@ public class NominatimPOIProvider implements POIProvider {
 	 * @return list of POIs, null if technical issue.
 	 */
 	public ArrayList<POI> getPOIAlong(ArrayList<GeoPoint> path, String type,
-			int maxResults, double maxWidth) {
+	        int maxResults, double maxWidth) {
 		StringBuffer urlString = getCommonUrl(type, maxResults);
 		urlString.append("&routewidth=" + maxWidth);
 		urlString.append("&route=");

@@ -60,28 +60,35 @@ public class POISearch {
 		//POI markers:
 		final ArrayList<ExtendedMarkerItem> poiItems = new ArrayList<ExtendedMarkerItem>();
 
-		poiMarkers = new ItemizedOverlayWithBubble<ExtendedMarkerItem>(App.map, App.activity, null,
-				poiItems, new POIInfoWindow(App.map));
+		poiMarkers = new ItemizedOverlayWithBubble<ExtendedMarkerItem>(App.map,
+		                                                               App.activity,
+		                                                               null,
+		                                                               poiItems,
+		                                                               new POIInfoWindow(App.map));
 
 		App.map.getLayers().add(poiMarkers);
 
 		mMarkers = new MarkerSymbol[5];
 
 		mMarkers[MDEFAULT] = AndroidGraphics.makeMarker(
-				App.res, R.drawable.pin,
-				HotspotPlace.BOTTOM_CENTER);
+		                                                App.res, R.drawable.pin,
+		                                                HotspotPlace.BOTTOM_CENTER);
 
 		mMarkers[MFLICKR] = AndroidGraphics.makeMarker(
-				App.res, R.drawable.marker_poi_flickr, null);
+		                                               App.res, R.drawable.marker_poi_flickr, null);
 
 		mMarkers[MPICASA] = AndroidGraphics.makeMarker(
-				App.res, R.drawable.marker_poi_picasa_24, null);
+		                                               App.res,
+		                                               R.drawable.marker_poi_picasa_24,
+		                                               null);
 
 		mMarkers[MWIKI16] = AndroidGraphics.makeMarker(
-				App.res, R.drawable.marker_poi_wikipedia_16, null);
+		                                               App.res,
+		                                               R.drawable.marker_poi_wikipedia_16,
+		                                               null);
 
 		mMarkers[MWIKI32] = AndroidGraphics.makeMarker(App.res,
-				R.drawable.marker_poi_wikipedia_32, null);
+		                                               R.drawable.marker_poi_wikipedia_32, null);
 	}
 
 	public List<POI> getPOIs() {
@@ -115,7 +122,7 @@ public class POISearch {
 				//return poiProvider.getPOIInside(bb, "", 0);
 			} else if (mTag.equals(TAG_FLICKR)) {
 				FlickrPOIProvider poiProvider = new FlickrPOIProvider(
-						"c39be46304a6c6efda8bc066c185cd7e");
+				                                                      "c39be46304a6c6efda8bc066c185cd7e");
 				BoundingBox bb = App.map.getBoundingBox();
 
 				return poiProvider.getPOIInside(bb, null, 20);
@@ -150,12 +157,12 @@ public class POISearch {
 				//no search, no message
 			} else if (pois == null) {
 				Toast.makeText(App.activity,
-						"Technical issue when getting " + mTag + " POI.",
-						Toast.LENGTH_SHORT).show();
+				               "Technical issue when getting " + mTag + " POI.",
+				               Toast.LENGTH_SHORT).show();
 			} else {
 				Toast.makeText(App.activity,
-						pois.size() + " " + mTag + " entries found",
-						Toast.LENGTH_SHORT).show();
+				               pois.size() + " " + mTag + " entries found",
+				               Toast.LENGTH_SHORT).show();
 
 				//	if (mTag.equals("flickr") || mTag.startsWith("picasa") || mTag.equals("wikipedia"))
 				//	startAsyncThumbnailsLoading(mPOIs);
@@ -195,7 +202,11 @@ public class POISearch {
 			}
 
 			ExtendedMarkerItem poiMarker = new ExtendedMarkerItem(
-					poi.type + (name == null ? "" : ": " + name), desc, poi.location);
+			                                                      poi.type
+			                                                              + (name == null ? ""
+			                                                                      : ": " + name),
+			                                                      desc,
+			                                                      poi.location);
 			MarkerSymbol marker = null;
 
 			if (poi.serviceId == POI.POI_SERVICE_NOMINATIM) {
@@ -307,24 +318,22 @@ public class POISearch {
 
 	public boolean onContextItemSelected(MenuItem item, GeoPoint geoPoint) {
 		switch (item.getItemId()) {
-		case R.id.menu_poi_nearby:
-			Intent intent = new Intent(App.activity, POIActivity.class);
-			intent.putExtra("ID", poiMarkers.getBubbledItemId());
-			App.activity.startActivityForResult(intent, TileMap.POIS_REQUEST);
-			return true;
+			case R.id.menu_poi_nearby:
+				Intent intent = new Intent(App.activity, POIActivity.class);
+				intent.putExtra("ID", poiMarkers.getBubbledItemId());
+				App.activity.startActivityForResult(intent, TileMap.POIS_REQUEST);
+				return true;
 
-		case R.id.menu_poi_clear:
-			poiMarkers.removeAllItems();
-			mPOIs.clear();
-			App.map.updateMap(true);
+			case R.id.menu_poi_clear:
+				poiMarkers.removeAllItems();
+				mPOIs.clear();
+				App.map.updateMap(true);
 
-			return true;
-		default:
+				return true;
+			default:
 		}
 		return false;
 
 	}
 
 }
-
-
