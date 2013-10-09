@@ -27,10 +27,7 @@ import org.oscim.layers.Layer;
 import org.oscim.map.Map;
 import org.osmdroid.overlays.MapEventsReceiver;
 
-import android.util.Log;
-
 public class DistanceTouchOverlay extends Layer implements EventListener {
-	private final static String TAG = DistanceTouchOverlay.class.getName();
 
 	private static final int LONGPRESS_THRESHOLD = 800;
 
@@ -39,9 +36,9 @@ public class DistanceTouchOverlay extends Layer implements EventListener {
 	private float mPrevX1, mPrevX2, mPrevY1, mPrevY2;
 	private float mCurX1, mCurX2, mCurY1, mCurY2;
 
-	private final static int POINTER_UP = -1;
-	private int mPointer1 = POINTER_UP;
-	private int mPointer2 = POINTER_UP;
+	//private final static int POINTER_UP = -1;
+	//private int mPointer1 = POINTER_UP;
+	//private int mPointer2 = POINTER_UP;
 
 	private final MapEventsReceiver mReceiver;
 
@@ -127,7 +124,7 @@ public class DistanceTouchOverlay extends Layer implements EventListener {
 
 		if ((action == MotionEvent.ACTION_POINTER_DOWN)
 		        && (e.getPointerCount() == 2)) {
-			Log.d(TAG, "down");
+			//App.log.debug("down");
 
 			// keep track of pointer ids, only
 			// use these for gesture, ignoring

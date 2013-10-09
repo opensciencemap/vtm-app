@@ -1,12 +1,13 @@
 package org.oscim.app.preferences;
 
 import org.oscim.app.R;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.preference.Preference;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +18,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 public class CacheSizePreference extends Preference implements OnSeekBarChangeListener {
-
-	private final String TAG = getClass().getName();
+	final static Logger log = LoggerFactory.getLogger(CacheSizePreference.class);
 
 	private static final String NS_OCIM_APP = "http://app.oscim.org";
 	private static final int DEFAULT_VALUE = 50;
@@ -69,7 +69,7 @@ public class CacheSizePreference extends Preference implements OnSeekBarChangeLi
 			if (newInterval != null)
 				mInterval = Integer.parseInt(newInterval);
 		} catch (Exception e) {
-			Log.e(TAG, "Invalid interval value", e);
+			log.error("", e);
 		}
 
 	}
@@ -95,7 +95,7 @@ public class CacheSizePreference extends Preference implements OnSeekBarChangeLi
 			layout = (RelativeLayout) mInflater
 			    .inflate(R.layout.seek_bar_preference, parent, false);
 		} catch (Exception e) {
-			Log.e(TAG, "Error creating seek bar preference", e);
+			log.error("", e);
 		}
 
 		return layout;
@@ -123,7 +123,7 @@ public class CacheSizePreference extends Preference implements OnSeekBarChangeLi
 				                     ViewGroup.LayoutParams.WRAP_CONTENT);
 			}
 		} catch (Exception ex) {
-			Log.e(TAG, "Error binding view: " + ex.toString());
+			log.error("Error binding view: " + ex.toString());
 		}
 
 		updateView(view);
@@ -152,7 +152,7 @@ public class CacheSizePreference extends Preference implements OnSeekBarChangeLi
 			unitsLeft.setText(mUnitsLeft);
 
 		} catch (Exception e) {
-			Log.e(TAG, "Error updating seek bar preference", e);
+			log.error("", e);
 		}
 
 	}
@@ -207,7 +207,7 @@ public class CacheSizePreference extends Preference implements OnSeekBarChangeLi
 			try {
 				temp = (Integer) defaultValue;
 			} catch (Exception ex) {
-				Log.e(TAG, "Invalid default value: " + defaultValue.toString());
+				log.error("Invalid default value: " + defaultValue.toString());
 			}
 
 			persistInt(temp);

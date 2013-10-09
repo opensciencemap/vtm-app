@@ -8,10 +8,7 @@ import org.oscim.core.GeoPoint;
 import org.osmdroid.routing.provider.GoogleRouteProvider;
 import org.osmdroid.routing.provider.MapQuestRouteProvider;
 import org.osmdroid.routing.provider.OSRMRouteProvider;
-import org.osmdroid.utils.BonusPackHelper;
 import org.osmdroid.utils.DouglasPeuckerReducer;
-
-import android.util.Log;
 
 /**
  * describes the way to go from a position to an other. Normally returned by a
@@ -23,6 +20,8 @@ import android.util.Log;
  * @author M.Kergall
  */
 public class Route {
+	//final static Logger log = LoggerFactory.getLogger(Route.class);
+
 	/**
 	 * @see #STATUS_INVALID STATUS_INVALID
 	 * @see #STATUS_OK STATUS_OK
@@ -100,10 +99,10 @@ public class Route {
 	public List<GeoPoint> getRouteLow() {
 		if (routeLow == null) {
 			// Simplify the route (divide number of points by around 10):
-			int n = routeHigh.size();
+			//int n = routeHigh.size();
 			routeLow = DouglasPeuckerReducer.reduceWithTolerance(routeHigh, 1500.0);
-			Log.d(BonusPackHelper.LOG_TAG, "route reduced from " + n + " to " + routeLow.size()
-			        + " points");
+			//log.debug("route reduced from " + n + " to " + routeLow.size()
+			//        + " points");
 		}
 		return routeLow;
 	}

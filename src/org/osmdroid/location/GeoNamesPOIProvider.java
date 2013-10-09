@@ -16,11 +16,11 @@ import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.osmdroid.utils.BonusPackHelper;
 import org.osmdroid.utils.HttpConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import android.util.Log;
 
 /**
  * POI Provider using GeoNames services. Currently, "find Nearby Wikipedia" and
@@ -30,6 +30,8 @@ import android.util.Log;
  * @author M.Kergall
  */
 public class GeoNamesPOIProvider {
+
+	final static Logger log = LoggerFactory.getLogger(GeoNamesPOIProvider.class);
 
 	protected String mUserName;
 
@@ -71,10 +73,10 @@ public class GeoNamesPOIProvider {
 	 * @return the list of POI
 	 */
 	public ArrayList<POI> getThem(String fullUrl) {
-		Log.d(BonusPackHelper.LOG_TAG, "GeoNamesPOIProvider:get:" + fullUrl);
+		log.debug("GeoNamesPOIProvider:get:" + fullUrl);
 		String jString = BonusPackHelper.requestStringFromUrl(fullUrl);
 		if (jString == null) {
-			Log.e(BonusPackHelper.LOG_TAG, "GeoNamesPOIProvider: request failed.");
+			log.error("GeoNamesPOIProvider: request failed.");
 			return null;
 		}
 		try {
@@ -104,7 +106,7 @@ public class GeoNamesPOIProvider {
 				//other attributes: distance?
 				pois.add(poi);
 			}
-			Log.d(BonusPackHelper.LOG_TAG, "done");
+			log.debug("done");
 			return pois;
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -114,7 +116,7 @@ public class GeoNamesPOIProvider {
 
 	//XML parsing seems 2 times slower than JSON parsing
 	public ArrayList<POI> getThemXML(String fullUrl) {
-		Log.d(BonusPackHelper.LOG_TAG, "GeoNamesPOIProvider:get:" + fullUrl);
+		log.debug("GeoNamesPOIProvider:get:" + fullUrl);
 		HttpConnection connection = new HttpConnection();
 		connection.doGet(fullUrl);
 		InputStream stream = connection.getStream();
@@ -133,7 +135,7 @@ public class GeoNamesPOIProvider {
 			e.printStackTrace();
 		}
 		connection.close();
-		Log.d(BonusPackHelper.LOG_TAG, "done");
+		log.debug("done");
 		return handler.mPOIs;
 	}
 

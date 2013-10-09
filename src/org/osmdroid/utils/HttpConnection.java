@@ -17,8 +17,8 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
-
-import android.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A "very very simple to use" class for performing http get and post requests.
@@ -37,6 +37,7 @@ import android.util.Log;
  * </pre>
  */
 public class HttpConnection {
+	final static Logger log = LoggerFactory.getLogger(HttpConnection.class);
 
 	private DefaultHttpClient client;
 	private InputStream stream;
@@ -80,7 +81,7 @@ public class HttpConnection {
 			HttpResponse response = client.execute(request);
 			StatusLine status = response.getStatusLine();
 			if (status.getStatusCode() != 200) {
-				Log.e(BonusPackHelper.LOG_TAG, "Invalid response from server: " + status.toString());
+				log.error("Invalid response from server: " + status.toString());
 			} else {
 				entity = response.getEntity();
 			}
@@ -98,7 +99,7 @@ public class HttpConnection {
 			HttpResponse response = client.execute(request);
 			StatusLine status = response.getStatusLine();
 			if (status.getStatusCode() != 200) {
-				Log.e(BonusPackHelper.LOG_TAG, "Invalid response from server: " + status.toString());
+				log.error("Invalid response from server: " + status.toString());
 			} else {
 				entity = response.getEntity();
 			}

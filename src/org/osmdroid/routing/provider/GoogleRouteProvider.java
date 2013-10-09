@@ -16,14 +16,13 @@ import org.osmdroid.routing.Route;
 import org.osmdroid.routing.RouteLeg;
 import org.osmdroid.routing.RouteNode;
 import org.osmdroid.routing.RouteProvider;
-import org.osmdroid.utils.BonusPackHelper;
 import org.osmdroid.utils.HttpConnection;
 import org.osmdroid.utils.PolylineEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import android.util.Log;
 
 /**
  * class to get a route between a start and a destination point, going through a
@@ -35,6 +34,8 @@ import android.util.Log;
  * @author M.Kergall
  */
 public class GoogleRouteProvider extends RouteProvider {
+
+	final static Logger log = LoggerFactory.getLogger(GoogleRouteProvider.class);
 
 	static final String GOOGLE_DIRECTIONS_SERVICE = "http://maps.googleapis.com/maps/api/directions/xml?";
 
@@ -80,7 +81,7 @@ public class GoogleRouteProvider extends RouteProvider {
 	@Override
 	public Route getRoute(List<GeoPoint> waypoints) {
 		String url = getUrl(waypoints);
-		Log.d(BonusPackHelper.LOG_TAG, "GoogleRouteManager.getRoute:" + url);
+		log.debug("GoogleRouteManager.getRoute:" + url);
 		Route route = null;
 		HttpConnection connection = new HttpConnection();
 		connection.doGet(url);
@@ -99,7 +100,7 @@ public class GoogleRouteProvider extends RouteProvider {
 			}
 			route.status = Route.STATUS_OK;
 		}
-		Log.d(BonusPackHelper.LOG_TAG, "GoogleRouteManager.getRoute - finished");
+		log.debug("GoogleRouteManager.getRoute - finished");
 		return route;
 	}
 
@@ -201,7 +202,7 @@ class GoogleDirectionsHandler extends DefaultHandler {
 				mString = mString.replaceAll("<[^>]*>", " "); //remove everything in <...>
 				mString = mString.replaceAll("&nbsp;", " ");
 				mNode.instructions = mString;
-				//Log.d(BonusPackHelper.LOG_TAG, mString);
+				//log.debug(mString);
 			}
 		} else if (localName.equals("start_location")) {
 			if (isStep)

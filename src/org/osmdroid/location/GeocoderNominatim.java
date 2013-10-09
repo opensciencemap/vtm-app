@@ -10,10 +10,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.utils.BonusPackHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.location.Address;
-import android.util.Log;
 
 /**
  * Implements an equivalent to Android Geocoder class, based on OpenStreetMap
@@ -24,6 +25,9 @@ import android.util.Log;
  * @author M.Kergall
  */
 public class GeocoderNominatim {
+
+	final static Logger log = LoggerFactory.getLogger(GeocoderNominatim.class);
+
 	public static final String NOMINATIM_SERVICE_URL = "http://nominatim.openstreetmap.org/";
 	public static final String MAPQUEST_SERVICE_URL = "http://open.mapquestapi.com/nominatim/v1/";
 
@@ -153,9 +157,9 @@ public class GeocoderNominatim {
 		        //+ "&addressdetails=1"
 		        + "&lat=" + latitude
 		        + "&lon=" + longitude;
-		Log.d(BonusPackHelper.LOG_TAG, "GeocoderNominatim::getFromLocation:" + url);
+		log.debug("GeocoderNominatim::getFromLocation:" + url);
 		String result = BonusPackHelper.requestStringFromUrl(url);
-		//Log.d("NOMINATIM", result);
+		//log.debug(result);
 		if (result == null)
 			throw new IOException();
 		try {
@@ -188,9 +192,9 @@ public class GeocoderNominatim {
 			        + "," + lowerLeftLatitude
 			        + "&bounded=1";
 		}
-		Log.d(BonusPackHelper.LOG_TAG, "GeocoderNominatim::getFromLocationName:" + url);
+		log.debug("GeocoderNominatim::getFromLocationName:" + url);
 		String result = BonusPackHelper.requestStringFromUrl(url);
-		//Log.d(BonusPackHelper.LOG_TAG, result);
+		//log.debug(result);
 		if (result == null)
 			throw new IOException();
 		try {

@@ -16,13 +16,15 @@ package org.oscim.app;
 
 import org.oscim.android.MapView;
 import org.oscim.map.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.app.Application;
 import android.content.res.Resources;
 
 public class App extends Application {
 
-	public static final String TAG = TileMap.class.getName();
+	public final static Logger log = LoggerFactory.getLogger(App.class);
 
 	public static Map map;
 	public static MapView view;

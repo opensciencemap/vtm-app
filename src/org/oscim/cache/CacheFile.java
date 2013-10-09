@@ -31,7 +31,7 @@ import org.oscim.tiling.source.ITileCache;
  * to the file.
  */
 public class CacheFile implements ITileCache.TileReader, ITileCache.TileWriter {
-	//private final static String TAG = CacheFile.class.getName();
+	//final static Logger log = LoggerFactory.getLogger(CacheFile.class);
 
 	final File mFile;
 	final TileCache mCacheManager;

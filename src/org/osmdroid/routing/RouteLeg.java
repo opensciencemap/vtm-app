@@ -2,11 +2,8 @@ package org.osmdroid.routing;
 
 import java.util.List;
 
-import org.osmdroid.utils.BonusPackHelper;
-
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 /**
  * Road Leg is the portion of the route between 2 waypoints (intermediate points
@@ -15,6 +12,8 @@ import android.util.Log;
  * @author M.Kergall
  */
 public class RouteLeg implements Parcelable {
+	//final static Logger log = LoggerFactory.getLogger(RouteLeg.class);
+
 	/** in km */
 	public double length;
 	/** in sec */
@@ -40,8 +39,8 @@ public class RouteLeg implements Parcelable {
 			length += node.length;
 			duration += node.duration;
 		}
-		Log.d(BonusPackHelper.LOG_TAG, "Leg: " + startNodeIndex + "-" + endNodeIndex
-		        + ", length=" + length + "km, duration=" + duration + "s");
+		//log.debug("Leg: " + startNodeIndex + "-" + endNodeIndex
+		//        + ", length=" + length + "km, duration=" + duration + "s");
 	}
 
 	//--- Parcelable implementation

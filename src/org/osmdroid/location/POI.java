@@ -7,7 +7,6 @@ import org.osmdroid.utils.BonusPackHelper;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -19,6 +18,7 @@ import android.widget.ImageView;
  * @author M.Kergall
  */
 public class POI {
+
 	/** IDs of POI services */
 	public static int POI_SERVICE_NOMINATIM = 100;
 	public static int POI_SERVICE_GEONAMES_WIKIPEDIA = 200;
@@ -67,7 +67,6 @@ public class POI {
 	 */
 	public Bitmap getThumbnail() {
 		if (thumbnail == null && thumbnailPath != null) {
-			Log.d(BonusPackHelper.LOG_TAG, "POI:load thumbnail:" + thumbnailPath);
 			thumbnail = BonusPackHelper.loadBitmap(thumbnailPath);
 			if (thumbnail == null) {
 				mThumbnailLoadingFailures++;

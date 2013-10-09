@@ -9,9 +9,10 @@ import org.json.JSONObject;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.osmdroid.utils.BonusPackHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 /**
  * POI Provider using Nominatim service. <br>
@@ -21,6 +22,9 @@ import android.util.Log;
  * @author M.Kergall
  */
 public class NominatimPOIProvider implements POIProvider {
+
+	final static Logger log = LoggerFactory.getLogger(NominatimPOIProvider.class);
+
 	/*
 	 * As the doc lacks a lot of features, source code may help:
 	 * https://trac.openstreetmap
@@ -79,10 +83,10 @@ public class NominatimPOIProvider implements POIProvider {
 	 * @return the list of POI, of null if technical issue.
 	 */
 	public ArrayList<POI> getThem(String url) {
-		Log.d(BonusPackHelper.LOG_TAG, "NominatimPOIProvider:get:" + url);
+		log.debug("NominatimPOIProvider:get:" + url);
 		String jString = BonusPackHelper.requestStringFromUrl(url);
 		if (jString == null) {
-			Log.e(BonusPackHelper.LOG_TAG, "NominatimPOIProvider: request failed.");
+			log.error("NominatimPOIProvider: request failed.");
 			return null;
 		}
 		try {
@@ -102,9 +106,9 @@ public class NominatimPOIProvider implements POIProvider {
 						poi.bbox = new BoundingBox(bbox.getDouble(0), bbox.getDouble(2),
 						                           bbox.getDouble(1), bbox.getDouble(3));
 					} catch (Exception e) {
-						Log.d("NominatimPOIProvider", "could not parse " + bbox);
+						log.debug("could not parse " + bbox);
 					}
-					//Log.d("NominatimPOIProvider", "bbox " + poi.bbox);
+					//log.debug("bbox " + poi.bbox);
 				}
 				poi.category = jPlace.optString("class");
 				poi.type = jPlace.getString("type");

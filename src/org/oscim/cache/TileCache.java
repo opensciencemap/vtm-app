@@ -19,19 +19,20 @@ import java.util.ArrayList;
 
 import org.oscim.core.Tile;
 import org.oscim.tiling.source.ITileCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.util.Log;
 
 /**
  * FIXME: REWRITE
  */
 @SuppressLint("DefaultLocale")
 public class TileCache implements ITileCache {
-	private final static String TAG = TileCache.class.getName();
+	final static Logger log = LoggerFactory.getLogger(TileCache.class);
 	private final static boolean DEBUG = false;
 
 	// size of cache in bytes
@@ -148,7 +149,7 @@ public class TileCache implements ITileCache {
 			}
 			mCacheSize = size;
 			if (DEBUG)
-				Log.d(TAG, "cache size is now " + mCacheSize);
+				log.debug("cache size is now " + mCacheSize);
 
 			return size;
 		}
@@ -183,19 +184,19 @@ public class TileCache implements ITileCache {
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
 			// We can read and write the media
 			mCacheDir = createDirectory(cacheDirectoryPath);
-			Log.d(TAG, "SDCARD");
+			log.debug("SDCARD");
 		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
 			// We can only read the media
 			mCacheDir = mContext.getCacheDir();
-			Log.d(TAG, "SDCARD is read only!");
+			log.debug("SDCARD is read only!");
 		} else {
 			// Something else is wrong. It may be one of many other states, but all we need
 			//  to know is we can neither read nor write
 			mCacheDir = mContext.getCacheDir();
-			Log.d(TAG, "Memory");
+			log.debug("Memory");
 		}
 		if (DEBUG)
-			Log.d(TAG, "cache dir: " + mCacheDir);
+			log.debug("cache dir: " + mCacheDir);
 
 		new AsyncTask<Void, Void, Boolean>() {
 
@@ -268,7 +269,7 @@ public class TileCache implements ITileCache {
 				x = y / 2;
 			}
 			/* get the middle haeufigkeit */
-			//Log.d("Cache", "middle is: " + datasource.getMiddleHits());
+			//log.debug("middle is: " + datasource.getMiddleHits());
 			ArrayList<String> always = (ArrayList<String>) mTileStats
 			    .getAllTileFileAboveHits(mTileStats.getMiddleHits());
 
@@ -287,7 +288,7 @@ public class TileCache implements ITileCache {
 
 					long age = System.currentTimeMillis() - file.lastModified();
 
-					//Log.d("Cache", file.getName());
+					//log.debug(file.getName());
 					if (!safeTile.contains(file.getName()) && age > 2000000) {
 						currentSize -= file.length();
 						file.delete();
@@ -317,7 +318,7 @@ public class TileCache implements ITileCache {
 			mCacheSize -= (beginSize - currentSize);
 			mCleanupJob = null;
 			if (DEBUG)
-				Log.d(TAG, "freed: " + (beginSize - currentSize) + " now: " + mCacheSize);
+				log.debug("freed: " + (beginSize - currentSize) + " now: " + mCacheSize);
 		}
 
 	}
@@ -329,10 +330,10 @@ public class TileCache implements ITileCache {
 			int size = (int) cacheFile.mFile.length();
 			mCacheSize += size;
 			if (DEBUG)
-				Log.d(TAG, cacheFile.getTile() + " written: " + size + " / usage: "
+				log.debug(cacheFile.getTile() + " written: " + size + " / usage: "
 				        + (mCacheSize / 1024) + "kb");
 		} else {
-			Log.d(TAG, cacheFile.getTile() + " cache failed");
+			log.debug(cacheFile.getTile() + " cache failed");
 
 		}
 	}

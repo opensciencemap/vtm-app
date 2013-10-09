@@ -20,6 +20,8 @@ import org.oscim.app.App;
 import org.oscim.app.R;
 import org.oscim.app.TileMap;
 import org.oscim.core.MapPosition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.location.Criteria;
@@ -27,10 +29,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 
 public class LocationHandler implements LocationListener {
-	private final static String TAG = LocationHandler.class.getName();
+	final static Logger log = LoggerFactory.getLogger(LocationHandler.class);
 
 	public enum Mode {
 		OFF,
@@ -187,7 +188,7 @@ public class LocationHandler implements LocationListener {
 		double lat = location.getLatitude();
 		double lon = location.getLongitude();
 
-		Log.d(TAG, "update location " + lat + ":" + lon);
+		log.debug("update location " + lat + ":" + lon);
 
 		if (mSetCenter || mMode == Mode.SNAP) {
 			mSetCenter = false;

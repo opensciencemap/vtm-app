@@ -35,7 +35,7 @@ import android.os.AsyncTask;
 @SuppressLint("DefaultLocale")
 public class TileStats {
 
-	//private static final String TAG = TileStats.class.getName();
+	//final static Logger log = LoggerFactory.getLogger(TileStats.class);
 
 	/*
 	 * This class implement the sqldatabase for oscim map.
@@ -119,7 +119,7 @@ public class TileStats {
 			                + TileName + "'";
 			database.execSQL(insert);
 			database.execSQL(update);
-			//Log.d("Cache", "setTileHit once");
+			//log.debug("setTileHit once");
 			database.close();
 		}
 	}

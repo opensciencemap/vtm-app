@@ -9,8 +9,8 @@ import org.json.JSONObject;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.osmdroid.utils.BonusPackHelper;
-
-import android.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * POI Provider using Flickr service to get geolocalized photos.
@@ -19,6 +19,8 @@ import android.util.Log;
  * @author M.Kergall
  */
 public class FlickrPOIProvider implements POIProvider {
+
+	final static Logger log = LoggerFactory.getLogger(FlickrPOIProvider.class);
 
 	protected String mApiKey;
 	private final static String PHOTO_URL = "http://www.flickr.com/photos/%s/%s/sizes/o/in/photostream/";
@@ -61,12 +63,11 @@ public class FlickrPOIProvider implements POIProvider {
 	 * "http://api.flickr.com/services/rest/?method=flickr.photos.getInfo"
 	 * +
 	 * "&api_key=" + mApiKey + "&photo_id=" + photo Id +
-	 * "&format=json&nojsoncallback=1"; Log.d(BonusPackHelper.LOG_TAG,
-	 * "getPhoto:"+url); String jString =
+	 * "&format=json&nojsoncallback=1"; log.debug( * "getPhoto:"+url); String
+	 * jString =
 	 * BonusPackHelper.requestStringFromUrl(url); if (jString == null)
 	 * {
-	 * Log.e(BonusPackHelper.LOG_TAG,
-	 * "FlickrPOIProvider: request failed.");
+	 * log.error( * "FlickrPOIProvider: request failed.");
 	 * return null; } try { POI poi = new POI(POI.POI_SERVICE_FLICKR);
 	 * JSONObject jRoot = new JSONObject(jString); JSONObject jPhoto =
 	 * jRoot.getJSONObject("photo"); JSONObject jLocation =
@@ -102,10 +103,10 @@ public class FlickrPOIProvider implements POIProvider {
 	 */
 	public ArrayList<POI> getThem(String fullUrl) {
 		// for local debug: fullUrl = "http://10.0.2.2/flickr_mockup.json";
-		Log.d(BonusPackHelper.LOG_TAG, "FlickrPOIProvider:get:" + fullUrl);
+		log.debug("FlickrPOIProvider:get:" + fullUrl);
 		String jString = BonusPackHelper.requestStringFromUrl(fullUrl);
 		if (jString == null) {
-			Log.e(BonusPackHelper.LOG_TAG, "FlickrPOIProvider: request failed.");
+			log.error("FlickrPOIProvider: request failed.");
 			return null;
 		}
 		try {
@@ -137,7 +138,7 @@ public class FlickrPOIProvider implements POIProvider {
 				pois.add(poi);
 			}
 			//			int total = jPhotos.getInt("total");
-			//			Log.d(BonusPackHelper.LOG_TAG, "done:" + n + " got, on a total of:" + total);
+			//			log.debug(on a total of:" + total);
 			return pois;
 		} catch (JSONException e) {
 			e.printStackTrace();

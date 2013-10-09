@@ -12,10 +12,12 @@ import org.oscim.utils.osm.OSMData;
 import org.oscim.utils.osm.OSMNode;
 import org.oscim.utils.osmpbf.OsmPbfReader;
 import org.osmdroid.utils.HttpConnection;
-
-import android.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OverpassPOIProvider implements POIProvider {
+
+	final static Logger log = LoggerFactory.getLogger(OverpassPOIProvider.class);
 
 	public static final String TAG_KEY_WEBSITE = "website".intern();
 
@@ -34,7 +36,7 @@ public class OverpassPOIProvider implements POIProvider {
 			e1.printStackTrace();
 			return null;
 		}
-		Log.d("...", "request " + url + encoded);
+		log.debug("request " + url + encoded);
 		connection.doGet(url + encoded);
 		OSMData osmData = OsmPbfReader.process(connection.getStream());
 		ArrayList<POI> pois = new ArrayList<POI>(osmData.getNodes().size());
@@ -53,7 +55,7 @@ public class OverpassPOIProvider implements POIProvider {
 				p.type = t.value;
 
 			if ((t = n.tags.get(TAG_KEY_WEBSITE)) != null) {
-				Log.d("...", p.description + " " + t.value);
+				log.debug(p.description + " " + t.value);
 				p.url = t.value;
 			}
 			pois.add(p);

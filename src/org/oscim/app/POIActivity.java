@@ -78,7 +78,7 @@ public class POIActivity extends Activity {
 		list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View view, int position, long index) {
-				//Log.d(App.TAG, "poi on click: " + position);
+				//log.debug("poi on click: " + position);
 				Intent intent = new Intent();
 				intent.putExtra("ID", position);
 				setResult(RESULT_OK, intent);
@@ -192,7 +192,7 @@ public class POIActivity extends Activity {
 		if (v.getId() == R.id.items) {
 			//AdapterView.AdapterContextMenuInfo info =
 			// (AdapterView.AdapterContextMenuInfo) menuInfo;
-			//Log.d(App.TAG, "list context menu created " + info.position);
+			//log.debug("list context menu created " + info.position);
 
 			MenuInflater inflater = getMenuInflater();
 			inflater.inflate(R.menu.poi_menu, menu);
@@ -205,7 +205,7 @@ public class POIActivity extends Activity {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		//Log.d(App.TAG, "context menu item selected " + item.getItemId());
+		//log.debug("context menu item selected " + item.getItemId());
 
 		if (item.getItemId() == R.id.menu_link) {
 

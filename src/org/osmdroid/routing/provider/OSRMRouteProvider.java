@@ -15,8 +15,8 @@ import org.osmdroid.routing.RouteProvider;
 import org.osmdroid.utils.BonusPackHelper;
 import org.osmdroid.utils.HttpConnection;
 import org.osmdroid.utils.PolylineEncoder;
-
-import android.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * get a route between a start and a destination point. It uses OSRM, a free
@@ -29,6 +29,9 @@ import android.util.Log;
  * @author M.Kergall
  */
 public class OSRMRouteProvider extends RouteProvider {
+
+	final static Logger log = LoggerFactory.getLogger(OSRMRouteProvider.class);
+
 	// 1 for 6 digit precision, 10 for 5
 	private final static int ENCODING_PRECISION = 1;
 
@@ -191,7 +194,7 @@ public class OSRMRouteProvider extends RouteProvider {
 	@Override
 	public Route getRoute(List<GeoPoint> waypoints) {
 		String url = getUrl(waypoints);
-		Log.d(BonusPackHelper.LOG_TAG, "OSRMRouteManager.getRoute:" + url);
+		log.debug("OSRMRouteManager.getRoute:" + url);
 
 		//String jString = BonusPackHelper.requestStringFromUrl(url);
 		HttpConnection connection = new HttpConnection();
@@ -201,7 +204,7 @@ public class OSRMRouteProvider extends RouteProvider {
 		connection.close();
 
 		if (jString == null) {
-			Log.e(BonusPackHelper.LOG_TAG, "OSRMRouteManager::getRoute: request failed.");
+			log.error("OSRMRouteManager::getRoute: request failed.");
 			return new Route(waypoints);
 		}
 		Locale l = Locale.getDefault();
@@ -232,7 +235,7 @@ public class OSRMRouteProvider extends RouteProvider {
 				} else {
 					node.maneuverType = getManeuverCode(direction);
 					node.instructions = buildInstructions(direction, routeName, directions);
-					//Log.d(BonusPackHelper.LOG_TAG, direction+"=>"+node.mManeuverType+"; "+node.mInstructions);
+					//log.debug(direction+"=>"+node.mManeuverType+"; "+node.mInstructions);
 					route.nodes.add(node);
 					lastNode = node;
 				}
@@ -256,7 +259,7 @@ public class OSRMRouteProvider extends RouteProvider {
 			//	bb.getLatSouthE6(), bb.getLonWestE6(), bb.getLatNorthE6(), bb.getLonEastE6());
 			route.status = Route.STATUS_OK;
 		}
-		Log.d(BonusPackHelper.LOG_TAG, "OSRMRouteManager.getRoute - finished");
+		log.debug("OSRMRouteManager.getRoute - finished");
 		return route;
 	}
 

@@ -25,6 +25,8 @@ import org.oscim.core.GeoPoint;
 import org.oscim.overlay.DistanceTouchOverlay;
 import org.osmdroid.location.POI;
 import org.osmdroid.overlays.MapEventsReceiver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -37,7 +39,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -48,7 +49,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 public class TileMap extends MapActivity implements MapEventsReceiver {
-	static final String TAG = TileMap.class.getName();
+	final static Logger log = LoggerFactory.getLogger(TileMap.class);
 
 	private static final int DIALOG_ENTER_COORDINATES = 0;
 	private static final int DIALOG_LOCATION_PROVIDER_DISABLED = 2;
@@ -128,7 +129,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		Uri uri = intent.getData();
 		if (uri != null) {
 			String scheme = uri.getSchemeSpecificPart();
-			Log.d(TAG, "got intent: " + (scheme == null ? "" : scheme));
+			log.debug("got intent: " + (scheme == null ? "" : scheme));
 		}
 	}
 
@@ -286,10 +287,10 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		switch (requestCode) {
 			case POIS_REQUEST:
-				Log.d(TAG, "result: POIS_REQUEST");
+				log.debug("result: POIS_REQUEST");
 				if (resultCode == RESULT_OK) {
 					int id = intent.getIntExtra("ID", 0);
-					Log.d(TAG, "result: POIS_REQUEST: " + id);
+					log.debug("result: POIS_REQUEST: " + id);
 
 					App.poiSearch.poiMarkers.showBubbleOnItem(id);
 					POI poi = App.poiSearch.getPOIs().get(id);

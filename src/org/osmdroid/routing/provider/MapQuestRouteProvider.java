@@ -14,14 +14,13 @@ import org.oscim.core.GeoPoint;
 import org.osmdroid.routing.Route;
 import org.osmdroid.routing.RouteNode;
 import org.osmdroid.routing.RouteProvider;
-import org.osmdroid.utils.BonusPackHelper;
 import org.osmdroid.utils.HttpConnection;
 import org.osmdroid.utils.PolylineEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import android.util.Log;
 
 /**
  * class to get a route between a start and a destination point, going through a
@@ -32,6 +31,8 @@ import android.util.Log;
  * @author M.Kergall
  */
 public class MapQuestRouteProvider extends RouteProvider {
+
+	final static Logger log = LoggerFactory.getLogger(MapQuestRouteProvider.class);
 
 	static final String MAPQUEST_GUIDANCE_SERVICE = "http://open.mapquestapi.com/guidance/v0/route?";
 
@@ -84,7 +85,7 @@ public class MapQuestRouteProvider extends RouteProvider {
 	@Override
 	public Route getRoute(List<GeoPoint> waypoints) {
 		String url = getUrl(waypoints);
-		Log.d(BonusPackHelper.LOG_TAG, "MapQuestRouteManager.getRoute:" + url);
+		log.debug("MapQuestRouteManager.getRoute:" + url);
 		Route route = null;
 		HttpConnection connection = new HttpConnection();
 		connection.doGet(url);
@@ -96,7 +97,7 @@ public class MapQuestRouteProvider extends RouteProvider {
 			route = new Route(waypoints);
 		}
 		connection.close();
-		Log.d(BonusPackHelper.LOG_TAG, "MapQuestRouteManager.getRoute - finished");
+		log.debug("MapQuestRouteManager.getRoute - finished");
 		return route;
 	}
 
@@ -224,10 +225,10 @@ class XMLHandler extends DefaultHandler {
 			mLng = Double.parseDouble(mString);
 		} else if (localName.equals("shapePoints")) {
 			mRoute.routeHigh = PolylineEncoder.decode(mString, 10);
-			// Log.d("DD", "High="+mRoute.mRouteHigh.size());
+			// log.debug("High="+mRoute.mRouteHigh.size());
 		} else if (localName.equals("generalizedShape")) {
 			mRoute.setRouteLow(PolylineEncoder.decode(mString, 10));
-			// Log.d("DD", "Low="+mRoute.mRouteLow.size());
+			// log.debug("Low="+mRoute.mRouteLow.size());
 		} else if (localName.equals("length")) {
 			mLink.mLength = Double.parseDouble(mString);
 		} else if (localName.equals("speed")) {

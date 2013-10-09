@@ -34,7 +34,7 @@ import android.widget.ImageView;
 @SuppressWarnings("deprecation")
 public class Compass extends Layer implements SensorEventListener, Map.UpdateListener {
 
-	//private static final String TAG = Compass.class.getName();
+	//final static Logger log = LoggerFactory.getLogger(Compass.class);
 
 	public enum Mode {
 		OFF,
@@ -77,7 +77,7 @@ public class Compass extends Layer implements SensorEventListener, Map.UpdateLis
 
 		//List<Sensor> s = mSensorManager.getSensorList(Sensor.TYPE_ALL);
 		//for (Sensor sensor : s)
-		//	Log.d(TAG, sensor.toString());
+		//	log.debug(sensor.toString());
 
 		mArrowView = (ImageView) App.activity.findViewById(R.id.compass);
 

@@ -12,13 +12,12 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
-import org.osmdroid.utils.BonusPackHelper;
 import org.osmdroid.utils.HttpConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import android.util.Log;
 
 /**
  * POI Provider using Picasa service.
@@ -27,6 +26,8 @@ import android.util.Log;
  * @author M.Kergall
  */
 public class PicasaPOIProvider implements POIProvider {
+
+	final static Logger log = LoggerFactory.getLogger(PicasaPOIProvider.class);
 
 	String mAccessToken;
 
@@ -59,7 +60,7 @@ public class PicasaPOIProvider implements POIProvider {
 	}
 
 	public ArrayList<POI> getThem(String fullUrl) {
-		Log.d(BonusPackHelper.LOG_TAG, "PicasaPOIProvider:get:" + fullUrl);
+		log.debug("PicasaPOIProvider:get:" + fullUrl);
 		HttpConnection connection = new HttpConnection();
 		connection.doGet(fullUrl);
 		InputStream stream = connection.getStream();
@@ -82,7 +83,7 @@ public class PicasaPOIProvider implements POIProvider {
 		}
 		connection.close();
 		if (handler.mPOIs != null)
-			Log.d(BonusPackHelper.LOG_TAG, "done:" + handler.mPOIs.size() + " got, on a total of:"
+			log.debug("done:" + handler.mPOIs.size() + " got on a total of:"
 			        + handler.mTotalResults);
 		return handler.mPOIs;
 	}

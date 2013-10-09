@@ -20,13 +20,14 @@ import org.oscim.tiling.source.mapnik.MapnikVectorTileSource;
 import org.oscim.tiling.source.oscimap.OSciMap1TileSource;
 import org.oscim.tiling.source.oscimap2.OSciMap2TileSource;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 public class MapLayers {
 
-	private static final String TAG = MapLayers.class.getName();
+	final static Logger log = LoggerFactory.getLogger(MapLayers.class);
 
 	private static final String CACHE_DIRECTORY = "/Android/data/org.oscim.app/cache/";
 
@@ -72,7 +73,7 @@ public class MapLayers {
 			tileSource = new MapnikVectorTileSource();
 			tileSource.setOption("url", "http://d1s11ojcu7opje.cloudfront.net/dev/764e0b8d");
 		} else {
-			Log.d(TAG, "no matching tilesource for: " + dbname);
+			log.debug("no matching tilesource for: " + dbname);
 			return;
 		}
 
