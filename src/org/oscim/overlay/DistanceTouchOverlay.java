@@ -20,14 +20,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.oscim.core.GeoPoint;
-import org.oscim.event.EventListener;
-import org.oscim.event.MapEvent;
 import org.oscim.event.MotionEvent;
 import org.oscim.layers.Layer;
 import org.oscim.map.Map;
 import org.osmdroid.overlays.MapEventsReceiver;
 
-public class DistanceTouchOverlay extends Layer implements EventListener {
+public class DistanceTouchOverlay extends Layer implements Map.InputListener {
 
 	private static final int LONGPRESS_THRESHOLD = 800;
 
@@ -52,13 +50,11 @@ public class DistanceTouchOverlay extends Layer implements EventListener {
 	public DistanceTouchOverlay(Map map, MapEventsReceiver receiver) {
 		super(map);
 		mReceiver = receiver;
-		map.addListener(MotionEvent.TYPE, this);
 	}
 
 	@Override
 	public void onDetach() {
 		super.onDetach();
-		mMap.removeListener(MotionEvent.TYPE, this);
 	}
 
 	private void cancel() {
@@ -70,11 +66,7 @@ public class DistanceTouchOverlay extends Layer implements EventListener {
 	}
 
 	@Override
-	public void handleEvent(MapEvent event) {
-		if (!(event instanceof MotionEvent))
-			return;
-
-		MotionEvent e = (MotionEvent) event;
+	public void onMotionEvent(MotionEvent e) {
 
 		int action = e.getAction() & MotionEvent.ACTION_MASK;
 
