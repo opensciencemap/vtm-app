@@ -165,7 +165,7 @@ public class MapLayers {
 		if (mBackgroundLayer instanceof BitmapTileLayer)
 			App.map.setBackgroundMap((BitmapTileLayer) mBackgroundLayer);
 		else
-			App.map.getLayers().add(0, mBackroundPlaceholder);
+			App.map.getLayers().add(1, mBackroundPlaceholder);
 
 		mBackgroundId = id;
 	}
