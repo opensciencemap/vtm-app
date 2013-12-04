@@ -11,14 +11,11 @@ import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.renderer.GridRenderer;
 import org.oscim.theme.InternalRenderTheme;
-import org.oscim.theme.ThemeLoader;
 import org.oscim.tiling.source.ITileCache;
 import org.oscim.tiling.source.TileSource;
 import org.oscim.tiling.source.common.UrlTileSource;
 import org.oscim.tiling.source.mapfile.MapFileTileSource;
 import org.oscim.tiling.source.mapnik.MapnikVectorTileSource;
-import org.oscim.tiling.source.oscimap.OSciMap1TileSource;
-import org.oscim.tiling.source.oscimap2.OSciMap2TileSource;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +27,36 @@ public class MapLayers {
 	final static Logger log = LoggerFactory.getLogger(MapLayers.class);
 
 	private static final String CACHE_DIRECTORY = "/Android/data/org.oscim.app/cache/";
+
+	abstract static class Config {
+		final String name;
+
+		public Config(String name) {
+			this.name = name;
+		}
+
+		abstract TileSource init();
+	}
+
+	static Config[] configs = new Config[] {
+			new Config("OPENSCIENCEMAP4") {
+				TileSource init() {
+					return new OSciMap4TileSource()
+							.setOption("url", "http://opensciencemap.org/tiles/vtm");
+				}
+			},
+			new Config("MAPSFORGE") {
+				TileSource init() {
+					return new MapFileTileSource()
+							.setOption("file", "/storage/sdcard0/germany.map");
+				}
+			},
+			new Config("MAPNIK_VECTOR") {
+				TileSource init() {
+					return new MapnikVectorTileSource()
+							.setOption("url", "http://d1s11ojcu7opje.cloudfront.net/dev/764e0b8d");
+				}
+			} };
 
 	private VectorTileLayer mBaseLayer;
 	private String mMapDatabase;
@@ -52,29 +79,18 @@ public class MapLayers {
 	void setBaseMap(SharedPreferences preferences) {
 		String dbname = preferences.getString("mapDatabase", "OPENSCIENCEMAP4");
 
-		if (dbname == mMapDatabase)
+		if (dbname.equals(mMapDatabase) && mBaseLayer != null)
 			return;
 
 		TileSource tileSource = null;
+		for (Config c : configs)
+			if (c.name.equals(dbname))
+				tileSource = c.init();
 
-		if ("OPENSCIENCEMAP1".equals(dbname)) {
-			tileSource = new OSciMap1TileSource();
-			tileSource.setOption("url", "http://opensciencemap.org/osmstache/test");
-		} else if ("OPENSCIENCEMAP2".equals(dbname)) {
-			tileSource = new OSciMap2TileSource();
-			tileSource.setOption("url", "http://opensciencemap.org/osci/map-live");
-		} else if ("OPENSCIENCEMAP4".equals(dbname)) {
-			tileSource = new OSciMap4TileSource();
-			tileSource.setOption("url", "http://opensciencemap.org/tiles/vtm");
-		} else if ("MAPSFORGE".equals(dbname)) {
-			tileSource = new MapFileTileSource();
-			tileSource.setOption("file", "/storage/sdcard0/germany.map");
-		} else if ("MAPNIK_VECTOR".equals(dbname)) {
-			tileSource = new MapnikVectorTileSource();
-			tileSource.setOption("url", "http://d1s11ojcu7opje.cloudfront.net/dev/764e0b8d");
-		} else {
-			log.debug("no matching tilesource for: " + dbname);
-			return;
+		if (tileSource == null) {
+			tileSource = configs[0].init();
+			dbname = configs[0].name;
+			preferences.edit().putString("mapDatabase", dbname).commit();
 		}
 
 		if (tileSource instanceof UrlTileSource) {
@@ -87,8 +103,7 @@ public class MapLayers {
 
 		if (mBaseLayer == null) {
 			mBaseLayer = App.map.setBaseMap(tileSource);
-			App.map.getLayers().add(2,
-			                        new BuildingLayer(App.map, mBaseLayer.getTileLayer()));
+			App.map.getLayers().add(2, new BuildingLayer(App.map, mBaseLayer.getTileLayer()));
 			App.map.getLayers().add(3, new LabelLayer(App.map, mBaseLayer.getTileLayer()));
 		} else
 			mBaseLayer.setTileSource(tileSource);
@@ -97,15 +112,13 @@ public class MapLayers {
 	}
 
 	void setPreferences(SharedPreferences preferences) {
-		if (preferences.contains("mapDatabase"))
-			setBaseMap(preferences);
+		setBaseMap(preferences);
 
 		InternalRenderTheme theme = InternalRenderTheme.DEFAULT;
 		if (preferences.contains("theme")) {
 			String name = preferences.getString("theme", "DEFAULT");
 			try {
 				theme = InternalRenderTheme.valueOf(name);
-				mBaseLayer.setRenderTheme(ThemeLoader.load(theme));
 			} catch (IllegalArgumentException e) {
 				theme = InternalRenderTheme.DEFAULT;
 			}
