@@ -588,8 +588,6 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	// ------------ MapEventsReceiver implementation
 	@Override
 	public boolean singleTapUpHelper(GeoPoint p) {
-		App.poiSearch.singleTapUp();
-		App.routeSearch.singleTapUp();
 		return false;
 	}
 

@@ -20,12 +20,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.oscim.core.GeoPoint;
+import org.oscim.event.Gesture;
+import org.oscim.event.GestureListener;
 import org.oscim.event.MotionEvent;
 import org.oscim.layers.Layer;
 import org.oscim.map.Map;
 import org.osmdroid.overlays.MapEventsReceiver;
 
-public class DistanceTouchOverlay extends Layer implements Map.InputListener {
+public class DistanceTouchOverlay extends Layer implements Map.InputListener, GestureListener {
 
 	private static final int LONGPRESS_THRESHOLD = 800;
 
@@ -164,6 +166,15 @@ public class DistanceTouchOverlay extends Layer implements Map.InputListener {
 				});
 			}
 		}, LONGPRESS_THRESHOLD);
+	}
+
+	@Override
+	public boolean onGesture(Gesture g, MotionEvent e) {
+		if (g instanceof Gesture.LongPress) {
+			GeoPoint p = mMap.getViewport().fromScreenPoint(e.getX(), e.getY());
+			return mReceiver.longPressHelper(p);
+		}
+		return false;
 	}
 
 }

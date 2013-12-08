@@ -320,11 +320,6 @@ public class RouteSearch {
 		mRouteTask.execute(waypoints);
 	}
 
-	void singleTapUp() {
-		//mRouteMarkers.hideBubble();
-		mItineraryMarkers.hideBubble();
-	}
-
 	boolean onContextItemSelected(MenuItem item, GeoPoint geoPoint) {
 		switch (item.getItemId()) {
 			case R.id.menu_route_departure:

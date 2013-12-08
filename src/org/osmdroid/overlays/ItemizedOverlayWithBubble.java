@@ -6,6 +6,7 @@ import org.oscim.app.App;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.Point;
+import org.oscim.event.MotionEvent;
 import org.oscim.layers.marker.ItemizedIconLayer;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerSymbol;
@@ -40,35 +41,6 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 
 	static int layoutResId = 0;
 
-	@Override
-	public boolean onItemLongPress(int index, MarkerItem item) {
-		if (mBubble.isOpen())
-			hideBubble();
-		else
-			showBubble(index);
-		return false;
-	}
-
-	@Override
-	public boolean onItemSingleTapUp(int index, MarkerItem item) {
-		showBubble(index);
-		return false;
-	}
-
-	private final Point mTmpPoint = new Point();
-
-	@Override
-	public void onMapUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
-		if (mBubble.isOpen()) {
-			GeoPoint gp = mItemWithBubble.getPoint();
-
-			Point p = mTmpPoint;
-			mMap.getViewport().toScreenPoint(gp, p);
-
-			mBubble.position((int) p.x, (int) p.y);
-		}
-	}
-
 	public ItemizedOverlayWithBubble(Map map, Context context, MarkerSymbol marker,
 	        List<Item> aList, InfoWindow bubble) {
 		super(map, aList, marker, null);
@@ -88,17 +60,56 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 					      "ItemizedOverlayWithBubble: layout/bonuspack_bubble not found in "
 					              + packageName);
 			}
-			// FIXME
 			mBubble = new DefaultInfoWindow(layoutResId, App.view);
 		}
-		mItemWithBubble = null;
 
+		mItemWithBubble = null;
 		mOnItemGestureListener = this;
 	}
 
 	public ItemizedOverlayWithBubble(Map map, Context context, MarkerSymbol marker,
 	        List<Item> aList) {
 		this(map, context, marker, aList, null);
+	}
+
+	@Override
+	public boolean onItemLongPress(int index, MarkerItem item) {
+		if (mBubble.isOpen())
+			hideBubble();
+		else
+			showBubble(index);
+		return false;
+	}
+
+	@Override
+	public boolean onItemSingleTapUp(int index, MarkerItem item) {
+		showBubble(index);
+
+		return true;
+	}
+
+	private final Point mTmpPoint = new Point();
+
+	@Override
+	protected boolean activateSelectedItems(MotionEvent event, ActiveItem task) {
+		boolean hit = super.activateSelectedItems(event, task);
+
+		if (!hit)
+			hideBubble();
+
+		return hit;
+	}
+
+	@Override
+	public void onMapUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
+		if (mBubble.isOpen()) {
+			GeoPoint gp = mItemWithBubble.getPoint();
+
+			Point p = mTmpPoint;
+			mMap.getViewport().toScreenPoint(gp, p);
+
+			mBubble.position((int) p.x, (int) p.y);
+		}
 	}
 
 	void showBubble(int index) {

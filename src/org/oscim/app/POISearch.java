@@ -312,10 +312,6 @@ public class POISearch {
 		}
 	}
 
-	void singleTapUp() {
-		poiMarkers.hideBubble();
-	}
-
 	public boolean onContextItemSelected(MenuItem item, GeoPoint geoPoint) {
 		switch (item.getItemId()) {
 			case R.id.menu_poi_nearby:
