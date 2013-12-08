@@ -70,25 +70,20 @@ public class POISearch {
 
 		mMarkers = new MarkerSymbol[5];
 
-		mMarkers[MDEFAULT] = AndroidGraphics.makeMarker(
-		                                                App.res, R.drawable.pin,
-		                                                HotspotPlace.BOTTOM_CENTER);
+		mMarkers[MDEFAULT] = AndroidGraphics
+		    .makeMarker(App.res, R.drawable.pin, HotspotPlace.BOTTOM_CENTER);
 
-		mMarkers[MFLICKR] = AndroidGraphics.makeMarker(
-		                                               App.res, R.drawable.marker_poi_flickr, null);
+		mMarkers[MFLICKR] = AndroidGraphics
+		    .makeMarker(App.res, R.drawable.marker_poi_flickr, null);
 
-		mMarkers[MPICASA] = AndroidGraphics.makeMarker(
-		                                               App.res,
-		                                               R.drawable.marker_poi_picasa_24,
-		                                               null);
+		mMarkers[MPICASA] = AndroidGraphics
+		    .makeMarker(App.res, R.drawable.marker_poi_picasa_24, null);
 
-		mMarkers[MWIKI16] = AndroidGraphics.makeMarker(
-		                                               App.res,
-		                                               R.drawable.marker_poi_wikipedia_16,
-		                                               null);
+		mMarkers[MWIKI16] = AndroidGraphics
+		    .makeMarker(App.res, R.drawable.marker_poi_wikipedia_16, null);
 
-		mMarkers[MWIKI32] = AndroidGraphics.makeMarker(App.res,
-		                                               R.drawable.marker_poi_wikipedia_32, null);
+		mMarkers[MWIKI32] = AndroidGraphics
+		    .makeMarker(App.res, R.drawable.marker_poi_wikipedia_32, null);
 	}
 
 	public List<POI> getPOIs() {
@@ -111,41 +106,37 @@ public class POISearch {
 
 			if (mTag == null || mTag.equals("")) {
 				return null;
-			} else if (mTag.equals(TAG_WIKIPEDIA)) {
+			}
+			BoundingBox bb = App.map.getViewport().getViewBox();
+
+			if (mTag.equals(TAG_WIKIPEDIA)) {
 				GeoNamesPOIProvider poiProvider = new GeoNamesPOIProvider("mkergall");
 				//ArrayList<POI> pois = poiProvider.getPOICloseTo(point, 30, 20.0);
 				//Get POI inside the bounding box of the current map view:
-				BoundingBox bb = App.map.getBoundingBox();
+
 				return poiProvider.getPOIInside(bb, 30);
 
 				//OverpassPOIProvider poiProvider = new OverpassPOIProvider();
 				//return poiProvider.getPOIInside(bb, "", 0);
 			} else if (mTag.equals(TAG_FLICKR)) {
-				FlickrPOIProvider poiProvider = new FlickrPOIProvider(
-				                                                      "c39be46304a6c6efda8bc066c185cd7e");
-				BoundingBox bb = App.map.getBoundingBox();
-
+				FlickrPOIProvider poiProvider = new FlickrPOIProvider("c39be46304a6c6efda8bc066c185cd7e");
 				return poiProvider.getPOIInside(bb, null, 20);
 			} else if (mTag.startsWith(TAG_PICASA)) {
 				PicasaPOIProvider poiProvider = new PicasaPOIProvider(null);
-				BoundingBox bb = App.map.getBoundingBox();
 				String q = mTag.substring(7);
 				return poiProvider.getPOIInside(bb, q, 20);
 			}
 			else if (mTag.startsWith(TAG_FOURSQUARE)) {
 				FourSquareProvider poiProvider = new FourSquareProvider(null, null);
-				BoundingBox bb = App.map.getBoundingBox();
 				String q = mTag.substring(10);
 				//				String q = mTag.substring("picasa".length());
 				return poiProvider.getPOIInside(bb, q, 40);
-			}
-			else {
+			} else {
 				NominatimPOIProvider poiProvider = new NominatimPOIProvider();
 				//poiProvider.setService(NominatimPOIProvider.NOMINATIM_POI_SERVICE);
 
 				poiProvider.setService(NominatimPOIProvider.MAPQUEST_POI_SERVICE);
 
-				BoundingBox bb = App.map.getBoundingBox();
 				//pois = poiProvider.getPOIAlong(mRoute.getRouteLow(), mTag, 100, 2.0);
 				return poiProvider.getPOIInside(bb, mTag, 10);
 			}
@@ -201,12 +192,9 @@ public class POISearch {
 				desc = poi.description;
 			}
 
-			ExtendedMarkerItem poiMarker = new ExtendedMarkerItem(
-			                                                      poi.type
-			                                                              + (name == null ? ""
-			                                                                      : ": " + name),
-			                                                      desc,
-			                                                      poi.location);
+			ExtendedMarkerItem poiMarker =
+			        new ExtendedMarkerItem(poi.type + (name == null ? "" : ": " + name), desc,
+			                               poi.location);
 			MarkerSymbol marker = null;
 
 			if (poi.serviceId == POI.POI_SERVICE_NOMINATIM) {

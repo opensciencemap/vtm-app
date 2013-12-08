@@ -22,8 +22,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.oscim.core.Tile;
-import org.oscim.utils.IOUtils;
 import org.oscim.tiling.source.ITileCache;
+import org.oscim.utils.IOUtils;
 
 /*
  * The class CacheFile implements the concrete cache unit for the cache operation.
