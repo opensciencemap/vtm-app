@@ -1,6 +1,6 @@
 package org.oscim.app;
 
-import org.oscim.cache.TileCache;
+import org.oscim.android.cache.TileCache;
 import org.oscim.layers.GenericLayer;
 import org.oscim.layers.Layer;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
@@ -39,24 +39,24 @@ public class MapLayers {
 	}
 
 	static Config[] configs = new Config[] {
-			new Config("OPENSCIENCEMAP4") {
-				TileSource init() {
-					return new OSciMap4TileSource()
-							.setOption("url", "http://opensciencemap.org/tiles/vtm");
-				}
-			},
-			new Config("MAPSFORGE") {
-				TileSource init() {
-					return new MapFileTileSource()
-							.setOption("file", "/storage/sdcard0/germany.map");
-				}
-			},
-			new Config("MAPNIK_VECTOR") {
-				TileSource init() {
-					return new MapnikVectorTileSource()
-							.setOption("url", "http://d1s11ojcu7opje.cloudfront.net/dev/764e0b8d");
-				}
-			} };
+	        new Config("OPENSCIENCEMAP4") {
+		        TileSource init() {
+			        return new OSciMap4TileSource()
+			            .setOption("url", "http://opensciencemap.org/tiles/vtm");
+		        }
+	        },
+	        new Config("MAPSFORGE") {
+		        TileSource init() {
+			        return new MapFileTileSource()
+			            .setOption("file", "/storage/sdcard0/germany.map");
+		        }
+	        },
+	        new Config("MAPNIK_VECTOR") {
+		        TileSource init() {
+			        return new MapnikVectorTileSource()
+			            .setOption("url", "http://d1s11ojcu7opje.cloudfront.net/dev/764e0b8d");
+		        }
+	        } };
 
 	private VectorTileLayer mBaseLayer;
 	private String mMapDatabase;
@@ -96,7 +96,7 @@ public class MapLayers {
 		if (tileSource instanceof UrlTileSource) {
 			mCache = new TileCache(App.activity, CACHE_DIRECTORY, dbname);
 			mCache.setCacheSize(512 * (1 << 10));
-			//tileSource.setCache(mCache);
+			tileSource.setCache(mCache);
 		} else {
 			mCache = null;
 		}
