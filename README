@@ -1,2 +1,10 @@
 VectorTileMap is part of the OpenScienceMap project, developed at University of Bremen. 
 http://www.opensciencemap.org
+
+The android build system is not able to merge asset directories, 
+(http://code.google.com/p/android/issues/detail?id=9042)
+please copy:
+
+cp -r ../vtm/assets/patterns assets/
+cp -r ../vtm/assets/styles assets/
+ 

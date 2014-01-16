@@ -1,2 +1,4 @@
 bin/*
 gen/*
+assets/patterns/*
+assets/styles/*
