@@ -201,10 +201,7 @@ public class LocationOverlay extends Layer {
 			GLState.test(false, false);
 
 			GLState.enableVertexArrays(hVertexPosition, -1);
-			GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER,
-			                    MapRenderer.getQuadVertexVBO());
-			GLES20.glVertexAttribPointer(hVertexPosition, 2,
-			                             GLES20.GL_FLOAT, false, 0, 0);
+			MapRenderer.bindQuadVertexVBO(hVertexPosition, true);
 
 			float radius = CIRCLE_SIZE;
 
