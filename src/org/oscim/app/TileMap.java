@@ -77,8 +77,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 		setContentView(R.layout.activity_tilemap);
 		App.view = (MapView) findViewById(R.id.mapView);
-		App.view.setClickable(true);
-		App.view.setFocusable(true);
+		registerMapView(App.view);
 
 		App.map = mMap;
 		App.activity = this;
