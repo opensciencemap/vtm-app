@@ -33,7 +33,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -413,12 +412,14 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 		}
 
-		if (preferences.getBoolean("fixOrientation", true)) {
-			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-			// this all returns the orientation which is not currently active?!
-			// getWindow().getWindowManager().getDefaultDisplay().getRotation());
-			// getWindow().getWindowManager().getDefaultDisplay().getOrientation());
-		}
+		App.lockOrientation(this);
+
+		//		if (preferences.getBoolean("fixOrientation", true)) {
+		//			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		//			// this all returns the orientation which is not currently active?!
+		//			// getWindow().getWindowManager().getDefaultDisplay().getRotation());
+		//			// getWindow().getWindowManager().getDefaultDisplay().getOrientation());
+		//		}
 
 		boolean distanceTouch = preferences.getBoolean("distanceTouch", true);
 		if (distanceTouch) {
