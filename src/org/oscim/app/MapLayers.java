@@ -3,9 +3,7 @@ package org.oscim.app;
 import org.oscim.android.cache.TileCache;
 import org.oscim.layers.GenericLayer;
 import org.oscim.layers.Layer;
-import org.oscim.layers.tile.bitmap.BitmapTileLayer;
-import org.oscim.layers.tile.bitmap.MapQuestAerial;
-import org.oscim.layers.tile.bitmap.NaturalEarth;
+import org.oscim.layers.tile.BitmapTileLayer;
 import org.oscim.layers.tile.vector.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
@@ -13,6 +11,8 @@ import org.oscim.renderer.GridRenderer;
 import org.oscim.theme.InternalRenderTheme;
 import org.oscim.tiling.source.ITileCache;
 import org.oscim.tiling.source.TileSource;
+import org.oscim.tiling.source.bitmap.DefaultSources.ImagicoLandcover;
+import org.oscim.tiling.source.bitmap.DefaultSources.NaturalEarth;
 import org.oscim.tiling.source.common.UrlTileSource;
 import org.oscim.tiling.source.mapfile.MapFileTileSource;
 import org.oscim.tiling.source.mapnik.MapnikVectorTileSource;
@@ -41,8 +41,7 @@ public class MapLayers {
 	static Config[] configs = new Config[] {
 	        new Config("OPENSCIENCEMAP4") {
 		        TileSource init() {
-			        return new OSciMap4TileSource()
-			            .setOption("url", "http://opensciencemap.org/tiles/vtm");
+			        return new OSciMap4TileSource();
 		        }
 	        },
 	        new Config("MAPSFORGE") {
@@ -53,8 +52,7 @@ public class MapLayers {
 	        },
 	        new Config("MAPNIK_VECTOR") {
 		        TileSource init() {
-			        return new MapnikVectorTileSource()
-			            .setOption("url", "http://d1s11ojcu7opje.cloudfront.net/dev/764e0b8d");
+			        return new MapnikVectorTileSource();
 		        }
 	        } };
 
@@ -164,11 +162,12 @@ public class MapLayers {
 
 		switch (id) {
 			case R.id.menu_layer_mapquest:
-				mBackgroundLayer = new BitmapTileLayer(App.map, MapQuestAerial.INSTANCE);
+				//mBackgroundLayer = new BitmapTileLayer(App.map, new MapQuestAerial());
+				mBackgroundLayer = new BitmapTileLayer(App.map, new ImagicoLandcover());
 				break;
 
 			case R.id.menu_layer_naturalearth:
-				mBackgroundLayer = new BitmapTileLayer(App.map, NaturalEarth.INSTANCE);
+				mBackgroundLayer = new BitmapTileLayer(App.map, new NaturalEarth());
 				break;
 			default:
 				mBackgroundLayer = mBackroundPlaceholder;
