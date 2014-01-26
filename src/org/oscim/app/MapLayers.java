@@ -3,11 +3,11 @@ package org.oscim.app;
 import org.oscim.android.cache.TileCache;
 import org.oscim.layers.GenericLayer;
 import org.oscim.layers.Layer;
+import org.oscim.layers.TileGridLayer;
 import org.oscim.layers.tile.BitmapTileLayer;
 import org.oscim.layers.tile.vector.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
-import org.oscim.renderer.GridRenderer;
 import org.oscim.theme.InternalRenderTheme;
 import org.oscim.tiling.source.ITileCache;
 import org.oscim.tiling.source.TileSource;
@@ -138,7 +138,7 @@ public class MapLayers {
 
 		if (enable) {
 			if (mGridOverlay == null)
-				mGridOverlay = new GenericLayer(App.map, new GridRenderer());
+				mGridOverlay = new TileGridLayer(App.map);
 
 			App.map.getLayers().add(mGridOverlay);
 		} else {
