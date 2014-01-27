@@ -71,19 +71,19 @@ public class POISearch {
 		mMarkers = new MarkerSymbol[5];
 
 		mMarkers[MDEFAULT] = AndroidGraphics
-		    .makeMarker(App.res, R.drawable.pin, HotspotPlace.BOTTOM_CENTER);
+		    .makeMarker(App.res.getDrawable(R.drawable.pin), HotspotPlace.BOTTOM_CENTER);
 
 		mMarkers[MFLICKR] = AndroidGraphics
-		    .makeMarker(App.res, R.drawable.marker_poi_flickr, null);
+		    .makeMarker(App.res.getDrawable(R.drawable.marker_poi_flickr), null);
 
 		mMarkers[MPICASA] = AndroidGraphics
-		    .makeMarker(App.res, R.drawable.marker_poi_picasa_24, null);
+		    .makeMarker(App.res.getDrawable(R.drawable.marker_poi_picasa_24), null);
 
 		mMarkers[MWIKI16] = AndroidGraphics
-		    .makeMarker(App.res, R.drawable.marker_poi_wikipedia_16, null);
+		    .makeMarker(App.res.getDrawable(R.drawable.marker_poi_wikipedia_16), null);
 
 		mMarkers[MWIKI32] = AndroidGraphics
-		    .makeMarker(App.res, R.drawable.marker_poi_wikipedia_32, null);
+		    .makeMarker(App.res.getDrawable(R.drawable.marker_poi_wikipedia_32), null);
 	}
 
 	public List<POI> getPOIs() {

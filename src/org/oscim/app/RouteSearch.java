@@ -161,7 +161,7 @@ public class RouteSearch {
 		if (item != null)
 			mItineraryMarkers.removeItem(item);
 
-		MarkerSymbol marker = AndroidGraphics.makeMarker(App.res, markerResId,
+		MarkerSymbol marker = AndroidGraphics.makeMarker(App.res.getDrawable(markerResId),
 		                                                 HotspotPlace.BOTTOM_CENTER);
 
 		ExtendedMarkerItem overlayItem =
