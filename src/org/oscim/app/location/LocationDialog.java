@@ -36,7 +36,7 @@ public class LocationDialog {
 	public void prepareDialog(Map map, final Dialog dialog) {
 		EditText editText = (EditText) dialog.findViewById(R.id.latitude);
 
-		MapPosition mapCenter = map.getMapPostion();
+		MapPosition mapCenter = map.getMapPosition();
 
 		editText.setText(Double.toString(mapCenter.getLatitude()));
 
