@@ -15,6 +15,8 @@
 
 package org.oscim.app;
 
+import java.util.Map;
+
 import org.oscim.android.MapActivity;
 import org.oscim.android.MapView;
 import org.oscim.app.location.Compass;
@@ -57,11 +59,9 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	protected static final int POIS_REQUEST = 2;
 
 	private LocationHandler mLocation;
-
-	private Menu mMenu = null;
-
 	private Compass mCompass;
 
+	private Menu mMenu = null;
 	private MapLayers mMapLayers;
 
 	public MapLayers getMapLayers() {
@@ -262,24 +262,10 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			onCreateOptionsMenu(menu);
 		}
 
-		//if (mMapDatabase == TileSources.MAPSFORGE) {
-		//	// menu.findItem(R.id.menu_mapfile).setVisible(true);
-		//	menu.findItem(R.id.menu_position_map_center).setVisible(true);
-		//} else {
-		//	// menu.findItem(R.id.menu_mapfile).setVisible(false);
-		//	menu.findItem(R.id.menu_position_map_center).setVisible(false);
-		//}
-
 		menu.findItem(R.id.menu_position_map_center).setVisible(false);
 
 		return super.onPrepareOptionsMenu(menu);
 	}
-
-	//@Override
-	//public boolean onTrackballEvent(MotionEvent event) {
-	//	// forward the event to the Map
-	//	return mMap.onTrackballEvent(event);
-	//}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -299,43 +285,9 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 						mMap.getAnimator().animateTo(poi.location);
 				}
 				break;
-			//case SELECT_RENDER_THEME_FILE:
-			//	if (resultCode == RESULT_OK && intent != null
-			//			&& intent.getStringExtra(FilePicker.SELECTED_FILE) != null) {
-			//		try {
-			//			mMap.setRenderTheme(intent
-			//					.getStringExtra(FilePicker.SELECTED_FILE));
-			//		} catch (FileNotFoundException e) {
-			//			showToastOnUiThread(e.getLocalizedMessage());
-			//		}
-			//	}
-			//	break;
 			default:
 				break;
 		}
-
-		//if (requestCode == SELECT_MAP_FILE) {
-		//	if (resultCode == RESULT_OK) {
-		//		if (intent != null) {
-		//			if (intent.getStringExtra(FilePicker.SELECTED_FILE) != null) {
-		//				map.setMapFile(intent
-		//						.getStringExtra(FilePicker.SELECTED_FILE));
-		//			}
-		//		}
-		//	} else if (resultCode == RESULT_CANCELED) {
-		//		startActivity(new Intent(this, EditPreferences.class));
-		//	}
-		//} else if (requestCode == SELECT_RENDER_THEME_FILE && resultCode ==
-		//		RESULT_OK
-		//		&& intent != null
-		//		&& intent.getStringExtra(FilePicker.SELECTED_FILE) != null) {
-		//	try {
-		//		map.setRenderTheme(intent
-		//				.getStringExtra(FilePicker.SELECTED_FILE));
-		//	} catch (FileNotFoundException e) {
-		//		showToastOnUiThread(e.getLocalizedMessage());
-		//	}
-		//}
 	}
 
 	static boolean isPreHoneyComb() {
@@ -366,7 +318,6 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		//mLocation.disableShowMyLocation();
 	}
 
 	@Override
@@ -374,12 +325,6 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		super.onPause();
 		mCompass.pause();
 		mLocation.pause();
-
-		//mCompass.setEnabled(false);
-		// release the wake lock if necessary
-		// if (mWakeLock.isHeld()) {
-		// mWakeLock.release();
-		// }
 	}
 
 	LocationDialog mLocationDialog;
@@ -416,13 +361,6 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 		App.lockOrientation(this);
 
-		//		if (preferences.getBoolean("fixOrientation", true)) {
-		//			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		//			// this all returns the orientation which is not currently active?!
-		//			// getWindow().getWindowManager().getDefaultDisplay().getRotation());
-		//			// getWindow().getWindowManager().getDefaultDisplay().getOrientation());
-		//		}
-
 		boolean distanceTouch = preferences.getBoolean("distanceTouch", true);
 		if (distanceTouch) {
 			if (mDistanceTouch == null) {
@@ -433,38 +371,6 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 			mMap.getLayers().remove(mDistanceTouch);
 			mDistanceTouch = null;
 		}
-
-		// try {
-		// String textScaleDefault =
-		// getString(R.string.preferences_text_scale_default);
-		// map.setTextScale(Float.parseFloat(preferences.getString("textScale",
-		// textScaleDefault)));
-		// } catch (NumberFormatException e) {
-		// map.setTextScale(1);
-		// }
-		// if (preferences.getBoolean("wakeLock", false) && !mWakeLock.isHeld())
-		// {
-		// mWakeLock.acquire();
-		// }
-
-		//boolean drawTileFrames = preferences.getBoolean("drawTileFrames", false);
-		//boolean drawTileCoordinates = preferences.getBoolean("drawTileCoordinates", false);
-		//boolean disablePolygons = preferences.getBoolean("disablePolygons", false);
-		//boolean drawUnmatchedWays = preferences.getBoolean("drawUnmatchedWays", false);
-		//boolean debugLabels = preferences.getBoolean("debugLabels", false);
-		//
-		//DebugSettings cur = mMap.getDebugSettings();
-		//if (cur.disablePolygons != disablePolygons
-		//		|| cur.drawTileCoordinates != drawTileCoordinates
-		//		|| cur.drawTileFrames != drawTileFrames
-		//		|| cur.debugTheme != drawUnmatchedWays
-		//		|| cur.debugLabels != debugLabels) {
-		//
-		//	DebugSettings debugSettings = new DebugSettings(drawTileCoordinates,
-		//			drawTileFrames, disablePolygons, drawUnmatchedWays, debugLabels);
-		//
-		//	mMap.setDebugSettings(debugSettings);
-		//}
 
 		mMap.updateMap(true);
 	}
@@ -559,7 +465,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		App.map.updateMap(true);
 	}
 
-	// ----------- Context Menu when clicking on the map
+	/** Context Menu when clicking on the {@link Map} */
 	private GeoPoint mLongPressGeoPoint;
 
 	@Override
@@ -587,7 +493,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		return super.onContextItemSelected(item);
 	}
 
-	// ------------ MapEventsReceiver implementation
+	/** MapEventsReceiver implementation */
 	@Override
 	public boolean singleTapUpHelper(GeoPoint p) {
 		return false;

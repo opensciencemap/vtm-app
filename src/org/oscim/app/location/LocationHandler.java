@@ -84,7 +84,6 @@ public class LocationHandler implements LocationListener {
 
 		// FIXME?
 		mSetCenter = false;
-
 		mMode = mode;
 
 		return true;
