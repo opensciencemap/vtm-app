@@ -16,6 +16,7 @@
 
 package org.oscim.app.location;
 
+import org.oscim.backend.GL20;
 import org.oscim.core.Box;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
@@ -32,7 +33,6 @@ import org.oscim.renderer.MapRenderer.Matrices;
 import org.oscim.utils.FastMath;
 import org.oscim.utils.Interpolation;
 
-import android.opengl.GLES20;
 import android.os.SystemClock;
 
 public class LocationOverlay extends Layer {
@@ -216,7 +216,7 @@ public class LocationOverlay extends Layer {
 				viewShed = true;
 				//animate(false);
 			}
-			GLES20.glUniform1f(hScale, radius);
+			GL.glUniform1f(hScale, radius);
 
 			double x = mIndicatorPosition.x - pos.x;
 			double y = mIndicatorPosition.y - pos.y;
@@ -231,21 +231,21 @@ public class LocationOverlay extends Layer {
 				//phase = Interpolation.fade.apply(phase);
 				phase = Interpolation.swing.apply(phase);
 
-				GLES20.glUniform1f(hPhase, 0.8f + phase * 0.2f);
+				GL.glUniform1f(hPhase, 0.8f + phase * 0.2f);
 			} else {
-				GLES20.glUniform1f(hPhase, 1);
+				GL.glUniform1f(hPhase, 1);
 			}
 
 			if (viewShed && mLocationIsVisible) {
 				float rotation = mCompass.getRotation() - 90;
-				GLES20.glUniform2f(hDirection,
-				                   (float) Math.cos(Math.toRadians(rotation)),
-				                   (float) Math.sin(Math.toRadians(rotation)));
+				GL.glUniform2f(hDirection,
+				               (float) Math.cos(Math.toRadians(rotation)),
+				               (float) Math.sin(Math.toRadians(rotation)));
 			} else {
-				GLES20.glUniform2f(hDirection, 0, 0);
+				GL.glUniform2f(hDirection, 0, 0);
 			}
 
-			GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+			GL.glDrawArrays(GL20.GL_TRIANGLE_STRIP, 0, 4);
 		}
 
 		private boolean init() {
@@ -254,11 +254,11 @@ public class LocationOverlay extends Layer {
 				return false;
 
 			mShaderProgram = shader;
-			hVertexPosition = GLES20.glGetAttribLocation(shader, "a_pos");
-			hMatrixPosition = GLES20.glGetUniformLocation(shader, "u_mvp");
-			hPhase = GLES20.glGetUniformLocation(shader, "u_phase");
-			hScale = GLES20.glGetUniformLocation(shader, "u_scale");
-			hDirection = GLES20.glGetUniformLocation(shader, "u_dir");
+			hVertexPosition = GL.glGetAttribLocation(shader, "a_pos");
+			hMatrixPosition = GL.glGetUniformLocation(shader, "u_mvp");
+			hPhase = GL.glGetUniformLocation(shader, "u_phase");
+			hScale = GL.glGetUniformLocation(shader, "u_scale");
+			hDirection = GL.glGetUniformLocation(shader, "u_dir");
 
 			return true;
 		}
