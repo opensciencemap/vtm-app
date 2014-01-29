@@ -217,4 +217,19 @@ public class LocationHandler implements LocationListener {
 		mSetCenter = true;
 	}
 
+	public void pause() {
+		if (mMode != Mode.OFF) {
+			log.debug("pause location listener");
+		}
+	}
+
+	public void resume() {
+		if (mMode != Mode.OFF) {
+			Criteria criteria = new Criteria();
+			criteria.setAccuracy(Criteria.ACCURACY_FINE);
+			String bestProvider = mLocationManager.getBestProvider(criteria, true);
+			mLocationManager.requestLocationUpdates(bestProvider, 10000, 10, this);
+		}
+	}
+
 }

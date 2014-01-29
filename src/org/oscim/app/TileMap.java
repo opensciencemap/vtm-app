@@ -373,6 +373,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 	protected void onPause() {
 		super.onPause();
 		mCompass.pause();
+		mLocation.pause();
 
 		//mCompass.setEnabled(false);
 		// release the wake lock if necessary
@@ -400,6 +401,7 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		super.onResume();
 
 		mCompass.resume();
+		mLocation.resume();
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		mMapLayers.setPreferences(preferences);
