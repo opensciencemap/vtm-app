@@ -101,8 +101,8 @@ public class MapLayers {
 
 		if (mBaseLayer == null) {
 			mBaseLayer = App.map.setBaseMap(tileSource);
-			App.map.getLayers().add(2, new BuildingLayer(App.map, mBaseLayer.getTileRenderer()));
-			App.map.getLayers().add(3, new LabelLayer(App.map, mBaseLayer.getTileRenderer()));
+			App.map.getLayers().add(2, new BuildingLayer(App.map, mBaseLayer));
+			App.map.getLayers().add(3, new LabelLayer(App.map, mBaseLayer));
 		} else
 			mBaseLayer.setTileSource(tileSource);
 
