@@ -90,11 +90,11 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 
 		if (prefs.getBoolean("distanceTouch", true)) {
 			mDistanceTouch = new DistanceTouchOverlay(mMap, this);
-			mMap.getLayers().add(mDistanceTouch);
+			mMap.layers().add(mDistanceTouch);
 		}
 
 		mCompass = new Compass(this, mMap);
-		mMap.getLayers().add(mCompass);
+		mMap.layers().add(mCompass);
 
 		mLocation = new LocationHandler(this, mCompass);
 
@@ -280,9 +280,9 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 					POI poi = App.poiSearch.getPOIs().get(id);
 
 					if (poi.bbox != null)
-						mMap.getAnimator().animateTo(poi.bbox);
+						mMap.animator().animateTo(poi.bbox);
 					else
-						mMap.getAnimator().animateTo(poi.location);
+						mMap.animator().animateTo(poi.location);
 				}
 				break;
 			default:
@@ -365,10 +365,10 @@ public class TileMap extends MapActivity implements MapEventsReceiver {
 		if (distanceTouch) {
 			if (mDistanceTouch == null) {
 				mDistanceTouch = new DistanceTouchOverlay(mMap, this);
-				mMap.getLayers().add(mDistanceTouch);
+				mMap.layers().add(mDistanceTouch);
 			}
 		} else {
-			mMap.getLayers().remove(mDistanceTouch);
+			mMap.layers().remove(mDistanceTouch);
 			mDistanceTouch = null;
 		}
 

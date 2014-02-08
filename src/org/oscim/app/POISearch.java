@@ -66,7 +66,7 @@ public class POISearch {
 		                                                               poiItems,
 		                                                               new POIInfoWindow(App.map));
 
-		App.map.getLayers().add(poiMarkers);
+		App.map.layers().add(poiMarkers);
 
 		mMarkers = new MarkerSymbol[5];
 
@@ -107,7 +107,7 @@ public class POISearch {
 			if (mTag == null || mTag.equals("")) {
 				return null;
 			}
-			BoundingBox bb = App.map.getViewport().getViewBox();
+			BoundingBox bb = App.map.viewport().getViewBox();
 
 			if (mTag.equals(TAG_WIKIPEDIA)) {
 				GeoNamesPOIProvider poiProvider = new GeoNamesPOIProvider("mkergall");

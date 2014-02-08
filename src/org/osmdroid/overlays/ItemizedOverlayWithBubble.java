@@ -103,7 +103,7 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 			GeoPoint gp = mItemWithBubble.getPoint();
 
 			Point p = mTmpPoint;
-			mMap.getViewport().toScreenPoint(gp, p);
+			mMap.viewport().toScreenPoint(gp, p);
 
 			mBubble.position((int) p.x, (int) p.y);
 		}
@@ -128,7 +128,7 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 		if (item != null) {
 			item.showBubble(mBubble, (Map) mMap);
 
-			mMap.getAnimator().animateTo(item.mGeoPoint);
+			mMap.animator().animateTo(item.mGeoPoint);
 
 			mMap.updateMap(true);
 			setFocus((Item) item);

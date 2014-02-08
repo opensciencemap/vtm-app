@@ -241,12 +241,12 @@ public class Compass extends Layer implements SensorEventListener, Map.UpdateLis
 
 			if (Math.abs(change) > 0.01) {
 				adjustArrow(mCurRotation, rotation);
-				mMap.getViewport().setRotation(-rotation);
+				mMap.viewport().setRotation(-rotation);
 				redraw = true;
 			}
 
 			if (mMode == Mode.C3D)
-				redraw |= mMap.getViewport().setTilt(-mCurTilt * 1.5f);
+				redraw |= mMap.viewport().setTilt(-mCurTilt * 1.5f);
 
 			if (redraw)
 				mMap.updateMap(true);

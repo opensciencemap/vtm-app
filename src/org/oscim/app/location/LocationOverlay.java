@@ -149,7 +149,7 @@ public class LocationOverlay extends Layer {
 			int width = mMap.getWidth();
 			int height = mMap.getHeight();
 
-			Viewport mapPosition = mMap.getViewport();
+			Viewport mapPosition = mMap.viewport();
 
 			// clamp location to a position that can be
 			// savely translated to screen coordinates

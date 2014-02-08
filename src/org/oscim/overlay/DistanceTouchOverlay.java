@@ -155,8 +155,8 @@ public class DistanceTouchOverlay extends Layer implements Map.InputListener, Ge
 
 			@Override
 			public void run() {
-				final GeoPoint p1 = mMap.getViewport().fromScreenPoint(mCurX1, mCurY1);
-				final GeoPoint p2 = mMap.getViewport().fromScreenPoint(mCurX2, mCurY2);
+				final GeoPoint p1 = mMap.viewport().fromScreenPoint(mCurX1, mCurY1);
+				final GeoPoint p2 = mMap.viewport().fromScreenPoint(mCurX2, mCurY2);
 
 				mMap.post(new Runnable() {
 					@Override
@@ -171,7 +171,7 @@ public class DistanceTouchOverlay extends Layer implements Map.InputListener, Ge
 	@Override
 	public boolean onGesture(Gesture g, MotionEvent e) {
 		if (g instanceof Gesture.LongPress) {
-			GeoPoint p = mMap.getViewport().fromScreenPoint(e.getX(), e.getY());
+			GeoPoint p = mMap.viewport().fromScreenPoint(e.getX(), e.getY());
 			return mReceiver.longPressHelper(p);
 		}
 		return false;

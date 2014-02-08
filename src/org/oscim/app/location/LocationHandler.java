@@ -121,7 +121,7 @@ public class LocationHandler implements LocationListener {
 		                             location.getAccuracy());
 
 		// FIXME -> implement LayerGroup
-		App.map.getLayers().add(4, mLocationOverlay);
+		App.map.layers().add(4, mLocationOverlay);
 
 		App.map.updateMap(true);
 		return true;
@@ -135,7 +135,7 @@ public class LocationHandler implements LocationListener {
 		mLocationManager.removeUpdates(this);
 		mLocationOverlay.setEnabled(false);
 
-		App.map.getLayers().remove(mLocationOverlay);
+		App.map.layers().remove(mLocationOverlay);
 		App.map.updateMap(true);
 
 		return true;

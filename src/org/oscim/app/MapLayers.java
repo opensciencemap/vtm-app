@@ -101,8 +101,8 @@ public class MapLayers {
 
 		if (mBaseLayer == null) {
 			mBaseLayer = App.map.setBaseMap(tileSource);
-			App.map.getLayers().add(2, new BuildingLayer(App.map, mBaseLayer));
-			App.map.getLayers().add(3, new LabelLayer(App.map, mBaseLayer));
+			App.map.layers().add(2, new BuildingLayer(App.map, mBaseLayer));
+			App.map.layers().add(3, new LabelLayer(App.map, mBaseLayer));
 		} else
 			mBaseLayer.setTileSource(tileSource);
 
@@ -140,9 +140,9 @@ public class MapLayers {
 			if (mGridOverlay == null)
 				mGridOverlay = new TileGridLayer(App.map);
 
-			App.map.getLayers().add(mGridOverlay);
+			App.map.layers().add(mGridOverlay);
 		} else {
-			App.map.getLayers().remove(mGridOverlay);
+			App.map.layers().remove(mGridOverlay);
 		}
 
 		mGridEnabled = enable;
@@ -157,7 +157,7 @@ public class MapLayers {
 		if (id == mBackgroundId)
 			return;
 
-		App.map.getLayers().remove(mBackgroundLayer);
+		App.map.layers().remove(mBackgroundLayer);
 		mBackgroundLayer = null;
 
 		switch (id) {
@@ -177,7 +177,7 @@ public class MapLayers {
 		if (mBackgroundLayer instanceof BitmapTileLayer)
 			App.map.setBackgroundMap((BitmapTileLayer) mBackgroundLayer);
 		else
-			App.map.getLayers().add(1, mBackroundPlaceholder);
+			App.map.layers().add(1, mBackroundPlaceholder);
 
 		mBackgroundId = id;
 	}
