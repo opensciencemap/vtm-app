@@ -107,7 +107,7 @@ public class POISearch {
 			if (mTag == null || mTag.equals("")) {
 				return null;
 			}
-			BoundingBox bb = App.map.viewport().getViewBox();
+			BoundingBox bb = App.map.viewport().getBBox();
 
 			if (mTag.equals(TAG_WIKIPEDIA)) {
 				GeoNamesPOIProvider poiProvider = new GeoNamesPOIProvider("mkergall");
