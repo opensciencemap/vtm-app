@@ -31,7 +31,7 @@ import org.oscim.renderer.LayerRenderer;
 import org.oscim.renderer.MapRenderer;
 import org.oscim.renderer.MapRenderer.Matrices;
 import org.oscim.utils.FastMath;
-import org.oscim.utils.Interpolation;
+import org.oscim.utils.math.Interpolation;
 
 import android.os.SystemClock;
 
