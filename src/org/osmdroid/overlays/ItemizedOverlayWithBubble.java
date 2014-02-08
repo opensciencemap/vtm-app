@@ -7,7 +7,7 @@ import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.Point;
 import org.oscim.event.MotionEvent;
-import org.oscim.layers.marker.ItemizedIconLayer;
+import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.map.Map;
@@ -27,8 +27,8 @@ import android.util.Log;
  * @param <Item>
  *            ...
  */
-public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends ItemizedIconLayer<Item>
-        implements ItemizedIconLayer.OnItemGestureListener<Item>, Map.UpdateListener
+public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends ItemizedLayer<Item>
+        implements ItemizedLayer.OnItemGestureListener<Item>, Map.UpdateListener
 {
 
 	/* only one for all items of this overlay => one at a time */
