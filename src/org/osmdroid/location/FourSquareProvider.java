@@ -49,7 +49,7 @@ public class FourSquareProvider implements POIProvider {
 	//			(HashMap<String,Bitmap>)Collections.synchronizedMap(new HashMap<String, Bitmap>());
 
 	/**
-	 * @param apiKey
+	 * @param clientSecret
 	 *            the registered API key to give to Flickr service.
 	 * @see "http://www.flickr.com/help/api/"
 	 */

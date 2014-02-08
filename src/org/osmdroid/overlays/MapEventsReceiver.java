@@ -6,7 +6,6 @@ import org.oscim.core.GeoPoint;
  * Interface for objects that need to handle map events thrown by a
  * MapEventsOverlay.
  * 
- * @see MapEventsOverlay
  * @author M.Kergall
  */
 public interface MapEventsReceiver {
@@ -28,7 +27,7 @@ public interface MapEventsReceiver {
 	boolean longPressHelper(GeoPoint p);
 
 	/**
-	 * @param p1, p2
+	 * @param p1 p2
 	 *            the position where the event occurred for 2 finger.
 	 * @return true if the event has been "consumed" and should not be handled
 	 *         by other objects.

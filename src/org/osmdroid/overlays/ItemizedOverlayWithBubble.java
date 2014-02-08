@@ -31,21 +31,18 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
         implements ItemizedIconLayer.OnItemGestureListener<Item>, Map.UpdateListener
 {
 
-	protected List<Item> mItemsList;
-
-	// only one for all items of this overlay => one at a time
+	/* only one for all items of this overlay => one at a time */
 	protected InfoWindow mBubble;
 
-	// the item currently showing the bubble. Null if none.
+	/* the item currently showing the bubble. Null if none. */
 	protected MarkerItem mItemWithBubble;
 
 	static int layoutResId = 0;
 
 	public ItemizedOverlayWithBubble(Map map, Context context, MarkerSymbol marker,
-	        List<Item> aList, InfoWindow bubble) {
-		super(map, aList, marker, null);
+	        List<Item> list, InfoWindow bubble) {
+		super(map, list, marker, null);
 
-		mItemsList = aList;
 		if (bubble != null) {
 			mBubble = bubble;
 		} else {
@@ -123,12 +120,10 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 	 * 
 	 * @param index
 	 *            of the overlay item to show
-	 * @param map
-	 *            ...
 	 */
 	@SuppressWarnings("unchecked")
 	public void showBubbleOnItem(int index) {
-		ExtendedMarkerItem item = (ExtendedMarkerItem) (getItem(index));
+		ExtendedMarkerItem item = (ExtendedMarkerItem) (mItemList.get(index));
 		mItemWithBubble = item;
 		if (item != null) {
 			item.showBubble(mBubble, (Map) mMap);
@@ -174,7 +169,7 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 		if (item == null)
 			return -1;
 
-		return mItemsList.indexOf(item);
+		return mItemList.indexOf(item);
 	}
 
 	@Override

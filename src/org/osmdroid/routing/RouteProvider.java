@@ -52,12 +52,6 @@ public abstract class RouteProvider {
 	/**
 	 * Builds an overlay for the route shape with a default (and nice!) color.
 	 * 
-	 * @param map
-	 *            ..
-	 * @param route
-	 *            ..
-	 * @param context
-	 *            ..
 	 * @return route shape overlay
 	 */
 	public static PathLayer buildRouteOverlay(Map map, Route route) {
