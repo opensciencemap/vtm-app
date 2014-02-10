@@ -21,7 +21,6 @@ import java.util.List;
 import org.oscim.android.canvas.AndroidGraphics;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
-import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerItem.HotspotPlace;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.map.Map;
@@ -216,7 +215,6 @@ public class POISearch {
 			}
 
 			poiMarker.setMarker(marker);
-			poiMarker.setMarkerHotspot(MarkerItem.HotspotPlace.CENTER);
 			//thumbnail loading moved in POIInfoWindow.onOpen for better performances.
 			poiMarker.setRelatedObject(poi);
 			poiMarkers.addItem(poiMarker);

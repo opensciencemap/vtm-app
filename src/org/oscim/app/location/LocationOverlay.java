@@ -153,7 +153,7 @@ public class LocationOverlay extends Layer {
 
 			// clamp location to a position that can be
 			// savely translated to screen coordinates
-			mapPosition.getBBox(mBBox);
+			mapPosition.getBBox(mBBox, 0);
 
 			double x = mLocation.x;
 			double y = mLocation.y;

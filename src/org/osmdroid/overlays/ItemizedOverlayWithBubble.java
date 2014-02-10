@@ -128,7 +128,7 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 		if (item != null) {
 			item.showBubble(mBubble, (Map) mMap);
 
-			mMap.animator().animateTo(item.mGeoPoint);
+			mMap.animator().animateTo(item.geoPoint);
 
 			mMap.updateMap(true);
 			setFocus((Item) item);
