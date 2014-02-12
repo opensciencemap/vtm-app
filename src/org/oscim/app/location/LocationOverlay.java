@@ -52,7 +52,7 @@ public class LocationOverlay extends Layer {
 	public void setPosition(double latitude, double longitude, double accuracy) {
 		mLocation.x = MercatorProjection.longitudeToX(longitude);
 		mLocation.y = MercatorProjection.latitudeToY(latitude);
-		mRadius = accuracy / MercatorProjection.calculateGroundResolution(latitude, 1);
+		mRadius = accuracy / MercatorProjection.groundResolution(latitude, 1);
 		((LocationIndicator) mRenderer).animate(true);
 	}
 
