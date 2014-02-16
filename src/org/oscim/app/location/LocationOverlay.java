@@ -18,18 +18,16 @@ package org.oscim.app.location;
 
 import org.oscim.backend.GL20;
 import org.oscim.core.Box;
-import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.Point;
 import org.oscim.core.Tile;
 import org.oscim.layers.Layer;
 import org.oscim.map.Map;
-import org.oscim.map.Viewport;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLUtils;
+import org.oscim.renderer.GLViewport;
 import org.oscim.renderer.LayerRenderer;
 import org.oscim.renderer.MapRenderer;
-import org.oscim.renderer.MapRenderer.Matrices;
 import org.oscim.utils.FastMath;
 import org.oscim.utils.math.Interpolation;
 
@@ -129,7 +127,7 @@ public class LocationOverlay extends Layer {
 		}
 
 		@Override
-		public void update(MapPosition curPos, boolean changed, Matrices matrices) {
+		public void update(GLViewport v) {
 
 			if (!mInitialized) {
 				init();
@@ -141,7 +139,7 @@ public class LocationOverlay extends Layer {
 				return;
 			}
 
-			if (!changed && isReady())
+			if (!v.changed() && isReady())
 				return;
 
 			setReady(true);
@@ -149,11 +147,9 @@ public class LocationOverlay extends Layer {
 			int width = mMap.getWidth();
 			int height = mMap.getHeight();
 
-			Viewport mapPosition = mMap.viewport();
-
 			// clamp location to a position that can be
 			// savely translated to screen coordinates
-			mapPosition.getBBox(mBBox, 0);
+			v.getBBox(mBBox, 0);
 
 			double x = mLocation.x;
 			double y = mLocation.y;
@@ -165,7 +161,7 @@ public class LocationOverlay extends Layer {
 
 			// get position of Location in pixel relative to
 			// screen center
-			mapPosition.toScreenPoint(x, y, mScreenPoint);
+			v.toScreenPoint(x, y, mScreenPoint);
 
 			x = mScreenPoint.x + width / 2;
 			y = mScreenPoint.y + height / 2;
@@ -190,11 +186,11 @@ public class LocationOverlay extends Layer {
 			mLocationIsVisible = (visible == 2);
 
 			// set location indicator position
-			mapPosition.fromScreenPoint(x, y, mIndicatorPosition);
+			v.fromScreenPoint(x, y, mIndicatorPosition);
 		}
 
 		@Override
-		public void render(MapPosition pos, Matrices m) {
+		public void render(GLViewport v) {
 
 			GLState.useProgram(mShaderProgram);
 			GLState.blend(true);
@@ -210,21 +206,21 @@ public class LocationOverlay extends Layer {
 			if (!mLocationIsVisible /* || pos.zoomLevel < SHOW_ACCURACY_ZOOM */) {
 				//animate(true);
 			} else {
-				if (pos.zoomLevel >= SHOW_ACCURACY_ZOOM)
-					radius = (float) (mRadius * pos.scale);
+				if (v.pos.zoomLevel >= SHOW_ACCURACY_ZOOM)
+					radius = (float) (mRadius * v.pos.scale);
 
 				viewShed = true;
 				//animate(false);
 			}
 			GL.glUniform1f(hScale, radius);
 
-			double x = mIndicatorPosition.x - pos.x;
-			double y = mIndicatorPosition.y - pos.y;
-			double tileScale = Tile.SIZE * pos.scale;
+			double x = mIndicatorPosition.x - v.pos.x;
+			double y = mIndicatorPosition.y - v.pos.y;
+			double tileScale = Tile.SIZE * v.pos.scale;
 
-			m.mvp.setTransScale((float) (x * tileScale), (float) (y * tileScale), 1);
-			m.mvp.multiplyMM(m.viewproj, m.mvp);
-			m.mvp.setAsUniform(hMatrixPosition);
+			v.mvp.setTransScale((float) (x * tileScale), (float) (y * tileScale), 1);
+			v.mvp.multiplyMM(v.viewproj, v.mvp);
+			v.mvp.setAsUniform(hMatrixPosition);
 
 			if (!viewShed) {
 				float phase = Math.abs(animPhase() - 0.5f) * 2;
