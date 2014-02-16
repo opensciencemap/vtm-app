@@ -64,7 +64,7 @@ public class Compass extends Layer implements SensorEventListener, Map.UpdateLis
 	@Override
 	public void onMapUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
 		if (!mControlOrientation) {
-			float rotation = -mapPosition.angle;
+			float rotation = -mapPosition.bearing;
 			adjustArrow(rotation, rotation);
 		}
 	}
