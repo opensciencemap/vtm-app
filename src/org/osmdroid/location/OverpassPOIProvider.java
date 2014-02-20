@@ -38,7 +38,7 @@ public class OverpassPOIProvider implements POIProvider {
 		}
 		log.debug("request " + url + encoded);
 		connection.doGet(url + encoded);
-		OSMData osmData = OsmPbfReader.process(connection.getStream());
+		OsmData osmData = OsmPbfReader.process(connection.getStream());
 		ArrayList<POI> pois = new ArrayList<POI>(osmData.getNodes().size());
 
 		for (OSMNode n : osmData.getNodes()) {
