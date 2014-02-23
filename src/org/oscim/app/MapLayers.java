@@ -8,7 +8,8 @@ import org.oscim.layers.tile.BitmapTileLayer;
 import org.oscim.layers.tile.vector.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
-import org.oscim.theme.InternalRenderTheme;
+import org.oscim.theme.ThemeFile;
+import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.ITileCache;
 import org.oscim.tiling.TileSource;
 import org.oscim.tiling.source.UrlTileSource;
@@ -109,13 +110,13 @@ public class MapLayers {
 	void setPreferences(SharedPreferences preferences) {
 		setBaseMap(preferences);
 
-		InternalRenderTheme theme = InternalRenderTheme.DEFAULT;
+		ThemeFile theme = VtmThemes.DEFAULT;
 		if (preferences.contains("theme")) {
 			String name = preferences.getString("theme", "DEFAULT");
 			try {
-				theme = InternalRenderTheme.valueOf(name);
+				theme = VtmThemes.valueOf(name);
 			} catch (IllegalArgumentException e) {
-				theme = InternalRenderTheme.DEFAULT;
+				theme = VtmThemes.DEFAULT;
 			}
 		}
 
