@@ -2,3 +2,9 @@ bin/*
 gen/*
 assets/patterns/*
 assets/styles/*
+assets/textures/*
+
+# eclipse
+.classpath
+.project
+.settings
