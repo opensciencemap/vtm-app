@@ -58,8 +58,7 @@ public class FlickrPOIProvider implements POIProvider {
 		return url.toString();
 	}
 
-	/*
-	 * public POI getPhoto(String photoId){ String url =
+	/* public POI getPhoto(String photoId){ String url =
 	 * "http://api.flickr.com/services/rest/?method=flickr.photos.getInfo"
 	 * +
 	 * "&api_key=" + mApiKey + "&photo_id=" + photo Id +
@@ -93,8 +92,7 @@ public class FlickrPOIProvider implements POIProvider {
 	 * +server+"/"+photoId+"_"+secret+"_s.jpg"; poi.mUrl =
 	 * "http://www.flickr.com/photos/"+nsid+"/"+photoId; return poi;
 	 * }catch
-	 * (JSONException e) { e.printStackTrace(); return null; } }
-	 */
+	 * (JSONException e) { e.printStackTrace(); return null; } } */
 
 	/**
 	 * @param fullUrl

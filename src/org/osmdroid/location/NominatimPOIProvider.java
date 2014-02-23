@@ -25,15 +25,13 @@ public class NominatimPOIProvider implements POIProvider {
 
 	final static Logger log = LoggerFactory.getLogger(NominatimPOIProvider.class);
 
-	/*
-	 * As the doc lacks a lot of features, source code may help:
+	/* As the doc lacks a lot of features, source code may help:
 	 * https://trac.openstreetmap
 	 * .org/browser/applications/utils/nominatim/website/search.php featuretype=
 	 * to select on feature type (country, city, state, settlement)<br>
 	 * format=jsonv2 to get a place_rank<br> offset= to offset the result ?...
 	 * <br> polygon=1 to get the border of the poi as a polygon<br> nearlat &
-	 * nearlon = ???<br> routewidth/69 and routewidth/30 ???<br>
-	 */
+	 * nearlon = ???<br> routewidth/69 and routewidth/30 ???<br> */
 	public static final String MAPQUEST_POI_SERVICE = "http://open.mapquestapi.com/nominatim/v1/";
 	public static final String NOMINATIM_POI_SERVICE = "http://nominatim.openstreetmap.org/";
 	protected String mService;

@@ -93,12 +93,10 @@ public class GeoNamesPOIProvider {
 				poi.type = jPlace.getString("title");
 				poi.description = jPlace.optString("summary");
 				poi.thumbnailPath = jPlace.optString("thumbnailImg", null);
-				/*
-				 * This makes loading too long. Thumbnail loading will be done
+				/* This makes loading too long. Thumbnail loading will be done
 				 * only when needed, with POI.getThumbnail() if
 				 * (poi.mThumbnailPath != null){ poi.mThumbnail =
-				 * BonusPackHelper.loadBitmap(poi.mThumbnailPath); }
-				 */
+				 * BonusPackHelper.loadBitmap(poi.mThumbnailPath); } */
 				poi.url = jPlace.optString("wikipediaUrl", null);
 				if (poi.url != null)
 					poi.url = "http://" + poi.url;

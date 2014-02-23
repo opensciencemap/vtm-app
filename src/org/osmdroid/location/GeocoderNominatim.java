@@ -126,13 +126,11 @@ public class GeocoderNominatim {
 		if (jAddress.has("country_code"))
 			gAddress.setCountryCode(jAddress.getString("country_code"));
 
-		/*
-		 * Other possible OSM tags in Nominatim results not handled yet: subway,
+		/* Other possible OSM tags in Nominatim results not handled yet: subway,
 		 * golf_course, bus_stop, parking,... house, house_number, building
 		 * city_district (13e Arrondissement) road => or highway, ... sub-city
 		 * (like suburb) => locality, isolated_dwelling, hamlet ...
-		 * state_district
-		 */
+		 * state_district */
 
 		return gAddress;
 	}

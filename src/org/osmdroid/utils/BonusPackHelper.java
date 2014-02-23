@@ -90,11 +90,9 @@ public class BonusPackHelper {
 			InputStream is = (InputStream) new URL(url).getContent();
 			bitmap = BitmapFactory.decodeStream(new FlushedInputStream(is));
 			//Alternative providing better handling on loading errors?
-			/*
-			 * Drawable d = Drawable.createFromStream(new
+			/* Drawable d = Drawable.createFromStream(new
 			 * FlushedInputStream(is), null); if (is != null) is.close(); if (d
-			 * != null) bitmap = ((BitmapDrawable)d).getBitmap();
-			 */
+			 * != null) bitmap = ((BitmapDrawable)d).getBitmap(); */
 		} catch (FileNotFoundException e) {
 			//log.debug("image not available: " + url);
 		} catch (Exception e) {

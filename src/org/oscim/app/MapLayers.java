@@ -9,11 +9,11 @@ import org.oscim.layers.tile.vector.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.theme.InternalRenderTheme;
-import org.oscim.tiling.source.ITileCache;
-import org.oscim.tiling.source.TileSource;
+import org.oscim.tiling.ITileCache;
+import org.oscim.tiling.TileSource;
+import org.oscim.tiling.source.UrlTileSource;
 import org.oscim.tiling.source.bitmap.DefaultSources.ImagicoLandcover;
 import org.oscim.tiling.source.bitmap.DefaultSources.NaturalEarth;
-import org.oscim.tiling.source.common.UrlTileSource;
 import org.oscim.tiling.source.mapfile.MapFileTileSource;
 import org.oscim.tiling.source.mapnik.MapnikVectorTileSource;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
@@ -38,23 +38,20 @@ public class MapLayers {
 		abstract TileSource init();
 	}
 
-	static Config[] configs = new Config[] {
-	        new Config("OPENSCIENCEMAP4") {
-		        TileSource init() {
-			        return new OSciMap4TileSource();
-		        }
-	        },
-	        new Config("MAPSFORGE") {
-		        TileSource init() {
-			        return new MapFileTileSource()
-			            .setOption("file", "/storage/sdcard0/germany.map");
-		        }
-	        },
-	        new Config("MAPNIK_VECTOR") {
-		        TileSource init() {
-			        return new MapnikVectorTileSource();
-		        }
-	        } };
+	static Config[] configs = new Config[] { new Config("OPENSCIENCEMAP4") {
+		TileSource init() {
+			return new OSciMap4TileSource();
+		}
+	}, new Config("MAPSFORGE") {
+		TileSource init() {
+			return new MapFileTileSource().setOption("file",
+			                                         "/storage/sdcard0/germany.map");
+		}
+	}, new Config("MAPNIK_VECTOR") {
+		TileSource init() {
+			return new MapnikVectorTileSource();
+		}
+	} };
 
 	private VectorTileLayer mBaseLayer;
 	private String mMapDatabase;
@@ -162,8 +159,10 @@ public class MapLayers {
 
 		switch (id) {
 			case R.id.menu_layer_mapquest:
-				//mBackgroundLayer = new BitmapTileLayer(App.map, new MapQuestAerial());
-				mBackgroundLayer = new BitmapTileLayer(App.map, new ImagicoLandcover());
+				// mBackgroundLayer = new BitmapTileLayer(App.map, new
+				// MapQuestAerial());
+				mBackgroundLayer = new BitmapTileLayer(App.map,
+				                                       new ImagicoLandcover());
 				break;
 
 			case R.id.menu_layer_naturalearth:

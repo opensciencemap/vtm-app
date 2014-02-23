@@ -16,7 +16,7 @@ package org.oscim.app.filefilter;
 
 import java.io.FileFilter;
 
-import org.oscim.tiling.source.TileSource.OpenResult;
+import org.oscim.tiling.TileSource.OpenResult;
 
 /**
  * An extension of the {@link FileFilter} interface.

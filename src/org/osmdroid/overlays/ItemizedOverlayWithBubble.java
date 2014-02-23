@@ -6,6 +6,7 @@ import org.oscim.app.App;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.Point;
+import org.oscim.event.Event;
 import org.oscim.event.MotionEvent;
 import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
@@ -27,9 +28,9 @@ import android.util.Log;
  * @param <Item>
  *            ...
  */
-public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends ItemizedLayer<Item>
-        implements ItemizedLayer.OnItemGestureListener<Item>, Map.UpdateListener
-{
+public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends
+        ItemizedLayer<Item> implements
+        ItemizedLayer.OnItemGestureListener<Item>, Map.UpdateListener {
 
 	/* only one for all items of this overlay => one at a time */
 	protected InfoWindow mBubble;
@@ -39,8 +40,8 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 
 	static int layoutResId = 0;
 
-	public ItemizedOverlayWithBubble(Map map, Context context, MarkerSymbol marker,
-	        List<Item> list, InfoWindow bubble) {
+	public ItemizedOverlayWithBubble(Map map, Context context,
+	        MarkerSymbol marker, List<Item> list, InfoWindow bubble) {
 		super(map, list, marker, null);
 
 		if (bubble != null) {
@@ -50,7 +51,8 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 			String packageName = context.getPackageName();
 			if (layoutResId == 0) {
 				layoutResId = context.getResources().getIdentifier(
-				                                                   "layout/bonuspack_bubble", null,
+				                                                   "layout/bonuspack_bubble",
+				                                                   null,
 				                                                   packageName);
 				if (layoutResId == 0)
 					Log.e(BonusPackHelper.LOG_TAG,
@@ -64,8 +66,8 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 		mOnItemGestureListener = this;
 	}
 
-	public ItemizedOverlayWithBubble(Map map, Context context, MarkerSymbol marker,
-	        List<Item> aList) {
+	public ItemizedOverlayWithBubble(Map map, Context context,
+	        MarkerSymbol marker, List<Item> aList) {
 		this(map, context, marker, aList, null);
 	}
 
@@ -98,7 +100,7 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 	}
 
 	@Override
-	public void onMapUpdate(MapPosition mapPosition, boolean changed, boolean clear) {
+	public void onMapEvent(Event e, MapPosition mapPosition) {
 		if (mBubble.isOpen()) {
 			GeoPoint gp = mItemWithBubble.getPoint();
 
@@ -141,19 +143,19 @@ public class ItemizedOverlayWithBubble<Item extends MarkerItem> extends Itemized
 		mItemWithBubble = null;
 	}
 
-	//	@Override
-	//	public boolean onSingleTapUp(final MotionEvent event) {
-	//		boolean handled = super.onSingleTapUp(event);
-	//		if (!handled)
-	//			hideBubble();
-	//		return handled;
-	//	}
+	// @Override
+	// public boolean onSingleTapUp(final MotionEvent event) {
+	// boolean handled = super.onSingleTapUp(event);
+	// if (!handled)
+	// hideBubble();
+	// return handled;
+	// }
 	//
-	//	@Override
-	//	protected boolean onSingleTapUpHelper(final int index, final Item item) {
-	//		showBubbleOnItem(index);
-	//		return true;
-	//	}
+	// @Override
+	// protected boolean onSingleTapUpHelper(final int index, final Item item) {
+	// showBubbleOnItem(index);
+	// return true;
+	// }
 
 	/** @return the item currenty showing the bubble, or null if none. */
 	public MarkerItem getBubbledItem() {

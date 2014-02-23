@@ -20,6 +20,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.oscim.core.GeoPoint;
+import org.oscim.event.Event;
 import org.oscim.event.Gesture;
 import org.oscim.event.GestureListener;
 import org.oscim.event.MotionEvent;
@@ -27,7 +28,8 @@ import org.oscim.layers.Layer;
 import org.oscim.map.Map;
 import org.osmdroid.overlays.MapEventsReceiver;
 
-public class DistanceTouchOverlay extends Layer implements Map.InputListener, GestureListener {
+public class DistanceTouchOverlay extends Layer implements Map.InputListener,
+        GestureListener {
 
 	private static final int LONGPRESS_THRESHOLD = 800;
 
@@ -36,9 +38,9 @@ public class DistanceTouchOverlay extends Layer implements Map.InputListener, Ge
 	private float mPrevX1, mPrevX2, mPrevY1, mPrevY2;
 	private float mCurX1, mCurX2, mCurY1, mCurY2;
 
-	//private final static int POINTER_UP = -1;
-	//private int mPointer1 = POINTER_UP;
-	//private int mPointer2 = POINTER_UP;
+	// private final static int POINTER_UP = -1;
+	// private int mPointer1 = POINTER_UP;
+	// private int mPointer2 = POINTER_UP;
 
 	private final MapEventsReceiver mReceiver;
 
@@ -68,7 +70,7 @@ public class DistanceTouchOverlay extends Layer implements Map.InputListener, Ge
 	}
 
 	@Override
-	public void onMotionEvent(MotionEvent e) {
+	public void onInputEvent(Event event, MotionEvent e) {
 
 		int action = e.getAction() & MotionEvent.ACTION_MASK;
 
@@ -80,8 +82,8 @@ public class DistanceTouchOverlay extends Layer implements Map.InputListener, Ge
 		if (mLongpressTimer != null) {
 			// any pointer up while long press detection
 			// cancels timer
-			if (action == MotionEvent.ACTION_POINTER_UP ||
-			        action == MotionEvent.ACTION_UP) {
+			if (action == MotionEvent.ACTION_POINTER_UP
+			        || action == MotionEvent.ACTION_UP) {
 
 				cancel();
 				return;
@@ -91,8 +93,8 @@ public class DistanceTouchOverlay extends Layer implements Map.InputListener, Ge
 			// one above.
 			if (action == MotionEvent.ACTION_MOVE) {
 				// update pointer positions
-				//int idx1 = e.findPointerIndex(mPointer1);
-				//int idx2 = e.findPointerIndex(mPointer2);
+				// int idx1 = e.findPointerIndex(mPointer1);
+				// int idx2 = e.findPointerIndex(mPointer2);
 
 				mCurX1 = e.getX(0);
 				mCurY1 = e.getY(0);
@@ -101,14 +103,14 @@ public class DistanceTouchOverlay extends Layer implements Map.InputListener, Ge
 
 				// cancel if moved one finger more than 50 pixel
 				float maxSq = 10 * 10;
-				float d = (mCurX1 - mPrevX1) * (mCurX1 - mPrevX1) +
-				        (mCurY1 - mPrevY1) * (mCurY1 - mPrevY1);
+				float d = (mCurX1 - mPrevX1) * (mCurX1 - mPrevX1)
+				        + (mCurY1 - mPrevY1) * (mCurY1 - mPrevY1);
 				if (d > maxSq) {
 					cancel();
 					return;
 				}
-				d = (mCurX2 - mPrevX2) * (mCurX2 - mPrevX2) +
-				        (mCurY2 - mPrevY2) * (mCurY2 - mPrevY2);
+				d = (mCurX2 - mPrevX2) * (mCurX2 - mPrevX2)
+				        + (mCurY2 - mPrevY2) * (mCurY2 - mPrevY2);
 				if (d > maxSq) {
 					cancel();
 					return;
@@ -118,14 +120,14 @@ public class DistanceTouchOverlay extends Layer implements Map.InputListener, Ge
 
 		if ((action == MotionEvent.ACTION_POINTER_DOWN)
 		        && (e.getPointerCount() == 2)) {
-			//App.log.debug("down");
+			// App.log.debug("down");
 
 			// keep track of pointer ids, only
 			// use these for gesture, ignoring
 			// more than two pointer
 
-			//mPointer1 = e.getPointerId(0);
-			//mPointer2 = e.getPointerId(1);
+			// mPointer1 = e.getPointerId(0);
+			// mPointer2 = e.getPointerId(1);
 
 			if (mLongpressTimer == null) {
 				// start timer, keep initial down position
@@ -138,25 +140,27 @@ public class DistanceTouchOverlay extends Layer implements Map.InputListener, Ge
 		}
 	}
 
-	//	@Override
-	//	public boolean onLongPress(MotionEvent e) {
-	//		// dont forward long press when two fingers are down.
-	//		// maybe should be only done if our timer is still running.
-	//		// ... not sure if this is even needed
-	//		GeoPoint p = mMap.getViewport().fromScreenPoint(e.getX(), e.getY());
-	//		return mReceiver.longPressHelper(p);
-	//	}
+	// @Override
+	// public boolean onLongPress(MotionEvent e) {
+	// // dont forward long press when two fingers are down.
+	// // maybe should be only done if our timer is still running.
+	// // ... not sure if this is even needed
+	// GeoPoint p = mMap.getViewport().fromScreenPoint(e.getX(), e.getY());
+	// return mReceiver.longPressHelper(p);
+	// }
 
 	public void runLongpressTimer() {
-		//mMap.postDelayed(action, delay);
+		// mMap.postDelayed(action, delay);
 
 		mLongpressTimer = new Timer();
 		mLongpressTimer.schedule(new TimerTask() {
 
 			@Override
 			public void run() {
-				final GeoPoint p1 = mMap.viewport().fromScreenPoint(mCurX1, mCurY1);
-				final GeoPoint p2 = mMap.viewport().fromScreenPoint(mCurX2, mCurY2);
+				final GeoPoint p1 = mMap.viewport().fromScreenPoint(mCurX1,
+				                                                    mCurY1);
+				final GeoPoint p2 = mMap.viewport().fromScreenPoint(mCurX2,
+				                                                    mCurY2);
 
 				mMap.post(new Runnable() {
 					@Override
