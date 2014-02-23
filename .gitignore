@@ -1,5 +1,6 @@
-bin/*
-gen/*
+bin/
+gen/
+build/
 assets/patterns/*
 assets/styles/*
 assets/textures/*
