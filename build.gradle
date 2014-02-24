@@ -33,6 +33,12 @@ android {
     release.setRoot('build-types/release')
   }
 
+  // remove duplicates
+  packagingOptions {
+    exclude 'META-INF/LICENSE'
+    exclude 'META-INF/NOTICE'
+  }
+
   // ignore deprecated
   lintOptions.abortOnError false
 }
