@@ -9,3 +9,7 @@ assets/textures/*
 .classpath
 .project
 .settings
+
+# idea
+*.iml
+
