@@ -23,8 +23,8 @@ import org.oscim.core.Point;
 import org.oscim.core.Tile;
 import org.oscim.layers.Layer;
 import org.oscim.map.Map;
+import org.oscim.renderer.GLShader;
 import org.oscim.renderer.GLState;
-import org.oscim.renderer.GLUtils;
 import org.oscim.renderer.GLViewport;
 import org.oscim.renderer.LayerRenderer;
 import org.oscim.renderer.MapRenderer;
@@ -245,7 +245,7 @@ public class LocationOverlay extends Layer {
 		}
 
 		private boolean init() {
-			int shader = GLUtils.createProgram(vShaderStr, fShaderStr);
+			int shader = GLShader.createProgram(vShaderStr, fShaderStr);
 			if (shader == 0)
 				return false;
 
