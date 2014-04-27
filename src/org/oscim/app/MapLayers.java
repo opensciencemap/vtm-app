@@ -175,7 +175,7 @@ public class MapLayers {
 		}
 
 		if (mBackgroundLayer instanceof BitmapTileLayer)
-			App.map.setBackgroundMap((BitmapTileLayer) mBackgroundLayer);
+			App.map.setBaseMap((BitmapTileLayer) mBackgroundLayer);
 		else
 			App.map.layers().add(1, mBackroundPlaceholder);
 
