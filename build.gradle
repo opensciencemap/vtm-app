@@ -8,6 +8,10 @@ buildscript {
   }
 }
 
+repositories {
+  maven { url "${System.env.ANDROID_HOME}/extras/android/m2repository" }
+}
+
 apply plugin: 'android'
 
 dependencies {
@@ -18,7 +22,7 @@ dependencies {
 
 android {
   compileSdkVersion 19
-  buildToolsVersion '19.0.1'
+  buildToolsVersion '19.0.3'
 
   sourceSets {
     main {
